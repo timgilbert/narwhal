@@ -40,8 +40,8 @@ defmodule Ui.Mixfile do
       {:cowboy, "~> 1.0"},
       {:elixir_ale, "~> 1.0"},
       # {:color_utils, "0.2.0"}
-      # {:color_utils, git: "https://github.com/timgilbert/color_utils", branch: "fix-rgb-to-hex"}
-      {:color_utils, path: "../../color_utils"}
+      {:color_utils, git: "https://github.com/timgilbert/color_utils", branch: "fix-rgb-to-hex"}
+      # {:color_utils, path: "../../color_utils"}
     ]
   end
 end

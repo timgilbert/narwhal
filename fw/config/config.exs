@@ -1,4 +1,4 @@
-# This file is responsible for configuring your application
+ # This file is responsible for configuring your application
 # and its dependencies with the aid of the Mix.Config module.
 #
 # This configuration file is loaded before any dependency and
@@ -26,8 +26,15 @@ config :nerves_network,
   regulatory_domain: "US"
 
 # https://github.com/nerves-project/nerves_network#wired-networking
+# https://github.com/nerves-project/nerves_examples/tree/master/hello_network#how-to-use-the-wifi-interface
+key_mgmt = System.get_env("NERVES_NETWORK_KEY_MGMT") || "WPA-PSK"
 config :nerves_network, :default,
-  eth0: [
+  wlan0: [
+    ssid: System.get_env("NERVES_NETWORK_SSID"),
+    psk: System.get_env("NERVES_NETWORK_PSK"),
+    key_mgmt: String.to_atom(key_mgmt)
+  ],
+eth0: [
     ipv4_address_method: :dhcp
     #ipv4_address: "10.0.0.30", ipv4_subnet_mask: "255.255.255.0",
     #nameservers: ["8.8.8.8", "8.8.4.4"]
