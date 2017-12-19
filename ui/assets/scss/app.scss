@@ -1,11 +1,11 @@
 /* This file is for your main application css. */
 
 @import "node_modules/bulma/bulma";
+@import 'node_modules/font-awesome/scss/font-awesome';
 
 .narwhal-grid-table {
   border-spacing: 5px;
 }
-
 
 .narwhal-grid-table td,
 .narwhal-grid-table th {
