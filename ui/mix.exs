@@ -37,7 +37,11 @@ defmodule Ui.Mixfile do
       {:phoenix_html, "~> 2.10"},
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:gettext, "~> 0.11"},
-      {:cowboy, "~> 1.0"}
+      {:cowboy, "~> 1.0"},
+      {:elixir_ale, "~> 1.0"},
+      # {:color_utils, "0.2.0"}
+      # {:color_utils, git: "https://github.com/timgilbert/color_utils", branch: "fix-rgb-to-hex"}
+      {:color_utils, path: "../../color_utils"}
     ]
   end
 end
