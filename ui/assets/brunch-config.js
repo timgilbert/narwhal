@@ -16,22 +16,13 @@ exports.config = {
     // This option sets where we should place non-css and non-js assets in.
     // By default, we set this to "/assets/static". Files in this directory
     // will be copied to `paths.public`, which is "priv/static" by default.
-    assets: [
-      /^(static)/,
-      // http://cloudless.studio/articles/4-installing-font-awesome-from-npm-in-phoenix
-      /^(node_modules\/font-awesome)/
-    ]
+    assets: /^(static)/
   },
 
   // Phoenix paths configuration
   paths: {
     // Dependencies and current project directories to watch
-    watched: ["static", "css", "scss", "js", "vendor",
-              'node_modules/font-awesome/fonts/fontawesome-webfont.eot',
-              'node_modules/font-awesome/fonts/fontawesome-webfont.svg',
-              'node_modules/font-awesome/fonts/fontawesome-webfont.ttf',
-              'node_modules/font-awesome/fonts/fontawesome-webfont.woff',
-              'node_modules/font-awesome/fonts/fontawesome-webfont.woff2'],
+    watched: ["static", "css", "scss", "js", "vendor"],
     // Where to compile files to
     public: "../priv/static"
   },
@@ -49,6 +40,12 @@ exports.config = {
           "node_modules/font-awesome/fonts"
         ]
       }
+    },
+    copycat: {
+      fonts: [
+        "node_modules/font-awesome/fonts",
+      ],
+      verbose : true
     }
   },
 
