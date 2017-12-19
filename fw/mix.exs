@@ -51,7 +51,8 @@ defmodule Fw.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   def deps do
-    [{:nerves, "~> 0.7", runtime: false}] ++
+    [{:nerves, "~> 0.7", runtime: false},
+     {:credo, "~> 0.8", only: [:dev, :test], runtime: false}] ++
     deps(@target)
   end
 
