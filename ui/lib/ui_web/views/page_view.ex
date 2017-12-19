@@ -1,6 +1,7 @@
 defmodule UiWeb.PageView do
   use UiWeb, :view
   import ColorUtils
+  import Ui.Grid
   require Logger
 
   def bounds() do
@@ -8,18 +9,13 @@ defmodule UiWeb.PageView do
   end
 
   def get_color(x, y) do
-    rc = %ColorUtils.RGB{red: :rand.uniform(256) - 1, 
+    # hmm
+    # Ui.Grid.get_hex(UiGrid, x, y)
+    rc = %ColorUtils.RGB{red: :rand.uniform(256) - 1,
                          blue: :rand.uniform(256) - 1,
                          green: :rand.uniform(256) - 1}
 
     ColorUtils.rgb_to_hex(rc)
   end
 
-  def grid() do
-    for x <- 1..16 do
-      for y <- 1..16 do
-        x + y
-      end
-    end
-  end
 end
