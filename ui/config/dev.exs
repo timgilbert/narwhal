@@ -34,7 +34,7 @@ config :ui, UiWeb.Endpoint,
 config :ui, UiWeb.Endpoint,
   live_reload: [
     patterns: [
-      ~r{priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$},
+      ~r{priv/static/.*(js|css|png|jpeg|jpg|gif|svg|ico)$},
       ~r{priv/gettext/.*(po)$},
       ~r{lib/ui_web/views/.*(ex)$},
       ~r{lib/ui_web/templates/.*(eex)$}

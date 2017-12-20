@@ -32,7 +32,7 @@ renderCell n =
 
 renderRow : List number -> Html a
 renderRow row = 
-  tr [] List.map renderCell row
+  tr [] ([] ++ List.map renderCell row)
 
 renderRows : List (Html a)
 renderRows = 
