@@ -7,8 +7,9 @@
       <h2 class="subtitle">
         Current state
       </h2>
+      <%= #render "grid.html" %>
+      <div id="elm-target"></div>
     </div>
-    <%= render "grid.html" %>
   </div>
 </section>
 
