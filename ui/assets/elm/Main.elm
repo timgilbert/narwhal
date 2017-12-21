@@ -4,10 +4,12 @@ module Main exposing (..)
 
 import Html exposing (Html, text, div)
 import Html.Attributes exposing (class)
+import Color
 
 import Components.Grid as Grid
 import Components.Messages exposing (Msg(..))
 import Components.Model as CM 
+import Components.Controls as Controls 
 
 -- MODEL
 type alias Model = 
@@ -21,11 +23,13 @@ init =
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
-  let _ = Debug.log "msg" msg in
-  let _ = Debug.log "mod" model in
+  -- let _ = Debug.log "msg" msg in
+  -- let _ = Debug.log "mod" model in
   case msg of
     GridClicked x y ->
-      (model, Cmd.none)
+      ({ model | grid = CM.paint model.grid x y Color.darkYellow}, Cmd.none)
+    FillClicked ->
+      ({ model | grid = CM.fill model.grid Color.blue}, Cmd.none)
 
 
 -- VIEW
@@ -33,7 +37,8 @@ update msg model =
 view : Model -> Html Msg
 view {grid} =
   div [ class "elm-grid" ] [ 
-    Grid.view grid
+    Grid.view grid,
+    Controls.view
   ]
 
 -- SUBSCRIPTIONS

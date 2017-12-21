@@ -1,4 +1,4 @@
-module Components.Model exposing (GridModel, Square, init)
+module Components.Model exposing (GridModel, Square, init, fill, paint)
 
 import Array exposing (Array)
 import Color exposing (Color)
@@ -13,9 +13,17 @@ type alias GridModel =
 defaultBounds : Int
 defaultBounds = 16
 
-makeGrid : Int -> a -> Array (Array(a))
+makeGrid : Int -> a -> Square a
 makeGrid bounds item =
    Array.repeat bounds (Array.repeat bounds item)
+
+setGrid : Square a -> Int -> Int -> a -> Square a
+setGrid square x y item =
+  let row = Array.get y square in
+    case row of
+      Nothing -> square
+      Just r ->
+        Array.set y (Array.set x item r) square
 
 init : Maybe Int -> GridModel
 init sizeParam = 
@@ -30,3 +38,7 @@ init sizeParam =
 fill : GridModel -> Color -> GridModel
 fill model color =
   { model | grid = makeGrid model.bounds color }
+
+paint : GridModel -> Int -> Int -> Color -> GridModel
+paint model x y color =
+  { model | grid = setGrid model.grid x y color }
