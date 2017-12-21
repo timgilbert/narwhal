@@ -1,47 +1,34 @@
 module Components.Grid exposing (view)
 
-import Html exposing (Html, text, table, thead, tfoot, tbody, tr, td)
-import Html.Attributes exposing (class)
+import Html exposing (Html, text, table, thead, tfoot, tbody, tr, td, br)
+import Html.Attributes exposing (class, style, property)
+import Array exposing (Array, toList, indexedMap)
+import Json.Encode exposing (string)
+import Color exposing (Color)
 
+import Color.Convert exposing (colorToHex)
 
-{-
-<table class="narwhal-grid-table">
-  <thead></thead>
-  <tfoot></tfoot>
-  <tbody>
-    <%= for x <- 1..16 do %>
-      <tr class="narwhal-grid-row">
-        <%= for y <- 1..16 do %>
-          <td class="narwhal-grid-cell"
-              style="background-color:<%= get_color(x, y)%>">
-             &nbsp;
-          </td>
-        <% end %>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
--}
+import Components.Model exposing (GridModel)
 
-gridData : List (List number)
-gridData = [ [1, 2, 3], [11, 22, 33], [ 111, 222, 333 ] ]
+renderCell : Int -> Int -> Color -> Html a
+renderCell y x color = 
+  td [ class "narwhal-grid-row"
+     , style [ ("backgroundColor", (colorToHex color)) ] 
+     , property "innerHTML" (string "&nbsp;")]
+     []
 
-renderCell : number -> Html a
-renderCell n = 
-  td [ class "narwhal-grid-row" ] [ text (toString n) ]
+renderRow : Int -> Array Color -> Html a
+renderRow y row = 
+  tr [] (toList (indexedMap (renderCell y) row))
 
-renderRow : List number -> Html a
-renderRow row = 
-  tr [] ([] ++ List.map renderCell row)
+renderRows : GridModel -> List (Html a)
+renderRows model = 
+  toList (indexedMap renderRow model.grid)
 
-renderRows : List (Html a)
-renderRows = 
-  List.map renderRow gridData
-
-view : Html a
-view =
+view : GridModel -> Html a
+view model =
   table [ class "narwhal-grid-table" ] [
     thead [] [],
     tfoot [] [],
-    tbody [] renderRows
+    tbody [] (renderRows model)
   ]
