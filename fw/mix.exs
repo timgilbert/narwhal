@@ -62,7 +62,7 @@ defmodule Fw.Mixfile do
     [
       {:bootloader, "~> 0.1.3"},
       {:nerves_runtime, "~> 0.5.1"},
-      {:nerves_network, "~> 0.3.4"},
+      {:nerves_init_gadget, "~> 0.2"},
       {:ui, path: "../ui"}
     ] ++ system(target)
   end

@@ -17,7 +17,7 @@ use Mix.Config
 # docs for separating out critical OTP applications such as those
 # involved with firmware updates.
 config :bootloader,
-  init: [:nerves_runtime, :nerves_network],
+  init: [:nerves_runtime, :nerves_init_gadget],
   app: Mix.Project.config[:app]
 
 # https://hexdocs.pm/nerves/user-interfaces.html#configure-networking
@@ -34,11 +34,23 @@ config :nerves_network, :default,
     psk: System.get_env("NERVES_NETWORK_PSK"),
     key_mgmt: String.to_atom(key_mgmt)
   ],
-eth0: [
+  eth0: [
     ipv4_address_method: :dhcp
     #ipv4_address: "10.0.0.30", ipv4_subnet_mask: "255.255.255.0",
     #nameservers: ["8.8.8.8", "8.8.4.4"]
   ]
+
+config :nerves_firmware_ssh,
+  authorized_keys: [
+    File.read!(Path.join(System.user_home!, ".ssh/id_rsa.pub"))
+  ]
+
+config :nerves_init_gadget,
+  ifname: "wlan0",
+  address_method: :dhcp,
+  mdns_domain: "narwhat.local",
+  node_name: "narwhal",
+  node_host: :mdns_domain
 
 config :ui, UiWeb.Endpoint,
   url: [host: "10.0.0.30"],
