@@ -29,4 +29,4 @@ init sizeParam =
 
 fill : GridModel -> Color -> GridModel
 fill model color =
-  { model | grid = (makeGrid model.bounds color ) }
+  { model | grid = makeGrid model.bounds color }

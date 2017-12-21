@@ -50,7 +50,8 @@ exports.config = {
     elmBrunch: {
       elmFolder: 'elm',
       mainModules: ['Main.elm'],
-      outputFolder: '../js'
+      outputFolder: '../js',
+      onlyChanged: true
     }
   },
 

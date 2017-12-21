@@ -6,10 +6,10 @@ import Html exposing (Html, text, div)
 import Html.Attributes exposing (class)
 
 import Components.Grid as Grid
-import Components.Model as CM
+import Components.Messages exposing (Msg(..))
+import Components.Model as CM 
 
 -- MODEL
-
 type alias Model = 
   { grid : CM.GridModel }
 
@@ -19,11 +19,13 @@ init =
 
 -- UPDATE
 
-type Msg = Submit
-
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
-  (model, Cmd.none)
+  let _ = Debug.log "msg" msg in
+  let _ = Debug.log "mod" model in
+  case msg of
+    GridClicked x y ->
+      (model, Cmd.none)
 
 
 -- VIEW
