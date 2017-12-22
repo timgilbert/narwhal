@@ -48,7 +48,7 @@ config :nerves_firmware_ssh,
 config :nerves_init_gadget,
   ifname: "wlan0",
   address_method: :dhcp,
-  mdns_domain: "narwhat.local",
+  mdns_domain: "narwhal.local",
   node_name: "narwhal",
   node_host: :mdns_domain
 
