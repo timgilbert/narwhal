@@ -38,7 +38,7 @@ view : Model -> Html Msg
 view {grid} =
   div [ class "elm-grid" ] [ 
     Grid.view grid,
-    Controls.view
+    Controls.view grid
   ]
 
 -- SUBSCRIPTIONS

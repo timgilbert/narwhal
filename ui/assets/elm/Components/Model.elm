@@ -1,7 +1,9 @@
-module Components.Model exposing (GridModel, Square, init, fill, paint)
+module Components.Model exposing (GridModel, Square, init, fill, paint, toHexJson)
 
 import Array exposing (Array)
 import Color exposing (Color)
+import Json.Encode as JE
+import Color.Convert exposing (colorToHex)
 
 type alias Square a = Array (Array a)
 
@@ -42,3 +44,15 @@ fill model color =
 paint : GridModel -> Int -> Int -> Color -> GridModel
 paint model x y color =
   { model | grid = setGrid model.grid x y color }
+
+hexRow : Array Color -> JE.Value
+hexRow cs = 
+  JE.array <| Array.map (\c -> c |> colorToHex |> JE.string) cs
+
+toHexJsonValue : GridModel -> JE.Value
+toHexJsonValue model = 
+  JE.array <| Array.map hexRow model.grid
+
+toHexJson : GridModel -> String
+toHexJson model = 
+  JE.encode 2 <| toHexJsonValue model
