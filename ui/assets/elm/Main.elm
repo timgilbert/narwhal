@@ -35,9 +35,9 @@ update msg model =
 view : Model -> Html Msg
 view model =
   div [ class "columns" ] 
-    [ div [ class "column is-two-thirds" ] 
+    [ div [ class "column is-three-fourths" ] 
       [ Grid.view model.grid ] 
-    , div [ class "column" ] 
+    , div [ class "column is-one-fourth" ] 
       [ Controls.view model ] 
     ]
 

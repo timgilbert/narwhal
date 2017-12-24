@@ -15,7 +15,7 @@ type alias Model =
 
 init : (Model, Cmd Msg)
 init =
-  (Model (initGrid Nothing) Color.black, Cmd.none)
+  (Model (initGrid Nothing) defaultColor, Cmd.none)
 
 type alias Square a = Array (Array a)
 
@@ -28,7 +28,7 @@ defaultBounds : Int
 defaultBounds = 16
 
 defaultColor : Color
-defaultColor = Color.darkGray
+defaultColor = Color.black
 
 makeGrid : Int -> a -> Square a
 makeGrid bounds item =
@@ -48,10 +48,7 @@ setGrid square x y item =
 
 initGrid : Maybe Int -> GridModel
 initGrid sizeParam = 
-  let selectedBound = 
-    case sizeParam of
-      Nothing -> defaultBounds
-      Just n -> n
+  let selectedBound = Maybe.withDefault defaultBounds sizeParam 
   in
     { bounds = selectedBound,
       grid = makeGrid selectedBound defaultColor }

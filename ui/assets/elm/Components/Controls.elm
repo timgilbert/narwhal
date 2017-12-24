@@ -45,7 +45,8 @@ iconButton label icon msg =
 
 colorButtons : List Color -> Html Msg
 colorButtons colors =
-  div [] (List.map colorButton colors)
+  div [ class "columns" ] 
+  <| List.map colorButton colors
 
 colorButton : Color -> Html Msg
 colorButton color = 
