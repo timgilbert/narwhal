@@ -14,17 +14,17 @@ view model =
     -- let _ = Debug.log "grid" model in
     section [ class "foo" ]
         [ h3 [] [ text "Controls" ]
-        , iconButton "Fill" "eraser" FillClicked
-        , br [] []
-        , iconButton "Upload" "cloud-upload" UploadClicked
-        , br [] []
-        , iconButton "Download" "cloud-download" DownloadClicked
-        , br [] []
-        , localButtons saveSlots
+        , div [ class "buttons " ]
+            [ iconButton "Fill" "eraser" FillClicked
+            , iconButton "Upload" "cloud-upload" UploadClicked
+            , iconButton "Download" "cloud-download" DownloadClicked
+            ]
         , hr [] []
         , colorSelect model
         , br [] []
-        , colorButtons colorIconList
+        , colorButtons model colorIconList
+        , hr [] []
+        , localButtons saveSlots
         , showStatus model
         , br [] []
 
@@ -48,7 +48,7 @@ colorIconList =
 
 saveSlots : List String
 saveSlots =
-    [ "A" ]
+    [ "A", "B", "C" ]
 
 
 iconButton : String -> String -> Msg -> Html Msg
@@ -60,26 +60,32 @@ iconButton label icon msg =
         ]
 
 
-colorButtons : List Color -> Html Msg
-colorButtons colors =
-    div [ class "columns" ] <|
-        List.map colorButton colors
+colorButtons : Model -> List Color -> Html Msg
+colorButtons model colors =
+    div [ class "field has-addons" ] <|
+        List.map (\c -> colorButton model.selectedColor c) colors
 
 
-colorButton : Color -> Html Msg
-colorButton color =
+colorButton : Color -> Color -> Html Msg
+colorButton activeColor displayColor =
     let
         hex =
-            colorToHex color
+            colorToHex displayColor
+
+        buttonState =
+            if activeColor == displayColor then
+                "button is-primary"
+            else
+                "button"
 
         buttonColor =
-            if color == Color.white then
+            if displayColor == Color.white then
                 colorToHex Color.lightGray
             else
                 hex
     in
         a
-            [ class "button is-outlined"
+            [ class buttonState
             , onClick <| SelectedPaintColor hex
             , style [ ( "color", buttonColor ) ]
             ]
@@ -107,9 +113,10 @@ localButtons slotNames =
 
 saveButtonsForSlot : String -> Html Msg
 saveButtonsForSlot slotName =
-    div []
+    div [ class "buttons" ]
         [ iconButton ("Save " ++ slotName) "save" <| SaveClicked slotName
         , iconButton ("Restore " ++ slotName) "folder-open-o" <| RestoreClicked slotName
+        , br [] []
         ]
 
 

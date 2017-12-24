@@ -20,7 +20,7 @@ type alias Model =
 
 init : ( Model, Cmd Msg )
 init =
-    ( Model (initGrid Nothing) defaultColor Nothing, Cmd.none )
+    ( Model (initGrid Nothing) Color.red Nothing, Cmd.none )
 
 
 type alias Square a =

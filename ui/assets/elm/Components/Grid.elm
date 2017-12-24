@@ -14,8 +14,11 @@ import Components.Messages exposing (Msg(..))
 renderCell : Int -> Int -> Color -> Html Msg
 renderCell y x color =
     td
-        [ class "narwhal-grid-row"
-        , style [ ( "backgroundColor", (colorToHex color) ) ]
+        [ class "narwhal-grid-cell is-unselectable"
+        , style
+            [ ( "backgroundColor", (colorToHex color) )
+            , ( "cursor", "cell" )
+            ]
         , property "innerHTML" (string "&nbsp;")
         , onClick (GridClicked x y)
         ]
