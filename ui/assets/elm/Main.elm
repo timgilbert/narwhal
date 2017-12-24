@@ -9,8 +9,8 @@ import Html.Attributes exposing (class)
 
 import Components.Grid as Grid
 import Components.Messages exposing (Msg(..))
-import Components.Model as CM exposing (Model, dumbColor)
-import Components.Controls as Controls 
+import Components.Model as CM exposing (Model, dumbColor, withStatus, clearStatus)
+import Components.Controls as Controls
 
 -- UPDATE
 
@@ -20,31 +20,35 @@ update msg model =
   -- let _ = Debug.log "mod" model in
   case msg of
     GridClicked x y ->
-      ({ model | grid = CM.paint model.grid x y model.selectedColor}, Cmd.none)
+      (clearStatus { model | grid = CM.paint model.grid x y model.selectedColor}, Cmd.none)
     FillClicked ->
-      ({ model | grid = CM.fill model.grid model.selectedColor}, Cmd.none)
+      (clearStatus { model | grid = CM.fill model.grid model.selectedColor}, Cmd.none)
     SelectedPaintColor color ->
-      ({ model | selectedColor = dumbColor color }, Cmd.none)
+      (clearStatus { model | selectedColor = dumbColor color }, Cmd.none)
+    SaveClicked slotName ->
+      (withStatus ("Saving to slot " ++ slotName ++ "...") model, Cmd.none)
+    RestoreClicked slotName ->
+      (withStatus ("Restoring from slot " ++ slotName ++ "...") model, Cmd.none)
     UploadClicked ->
-      (model, Cmd.none)
+      (withStatus "Uploading..." model, Cmd.none)
     DownloadClicked ->
-      (model, Cmd.none)
+      (withStatus "Downloading..." model, Cmd.none)
 
 -- VIEW
 
 view : Model -> Html Msg
 view model =
-  div [ class "columns" ] 
-    [ div [ class "column is-three-fourths" ] 
-      [ Grid.view model.grid ] 
-    , div [ class "column is-one-fourth" ] 
-      [ Controls.view model ] 
+  div [ class "columns" ]
+    [ div [ class "column is-three-fourths" ]
+      [ Grid.view model.grid ]
+    , div [ class "column is-one-fourth" ]
+      [ Controls.view model ]
     ]
 
 -- SUBSCRIPTIONS
 
 subscriptions : Model -> Sub Msg
-subscriptions model = 
+subscriptions model =
   Sub.none
 
 main : Program Never Model Msg

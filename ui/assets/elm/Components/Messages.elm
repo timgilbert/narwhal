@@ -1,8 +1,10 @@
 module Components.Messages exposing (Msg(..))
 
-type Msg = 
+type Msg =
   GridClicked Int Int |
   SelectedPaintColor String |
-  FillClicked | 
+  FillClicked |
+  SaveClicked String |
+  RestoreClicked String |
   DownloadClicked |
   UploadClicked

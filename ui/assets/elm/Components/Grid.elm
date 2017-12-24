@@ -13,20 +13,20 @@ import Components.Model exposing (GridModel)
 import Components.Messages exposing (Msg(..))
 
 renderCell : Int -> Int -> Color -> Html Msg
-renderCell y x color = 
+renderCell y x color =
   td [ class "narwhal-grid-row"
-     , style [ ("backgroundColor", (colorToHex color)) ] 
+     , style [ ("backgroundColor", (colorToHex color)) ]
      , property "innerHTML" (string "&nbsp;")
      , onClick (GridClicked x y)
      ]
      []
 
 renderRow : Int -> Array Color -> Html Msg
-renderRow y row = 
+renderRow y row =
   tr [] (toList (indexedMap (renderCell y) row))
 
 renderRows : GridModel -> List (Html Msg)
-renderRows model = 
+renderRows model =
   toList (indexedMap renderRow model.grid)
 
 view : GridModel -> Html Msg

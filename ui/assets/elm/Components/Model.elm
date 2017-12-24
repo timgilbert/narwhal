@@ -1,4 +1,4 @@
-module Components.Model exposing (Model, GridModel, Square, init, fill, paint, toHexJson, fromHexJson, dumbColor)
+module Components.Model exposing (Model, GridModel, Square, init, fill, paint, toHexJson, fromHexJson, dumbColor, withStatus, clearStatus)
 
 import Array exposing (Array)
 import Color exposing (Color)
@@ -9,20 +9,27 @@ import Color.Convert exposing (colorToHex, hexToColor)
 import Components.Messages exposing (Msg(..))
 
 -- MODEL
-type alias Model = 
+type alias Model =
   { grid : GridModel,
-    selectedColor : Color}
+    selectedColor : Color,
+    statusMsg : Maybe String }
 
 init : (Model, Cmd Msg)
 init =
-  (Model (initGrid Nothing) defaultColor, Cmd.none)
+  (Model (initGrid Nothing) defaultColor Nothing, Cmd.none)
 
 type alias Square a = Array (Array a)
 
-type alias GridModel = 
+type alias GridModel =
   { bounds : Int
   , grid : Square Color
   }
+
+clearStatus : { r | statusMsg : Maybe String } -> { r | statusMsg : Maybe String }
+clearStatus r = { r | statusMsg = Nothing }
+
+withStatus : String -> { r | statusMsg : Maybe String } -> { r | statusMsg : Maybe String }
+withStatus msg r = { r | statusMsg = Just msg }
 
 defaultBounds : Int
 defaultBounds = 16
@@ -47,8 +54,8 @@ setGrid square x y item =
         Array.set y (Array.set x item r) square
 
 initGrid : Maybe Int -> GridModel
-initGrid sizeParam = 
-  let selectedBound = Maybe.withDefault defaultBounds sizeParam 
+initGrid sizeParam =
+  let selectedBound = Maybe.withDefault defaultBounds sizeParam
   in
     { bounds = selectedBound,
       grid = makeGrid selectedBound defaultColor }
@@ -62,20 +69,20 @@ paint model x y color =
   { model | grid = setGrid model.grid x y color }
 
 toHexJson : GridModel -> String
-toHexJson model = 
+toHexJson model =
   JE.encode 2 <| toHexJsonValue model
 
 toHexJsonValue : GridModel -> JE.Value
-toHexJsonValue model = 
+toHexJsonValue model =
   JE.array <| Array.map hexRow model.grid
 
 hexRow : Array Color -> JE.Value
-hexRow cs = 
+hexRow cs =
   JE.array <| Array.map (\c -> c |> colorToHex |> JE.string) cs
 
 fromHexJson : GridModel -> String -> Maybe GridModel
 fromHexJson model json =
-  let res = 
+  let res =
     JD.array (JD.array JD.string)
   in case JD.decodeString res json of
     Ok matrix ->
