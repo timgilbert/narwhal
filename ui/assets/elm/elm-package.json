@@ -5,7 +5,8 @@
     "license": "BSD3",
     "source-directories": [
         ".",
-        "./Components"
+        "./Components",
+        "../node_modules/elm-local-storage-ports/lib/elm"
     ],
     "exposed-modules": [],
     "dependencies": {

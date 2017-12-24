@@ -1,4 +1,18 @@
-module Components.Model exposing (Model, GridModel, Square, init, fill, paint, toHexJson, fromHexJson, dumbColor, withStatus, clearStatus)
+module Components.Model
+    exposing
+        ( Model
+        , GridModel
+        , Square
+        , init
+        , fill
+        , paint
+        , toHexJson
+        , toHexJsonValue
+        , fromHexJsonValue
+        , dumbColor
+        , withStatus
+        , clearStatus
+        )
 
 import Array exposing (Array)
 import Color exposing (Color)
@@ -113,18 +127,24 @@ hexRow cs =
     JE.array <| Array.map (\c -> c |> colorToHex |> JE.string) cs
 
 
-fromHexJson : GridModel -> String -> Maybe GridModel
-fromHexJson model json =
+
+-- fromHexJson : String -> GridModel -> Result String GridModel
+-- fromHexJson json model =
+--     JD.decodeString json |> (fromHexJsonValue json model)
+
+
+fromHexJsonValue : JD.Value -> GridModel -> Result String GridModel
+fromHexJsonValue json model =
     let
         res =
             JD.array (JD.array JD.string)
     in
-        case JD.decodeString res json of
+        case JD.decodeValue res json of
             Ok matrix ->
-                Just { model | grid = mapSquare dumbColor matrix }
+                Ok { model | grid = mapSquare dumbColor matrix }
 
             Err msg ->
-                Nothing
+                Err msg
 
 
 dumbColor : String -> Color

@@ -4,15 +4,12 @@ module Main exposing (..)
 
 import Html exposing (Html, text, div)
 import Html.Attributes exposing (class)
-
-
--- import Color
--- import Color.Convert exposing (colorToHex, hexToColor)
-
+import Json.Decode as JD
 import Components.Grid as Grid
 import Components.Messages exposing (Msg(..))
-import Components.Model as CM exposing (Model, dumbColor, withStatus, clearStatus)
+import Components.Model as CM exposing (Model, dumbColor, withStatus, clearStatus, toHexJsonValue, fromHexJsonValue)
 import Components.Controls as Controls
+import Ports.LocalStorage as LocalStorage
 
 
 -- UPDATE
@@ -33,10 +30,30 @@ update msg model =
             ( clearStatus { model | selectedColor = dumbColor color }, Cmd.none )
 
         SaveClicked slotName ->
-            ( withStatus ("Saving to slot " ++ slotName ++ "...") model, Cmd.none )
+            ( model |> withStatus ("Saving to slot " ++ slotName ++ "...")
+            , LocalStorage.storageSetItem ( slotName, (toHexJsonValue model.grid) )
+            )
 
         RestoreClicked slotName ->
-            ( withStatus ("Restoring from slot " ++ slotName ++ "...") model, Cmd.none )
+            ( model |> withStatus ("Restoring from slot " ++ slotName ++ "...")
+            , LocalStorage.storageGetItem slotName
+            )
+
+        ReceiveFromLocalStorage ( slotName, value ) ->
+            case fromHexJsonValue value model.grid of
+                Ok loadedGrid ->
+                    ( { model | grid = loadedGrid }
+                        |> withStatus "Loaded!"
+                    , Cmd.none
+                    )
+
+                Err msg ->
+                    ( withStatus ("Error decoding JSON: " ++ msg ++ "!") model, Cmd.none )
+
+        SaveToLocalStorage ( slotName, value ) ->
+            ( model |> withStatus ("Restoring from slot " ++ slotName ++ "...")
+            , LocalStorage.storageSetItem ( slotName, (toHexJsonValue model.grid) )
+            )
 
         UploadClicked ->
             ( withStatus "Uploading..." model, Cmd.none )
@@ -65,7 +82,7 @@ view model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.none
+    LocalStorage.storageGetItemResponse ReceiveFromLocalStorage
 
 
 main : Program Never Model Msg

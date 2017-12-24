@@ -24,5 +24,7 @@ import 'phoenix_html';
 import Elm from './main';
 const elmDiv = document.querySelector('#elm-target');
 if (elmDiv) {
-  Elm.Main.embed(elmDiv);
+  var localStoragePorts = require("elm-local-storage-ports");
+  var elmApp = Elm.Main.embed(elmDiv);
+  localStoragePorts.register(elmApp.ports);
 }

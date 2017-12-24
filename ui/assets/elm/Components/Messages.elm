@@ -1,5 +1,7 @@
 module Components.Messages exposing (Msg(..))
 
+import Json.Decode
+
 
 type Msg
     = GridClicked Int Int
@@ -9,3 +11,5 @@ type Msg
     | RestoreClicked String
     | DownloadClicked
     | UploadClicked
+    | ReceiveFromLocalStorage ( String, Json.Decode.Value )
+    | SaveToLocalStorage ( String, Json.Decode.Value )
