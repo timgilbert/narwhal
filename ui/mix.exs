@@ -38,7 +38,8 @@ defmodule Ui.Mixfile do
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:gettext, "~> 0.11"},
       {:cowboy, "~> 1.0"},
-      {:elixir_ale, "~> 1.0"},
+      # {:elixir_ale, "~> 1.0"},
+      {:elixir_ale, git: "https://github.com/timgilbert/elixir_ale.git", branch: "increase-spi-transfer-max"},
       {:credo, "~> 0.8", only: [:dev, :test], runtime: false},
       # {:color_utils, "0.2.0"}
       {:color_utils, git: "https://github.com/timgilbert/color_utils", branch: "fix-rgb-to-hex"}

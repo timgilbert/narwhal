@@ -20,7 +20,7 @@ defmodule UI.Unicorn.Interface do
     # _spi.max_speed_hz = 9000000
 
     # is_setup = True
-    spi = SPI.start_link("spidev0.0", [speed_hz: @max_speed_hz])
+    {:ok, pid} = SPI.start_link("spidev0.0", [speed_hz: @max_speed_hz])
   end
 
   def upload(pid, matrix) do
@@ -33,7 +33,8 @@ defmodule UI.Unicorn.Interface do
   end
 
   def rand_data() do
-    Enum.reduce(1 .. (16 * 16 * 3), << 0x78 >>, fn(x, acc) -> << acc :: binary >> <> << :rand.uniform(256) - 1 :: size(8) >> end)
+    Enum.reduce(1 .. (16 * 16 * 3), << @start_of_file >>,
+                fn(x, acc) -> << acc :: binary >> <> << :rand.uniform(256) - 1 :: size(8) >> end)
   end
 
   def randomColor(x, y) do
