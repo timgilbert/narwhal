@@ -2,6 +2,7 @@ defmodule UiWeb.PageView do
   use UiWeb, :view
   import ColorUtils
   import Ui.Grid
+  import UI.Unicorn.Interface
   require Logger
 
   def bounds() do
