@@ -9,6 +9,7 @@
   "elixir_ale": {:git, "https://github.com/timgilbert/elixir_ale.git", "840314d6fbab404728831dd51543031bccbe9353", [branch: "increase-spi-transfer-max"]},
   "elixir_make": {:hex, :elixir_make, "0.4.0", "992f38fabe705bb45821a728f20914c554b276838433349d4f2341f7a687cddf", [], [], "hexpm"},
   "gettext": {:hex, :gettext, "0.14.0", "1a019a2e51d5ad3d126efe166dcdf6563768e5d06c32a99ad2281a1fa94b4c72", [], [], "hexpm"},
+  "logger_papertrail_backend": {:hex, :logger_papertrail_backend, "1.0.2", "9ebc566aedfd3e03a1ec1f0e1100a4534a670b928117a5eab9311b202ae19d70", [], [], "hexpm"},
   "mdns": {:hex, :mdns, "0.1.6", "b51b902b15b50e0e1522483c6a5fb073413e3d3d6ef52a44b93a541460b47d29", [], [{:dns, "~> 1.0", [hex: :dns, repo: "hexpm", optional: false]}], "hexpm"},
   "mime": {:hex, :mime, "1.1.0", "01c1d6f4083d8aa5c7b8c246ade95139620ef8effb009edde934e0ec3b28090a", [], [], "hexpm"},
   "nerves": {:hex, :nerves, "0.8.3", "cd3db3adadf5d4191249770ff2f247884408722f1fef2fa1e24f3145972bcf6f", [], [{:distillery, "~> 1.4", [hex: :distillery, repo: "hexpm", optional: false]}], "hexpm"},

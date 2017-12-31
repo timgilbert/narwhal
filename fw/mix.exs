@@ -63,7 +63,8 @@ defmodule Fw.Mixfile do
       {:bootloader, "~> 0.1.3"},
       {:nerves_runtime, "~> 0.5.1"},
       {:nerves_init_gadget, "~> 0.2"},
-      {:ui, path: "../ui"}
+      {:ui, path: "../ui"},
+      {:logger_papertrail_backend, "~> 1.0"}
     ] ++ system(target)
   end
 

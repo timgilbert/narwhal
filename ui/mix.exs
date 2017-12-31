@@ -41,6 +41,7 @@ defmodule Ui.Mixfile do
       # {:elixir_ale, "~> 1.0"},
       {:elixir_ale, git: "https://github.com/timgilbert/elixir_ale.git", branch: "increase-spi-transfer-max"},
       {:credo, "~> 0.8", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 0.5", only: [:dev, :test], runtime: false},
       # {:color_utils, "0.2.0"}
       {:color_utils, git: "https://github.com/timgilbert/color_utils", branch: "fix-rgb-to-hex"}
       # {:color_utils, path: "../../color_utils"}
