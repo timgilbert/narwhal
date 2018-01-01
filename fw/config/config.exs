@@ -64,14 +64,12 @@ config :ui, UiWeb.Endpoint,
 
 
 config :logger, :logger_papertrail_backend,
-  url: System.get_env("PAPERTRAIL_URL") || "papertrail://logs6.papertrailapp.com:39329/narwhal.localdev",
-  level: :info,
+  url: System.get_env("PAPERTRAIL_URL"),
+  level: :debug,
   format: "$metadata $message"
 
 config :logger,
-  backends: [ :console,
-    LoggerPapertrailBackend.Logger
-  ],
+  backends: [ :console, LoggerPapertrailBackend.Logger ],
   level: :debug
 
 # Import target specific config. This must remain at the bottom
