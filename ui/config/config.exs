@@ -5,6 +5,8 @@
 # is restricted to this project.
 use Mix.Config
 
+config :phoenix, :json_library, Jason
+
 # Configures the endpoint
 config :ui, UiWeb.Endpoint,
   url: [host: "localhost"],
