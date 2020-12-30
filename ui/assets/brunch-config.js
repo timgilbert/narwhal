@@ -48,7 +48,7 @@ exports.config = {
       verbose : true
     },
     elmBrunch: {
-      elmFolder: 'elm',
+      elmFolder: 'src',
       mainModules: ['Main.elm'],
       outputFolder: '../js',
       onlyChanged: true
