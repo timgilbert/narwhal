@@ -1,5 +1,6 @@
 defmodule Unicorn do
-  alias ElixirALE.SPI
+  alias Circuits.SPI
+  alias Unicorn.Frame
   import Enum
 
   # Port of https://github.com/pimoroni/unicorn-hat-hd/blob/master/library/unicornhathd/__init__.py
@@ -8,6 +9,7 @@ defmodule Unicorn do
   @max_speed_hz 9_000_000
   @start_of_file 0x72
 
+  @spec setup :: reference
   def setup do
     # def setup():
     # global _spi, _buf, is_setup
@@ -20,16 +22,19 @@ defmodule Unicorn do
     # _spi.max_speed_hz = 9000000
 
     # is_setup = True
-    {:ok, _pid} = SPI.start_link("spidev0.0", speed_hz: @max_speed_hz)
+    {:ok, pid} = SPI.open("spidev0.0", speed_hz: @max_speed_hz)
+    pid
   end
 
-  def upload(pid, matrix) do
+  @spec upload(reference, Frame.t()) :: binary()
+  def upload(pid, frame) do
     #     """Output the contents of the buffer to Unicorn HAT HD."""
     # setup()
     # _spi.xfer2([_SOF] + (numpy.rot90(_buf,_rotation).reshape(768) * _brightness).astype(numpy.uint8).tolist())
     # time.sleep(_DELAY)
-    data = matrixToBitString(matrix)
-    SPI.transfer(pid, data)
+    data = Frame.unicorn_binary(frame)
+    {:ok, result} = SPI.transfer(pid, data)
+    result
   end
 
   def rand_data() do

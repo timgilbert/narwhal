@@ -1,33 +1,42 @@
 defmodule Unicorn.Frame do
   alias Tint.RGB
   defstruct height: 16, width: 16, items: []
+  @type t :: %__MODULE__{height: non_neg_integer, width: non_neg_integer, items: any}
 
   @start_of_file 0x72
+  @default_color RGB.new(0, 0, 0)
 
-  @spec default_color :: RGB.t()
-  def default_color() do
-    RGB.new(0, 0, 0)
-  end
-
-  @defaults %{height: 16, width: 16, color: &Unicorn.Frame.default_color/0}
-
+  @spec new(keyword()) :: t()
   def new(options \\ []) do
-    %{height: height, width: width, color: color} = Enum.into(options, @defaults)
+    %{height: height, width: width, color: color} =
+      Enum.into(options, %{height: 16, width: 16, color: @default_color})
+
+    shader =
+      if Keyword.has_key?(options, :shader) do
+        Keyword.get(options, :shader)
+      else
+        constant_shader(color)
+      end
 
     %__MODULE__{
-      items: grid(width, height, color),
+      items: create_grid(width, height, shader),
       height: height,
       width: width
     }
   end
 
-  @spec get(__MODULE__, integer, integer) :: RGB.t()
+  @spec rand(keyword) :: t()
+  def rand(options \\ []) do
+    new(Keyword.put(options, :shader, random_shader()))
+  end
+
+  @spec get(t(), integer, integer) :: RGB.t()
   def get(frame, x, y) do
     Enum.at(frame.items, x)
     |> Enum.at(y)
   end
 
-  @spec hex_grid(__MODULE__) :: [[String.t()]]
+  @spec hex_grid(t()) :: [[String.t()]]
   def hex_grid(frame) do
     Enum.map(frame.items, fn row ->
       Enum.map(row, &RGB.to_hex/1)
@@ -39,14 +48,14 @@ defmodule Unicorn.Frame do
     <<color.red, color.green, color.blue>>
   end
 
-  @spec unicorn_binary(__MODULE__) :: binary
+  @spec unicorn_binary(t()) :: binary
   def unicorn_binary(frame) do
     frame.items
     |> List.flatten()
     |> Enum.reduce(<<@start_of_file>>, fn c, acc -> <<acc <> color_to_binary(c)>> end)
   end
 
-  @spec set(__MODULE__, non_neg_integer, non_neg_integer, RGB.t()) :: __MODULE__
+  @spec set(t(), non_neg_integer, non_neg_integer, RGB.t()) :: t()
   def set(frame, x, y, color) do
     row =
       Enum.at(frame.items, x)
@@ -58,11 +67,19 @@ defmodule Unicorn.Frame do
     }
   end
 
-  @spec grid(non_neg_integer, non_neg_integer, any) :: [[any]]
-  def grid(w, h, f) do
-    for _x <- 1..w do
-      for _y <- 1..h, do: f.()
+  @spec create_grid(non_neg_integer, non_neg_integer, any) :: [[RGB.t()]]
+  defp create_grid(w, h, shader) do
+    for x <- 1..w do
+      for y <- 1..h, do: shader.(x, y)
     end
+  end
+
+  defp constant_shader(color) do
+    fn _x, _y -> color end
+  end
+
+  defp random_shader() do
+    fn _x, _y -> random_color() end
   end
 
   @spec random_color :: RGB.t()
