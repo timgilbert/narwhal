@@ -52,13 +52,22 @@ config :nerves_ssh,
 config :vintage_net,
   regulatory_domain: "US",
   config: [
-    {"usb0", %{type: VintageNetDirect}},
+    # {"usb0", %{type: VintageNetDirect}},
     {"eth0",
      %{
        type: VintageNetEthernet,
        ipv4: %{method: :dhcp}
      }},
-    {"wlan0", %{type: VintageNetWiFi}}
+    {"wlan0",
+     %{
+       type: VintageNetWiFi,
+       vintage_net_wifi: %{
+         key_mgmt: :wpa_psk,
+         ssid: System.get_env("NERVES_NETWORK_SSID"),
+         psk: System.get_env("NERVES_NETWORK_PSK")
+       },
+       ipv4: %{method: :dhcp}
+     }}
   ]
 
 config :mdns_lite,
@@ -68,7 +77,8 @@ config :mdns_lite,
   # "nerves.local" for convenience. If more than one Nerves device is on the
   # network, delete "nerves" from the list.
 
-  host: [:hostname, "nerves"],
+  # host: [:hostname, "nerves"],
+  host: [:hostname, "narwhal"],
   ttl: 120,
 
   # Advertise the following services over mDNS.
