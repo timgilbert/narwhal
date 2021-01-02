@@ -1,15 +1,19 @@
 defmodule Unicorn.Frame do
+  # TODO: replace with single-list implementation instead of nested list
+
   alias Tint.RGB
   defstruct height: 16, width: 16, items: []
   @type t :: %__MODULE__{height: non_neg_integer, width: non_neg_integer, items: any}
+  @type color_t :: RGB.t()
 
   @start_of_file 0x72
-  @default_color RGB.new(0, 0, 0)
+  @spec default_color :: color_t()
+  def default_color, do: RGB.new(0, 0, 0)
 
   @spec new(keyword()) :: t()
   def new(options \\ []) do
     %{height: height, width: width, color: color} =
-      Enum.into(options, %{height: 16, width: 16, color: @default_color})
+      Enum.into(options, %{height: 16, width: 16, color: default_color()})
 
     shader =
       if Keyword.has_key?(options, :shader) do
@@ -48,6 +52,7 @@ defmodule Unicorn.Frame do
     <<color.red, color.green, color.blue>>
   end
 
+  # TODO: this probably belongs in the hardware module
   @spec unicorn_binary(t()) :: binary
   def unicorn_binary(frame) do
     frame.items
@@ -65,6 +70,12 @@ defmodule Unicorn.Frame do
       frame
       | items: List.replace_at(frame.items, x, row)
     }
+  end
+
+  @spec map(t(), (color_t() -> color_t)) :: t()
+  def map(frame, pixel_fn) do
+    items = for row <- frame.items, item <- row, do: pixel_fn.(item)
+    %{frame | items: items}
   end
 
   @spec create_grid(non_neg_integer, non_neg_integer, any) :: [[RGB.t()]]
