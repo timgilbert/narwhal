@@ -2,18 +2,52 @@ defmodule UnicornTimelineTest do
   use ExUnit.Case
   alias Unicorn.Step
   alias Unicorn.Timeline
-  alias Unicorn.Fx.{Color, Random}
+  alias Unicorn.Fx.Random
   doctest Unicorn.Timeline
 
-  test "nth works correctly, no repeat" do
-    s1 = Step.new(Random.new(), 1000, 1)
-    s2 = Step.new(Color.new(), 1000, 2)
-    t = Timeline.new()
-    |> Timeline.append(s1)
-    |> Timeline.append(s2)
+  setup _context do
+    {:ok,
+     %{
+       s1: Step.new(Random.new(), 1000, 1),
+       s2: Step.new(Random.new(), 2000, 2),
+       s3: Step.new(Random.new(), 3000, 3)
+     }}
+  end
 
-    assert Timeline.nth(t, 0) == {:ok, s1}
-    assert Timeline.nth(t, 1) == {:ok, s2}
-    assert Timeline.nth(t, 2) == {:ok, s2}
+  test "append / total work", context do
+    t =
+      Timeline.new()
+      |> Timeline.append(context[:s1])
+      |> Timeline.append(context[:s2])
+      |> Timeline.append(context[:s3])
+
+    assert t.total == 6
+    assert elem(Timeline.nth(t, 10), 0) == :err
+  end
+
+  test "nth works correctly for 0, no repeat", context do
+    t =
+      Timeline.new()
+      |> Timeline.append(context[:s1])
+      |> Timeline.append(context[:s2])
+      |> Timeline.append(context[:s3])
+
+    assert Timeline.nth(t, 0) == {:ok, context[:s1]}
+  end
+
+  test "nth works correctly, no repeat", context do
+    t =
+      Timeline.new()
+      |> Timeline.append(context[:s1])
+      |> Timeline.append(context[:s2])
+      |> Timeline.append(context[:s3])
+
+    assert Timeline.nth(t, 0) == {:ok, context[:s1]}
+    assert Timeline.nth(t, 1) == {:ok, context[:s2]}
+    assert Timeline.nth(t, 2) == {:ok, context[:s2]}
+    assert Timeline.nth(t, 3) == {:ok, context[:s3]}
+    assert Timeline.nth(t, 4) == {:ok, context[:s3]}
+    assert Timeline.nth(t, 5) == {:ok, context[:s3]}
+    assert elem(Timeline.nth(t, 6), 0) == :err
   end
 end
