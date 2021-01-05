@@ -5,6 +5,7 @@ defmodule Unicorn.Frame do
   defstruct height: 16, width: 16, items: []
   @type t :: %__MODULE__{height: non_neg_integer, width: non_neg_integer, items: any}
   @type color_t :: RGB.t()
+  @type color_fn :: (color_t -> color_t)
 
   @start_of_file 0x72
   @spec default_color :: color_t()
@@ -72,7 +73,7 @@ defmodule Unicorn.Frame do
     }
   end
 
-  @spec map(t(), (color_t() -> color_t)) :: t()
+  @spec map(t(), color_fn) :: t()
   def map(frame, pixel_fn) do
     items =
       for row <- frame.items do
