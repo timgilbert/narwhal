@@ -34,7 +34,7 @@ defmodule Unicorn.Frame do
     new(Keyword.put(options, :shader, random_shader()))
   end
 
-  @spec get(t(), integer, integer) :: RGB.t()
+  @spec get(t(), integer, integer) :: color_t()
   def get(frame, x, y) do
     Enum.at(frame.items, x)
     |> Enum.at(y)
@@ -47,7 +47,7 @@ defmodule Unicorn.Frame do
     end)
   end
 
-  @spec color_to_binary(RGB.t()) :: binary
+  @spec color_to_binary(color_t()) :: binary
   def color_to_binary(color) do
     <<color.red, color.green, color.blue>>
   end
@@ -60,7 +60,7 @@ defmodule Unicorn.Frame do
     |> Enum.reduce(<<@start_of_file>>, fn c, acc -> <<acc <> color_to_binary(c)>> end)
   end
 
-  @spec set(t(), non_neg_integer, non_neg_integer, RGB.t()) :: t()
+  @spec set(t(), non_neg_integer, non_neg_integer, color_t()) :: t()
   def set(frame, x, y, color) do
     row =
       Enum.at(frame.items, x)
@@ -95,7 +95,7 @@ defmodule Unicorn.Frame do
     RGB.new(dec8(c.red), dec8(c.green), dec8(c.blue))
   end
 
-  @spec create_grid(non_neg_integer, non_neg_integer, any) :: [[RGB.t()]]
+  @spec create_grid(non_neg_integer, non_neg_integer, any) :: [[color_t()]]
   defp create_grid(w, h, shader) do
     for x <- 1..w do
       for y <- 1..h, do: shader.(x, y)
@@ -110,7 +110,7 @@ defmodule Unicorn.Frame do
     fn _x, _y -> random_color() end
   end
 
-  @spec random_color :: RGB.t()
+  @spec random_color :: color_t()
   def random_color() do
     <<r, g, b>> = :crypto.strong_rand_bytes(3)
     RGB.new(r, g, b)
