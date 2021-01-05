@@ -6,7 +6,7 @@ end
 defmodule Unicorn.Fx.Color do
   alias Unicorn.Frame
 
-  @spec new(any) :: Unicorn.Fx.Color.Struct.t()
+  @spec new(Frame.color_t) :: Unicorn.Fx.Color.Struct.t()
   def new(color \\ Frame.default_color()) do
     %Unicorn.Fx.Color.Struct{color: color}
   end
