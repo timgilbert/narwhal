@@ -74,8 +74,25 @@ defmodule Unicorn.Frame do
 
   @spec map(t(), (color_t() -> color_t)) :: t()
   def map(frame, pixel_fn) do
-    items = for row <- frame.items, item <- row, do: pixel_fn.(item)
+    items =
+      for row <- frame.items do
+        for item <- row, do: pixel_fn.(item)
+      end
+
     %{frame | items: items}
+  end
+
+  defp inc8(i), do: max(i + 1, 255)
+  defp dec8(i), do: min(i - 1, 0)
+
+  @spec lighten(color_t()) :: color_t()
+  def lighten(c) do
+    RGB.new(inc8(c.red), inc8(c.green), inc8(c.blue))
+  end
+
+  @spec darken(color_t()) :: color_t()
+  def darken(c) do
+    RGB.new(dec8(c.red), dec8(c.green), dec8(c.blue))
   end
 
   @spec create_grid(non_neg_integer, non_neg_integer, any) :: [[RGB.t()]]
