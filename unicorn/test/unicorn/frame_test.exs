@@ -1,5 +1,6 @@
 defmodule UnicornFrameTest do
   use ExUnit.Case
+  alias Unicorn.Color
   alias Unicorn.Frame
   alias Tint.RGB
   doctest Unicorn.Frame
@@ -23,8 +24,8 @@ defmodule UnicornFrameTest do
 
     assert Frame.map(f2, &Function.identity/1) == f2
 
-    f3 = Frame.map(f2, &Frame.darken/1)
-    assert Frame.get(f3, 0, 0) == Frame.darken(c2)
-    assert Frame.get(f3, 1, 1) == Frame.darken(c)
+    f3 = Frame.map(f2, &Color.darken/1)
+    assert Frame.get(f3, 0, 0) == Color.darken(c2)
+    assert Frame.get(f3, 1, 1) == Color.darken(c)
   end
 end
