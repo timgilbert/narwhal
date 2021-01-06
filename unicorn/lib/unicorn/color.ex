@@ -32,7 +32,9 @@ defmodule Unicorn.Color do
   @spec create_grid(non_neg_integer, non_neg_integer, any) :: [[Color.t()]]
   def create_grid(w, h, shader) do
     for x <- 1..w do
-      for y <- 1..h, do: shader.(x, y)
+      for y <- 1..h do
+        shader.(x, y)
+      end
     end
   end
 
@@ -44,6 +46,12 @@ defmodule Unicorn.Color do
     fn _x, _y -> random_color() end
   end
 
+  def approach_shader(target, scale) do
+    fn x, y ->
+      black()
+    end
+  end
+
   @spec to_hex(t()) :: String.t()
   def to_hex(color) do
     RGB.to_hex(color)
@@ -53,5 +61,4 @@ defmodule Unicorn.Color do
   def to_binary(color) do
     <<color.red, color.green, color.blue>>
   end
-
 end
