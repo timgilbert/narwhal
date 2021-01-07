@@ -22,7 +22,7 @@ defmodule Unicorn.Fx.Map do
     %Unicorn.Fx.Map.Struct{pixel_fn: &Color.darken/1}
   end
 
-  defimpl Unicorn.Fx.Effect, for: Unicorn.Fx.Map do
+  defimpl Unicorn.Fx.Effect, for: Struct do
     @spec call(%Unicorn.Fx.Map.Struct{}, Frame.t()) :: Frame.t()
     def call(effect, frame) do
       Frame.map(frame, effect.pixel_fn)

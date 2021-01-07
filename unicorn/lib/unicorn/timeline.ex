@@ -1,5 +1,6 @@
 defmodule Unicorn.Timeline do
   alias Unicorn.Step
+  alias Unicorn.Fx.Tween
 
   @type t :: %__MODULE__{items: [Step.t()], repeat?: boolean(), total: non_neg_integer}
   defstruct items: [], repeat?: false, total: 0
@@ -22,7 +23,7 @@ defmodule Unicorn.Timeline do
     duration_each = div(duration, steps)
     scales = Enum.map(1..steps, fn i -> i / steps end)
     Enum.reduce(scales, timeline, fn scale, timeline ->
-      step = Step.new(Tween.new(target_frame, scale, duration_each, 1))
+      step = Step.new(Tween.new(target_frame, scale), duration_each, 1)
       append(timeline, step)
     end)
   end

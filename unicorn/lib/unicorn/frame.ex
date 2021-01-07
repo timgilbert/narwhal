@@ -71,7 +71,8 @@ defmodule Unicorn.Frame do
   def map(frame, pixel_fn) do
     items =
       for row <- frame.items do
-        for item <- row, do: pixel_fn.(item)
+        # TODO: count actual x/y values
+        for item <- row, do: pixel_fn.(0, 0, item)
       end
 
     %{frame | items: items}
