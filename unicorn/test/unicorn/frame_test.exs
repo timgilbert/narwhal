@@ -22,10 +22,10 @@ defmodule UnicornFrameTest do
     f2 = Frame.set(f, 0, 0, c2)
     assert Frame.get(f2, 0, 0) == c2
 
-    assert Frame.map(f2, &Function.identity/1) == f2
+    assert Frame.map(f2, fn _, _, x -> x end) == f2
 
-    f3 = Frame.map(f2, &Color.darken/1)
-    assert Frame.get(f3, 0, 0) == Color.darken(c2)
-    assert Frame.get(f3, 1, 1) == Color.darken(c)
+    f3 = Frame.map(f2, &Color.darken/3)
+    assert Frame.get(f3, 0, 0) == Color.darken(0, 0, c2)
+    assert Frame.get(f3, 1, 1) == Color.darken(0, 0, c)
   end
 end

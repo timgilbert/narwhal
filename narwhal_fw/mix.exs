@@ -35,6 +35,8 @@ defmodule NarwhalFw.MixProject do
       {:shoehorn, "~> 0.7.0"},
       {:ring_logger, "~> 0.8.1"},
       {:toolshed, "~> 0.2.13"},
+      {:logger_papertrail_backend, "~> 1.1"},
+
       # Local code
       {:unicorn, path: "../unicorn"},
 

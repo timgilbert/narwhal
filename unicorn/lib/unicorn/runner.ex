@@ -1,13 +1,16 @@
 defmodule Unicorn.Runner do
   alias Unicorn.Timeline
   alias Unicorn.Step
+  alias Unicorn.Frame
 
-  @type t :: %__MODULE__{timeline: Timeline.t(), counter: non_neg_integer}
-  defstruct timeline: nil, counter: 0
+  @buffer_size 10
+
+  @type t :: %__MODULE__{timeline: Timeline.t(), counter: non_neg_integer, buffer: [Frame.t()]}
+  defstruct timeline: nil, counter: 0, buffer: []
 
   @spec new(Timeline.t()) :: t()
   def new(timeline) do
-    %__MODULE__{timeline: timeline, counter: 0}
+    %__MODULE__{timeline: timeline}
   end
 
   def next(runner) do
