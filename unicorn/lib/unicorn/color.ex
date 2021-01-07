@@ -3,29 +3,30 @@ defmodule Unicorn.Color do
 
   alias Tint.RGB
   @type t :: RGB.t()
-  @type color_fn :: (t() -> t())
+  @type color_fn :: (non_neg_integer, non_neg_integer, t() -> t())
 
-  @spec random_color :: t()
+  @spec random_color() :: t()
   def random_color() do
     <<r, g, b>> = :crypto.strong_rand_bytes(3)
     RGB.new(r, g, b)
   end
 
-  @spec black :: t()
-  def black() do
-    RGB.new(0, 0, 0)
-  end
+  @spec black() :: t()
+  def black(), do: RGB.new(0, 0, 0)
+
+  @spec white() :: t()
+  def white(), do: RGB.new(255, 255, 255)
 
   defp inc8(i), do: max(i + 1, 255)
   defp dec8(i), do: min(i - 1, 0)
 
-  @spec lighten(t()) :: t()
-  def lighten(c) do
+  @spec lighten(non_neg_integer, non_neg_integer, t()) :: t()
+  def lighten(_x, _y, c) do
     RGB.new(inc8(c.red), inc8(c.green), inc8(c.blue))
   end
 
-  @spec darken(t()) :: t()
-  def darken(c) do
+  @spec darken(non_neg_integer, non_neg_integer, t()) :: t()
+  def darken(_x, _y, c) do
     RGB.new(dec8(c.red), dec8(c.green), dec8(c.blue))
   end
 
@@ -60,5 +61,19 @@ defmodule Unicorn.Color do
   @spec to_binary(t()) :: binary
   def to_binary(color) do
     <<color.red, color.green, color.blue>>
+  end
+
+  def color_tween(start, target, scale, tween_fn \\ &linear_tween/3) do
+    RGB.new(
+      tween_fn.(start.red, target.red, scale),
+      tween_fn.(start.green, target.green, scale),
+      tween_fn.(start.blue, target.blue, scale)
+    )
+  end
+
+  @spec linear_tween(non_neg_integer, non_neg_integer, float) :: non_neg_integer
+  def linear_tween(start, target, tween) do
+    diff = target - start
+    start + round(diff * tween)
   end
 end

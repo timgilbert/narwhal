@@ -18,6 +18,15 @@ defmodule Unicorn.Timeline do
     }
   end
 
+  def tween_to(timeline, target_frame, steps, duration) do
+    duration_each = div(duration, steps)
+    scales = Enum.map(1..steps, fn i -> i / steps end)
+    Enum.reduce(scales, timeline, fn scale, timeline ->
+      step = Step.new(Tween.new(target_frame, scale, duration_each, 1))
+      append(timeline, step)
+    end)
+  end
+
   @spec nth(t(), non_neg_integer) :: {:ok, Step.t()} | {:err, String.t()}
   def nth(timeline, pos) do
     if pos >= timeline.total and not timeline.repeat? do
