@@ -20,7 +20,7 @@ config :narwhal_ui, NarwhalUiWeb.Endpoint,
       cd: Path.expand("../assets", __DIR__)
     ],
     bash: [
-      "cljs-start.sh",
+      "cljs-start.bash",
       "node_modules/.bin/shadow-cljs",
       "watch",
       "app",

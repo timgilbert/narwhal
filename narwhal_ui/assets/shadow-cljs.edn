@@ -1,9 +1,6 @@
 ;; shadow-cljs configuration
-{:source-paths
- ["src"]
-
- :dependencies
- []
+{:deps
+ true
 
  :dev-http
  {9080 "../priv/static/js/"}
