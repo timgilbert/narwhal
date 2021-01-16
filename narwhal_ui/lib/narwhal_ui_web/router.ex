@@ -20,6 +20,13 @@ defmodule NarwhalUiWeb.Router do
     live "/", PageLive, :index
   end
 
+  forward "/graphql", Absinthe.Plug,
+          schema: NarwhalUiWeb.Schema
+
+  forward "/graphiql",
+          Absinthe.Plug.GraphiQL,
+          schema: NarwhalUiWeb.Schema
+
   # Other scopes may use custom stacks.
   # scope "/api", NarwhalUiWeb do
   #   pipe_through :api

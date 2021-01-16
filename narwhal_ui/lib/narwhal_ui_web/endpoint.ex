@@ -50,4 +50,6 @@ defmodule NarwhalUiWeb.Endpoint do
   plug Plug.Head
   plug Plug.Session, @session_options
   plug NarwhalUiWeb.Router
+
+  plug Absinthe.Plug, schema: NarwhalUiWeb.Schema
 end
