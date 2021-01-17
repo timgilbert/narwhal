@@ -2,7 +2,7 @@ defmodule NarwhalUiWeb.Resolvers.Frame do
   @moduledoc false
   alias Unicorn.Frame
 
-  def rand(parent, _args, _resolution) do
+  def rand(_parent, _args, _resolution) do
     {:ok, Frame.rand()}
   end
 

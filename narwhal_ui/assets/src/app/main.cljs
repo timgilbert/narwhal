@@ -2,7 +2,8 @@
   (:require [re-graph.core :as re-graph]
             [re-frame.core :as re-frame]))
 
-(re-frame/dispatch [::re-graph/init {}])
+(re-frame/dispatch [::re-graph/init {:ws   nil
+                                     :http {:url "/graphql"}}])
 
 (def value-a 1)
 (defonce value-b 2)

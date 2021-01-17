@@ -2,7 +2,6 @@ defmodule NarwhalUiWeb.Schema do
   @moduledoc false
 
   use Absinthe.Schema
-  alias Unicorn.Frame
 
   import_types NarwhalUiWeb.Schema.Types
 
