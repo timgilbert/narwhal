@@ -41,7 +41,7 @@ config :narwhal_ui, NarwhalUiWeb.Endpoint,
 config :narwhal_ui, NarwhalUiWeb.Endpoint,
   live_reload: [
     patterns: [
-      ~r"priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$",
+      ~r"priv/static/.*(css|png|jpeg|jpg|gif|svg)$",
       ~r"priv/gettext/.*(po)$",
       ~r"lib/narwhal_ui_web/(live|views)/.*(ex)$",
       ~r"lib/narwhal_ui_web/templates/.*(eex)$"
