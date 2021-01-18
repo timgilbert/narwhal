@@ -1,4 +1,4 @@
-(ns ^:figwheel-hooks narwhal.narwhal-fe
+(ns ^:figwheel-hooks narwhal.main
   (:require [reagent.dom :as rdom]
             [narwhal.grid :as grid]))
 
