@@ -6,7 +6,7 @@
                          30px 30px 30px 30px
                          30px 30px 30px 30px
                          30px 30px 30px 30px;
-  grid-gap: 2px;
+  gap: 2px;
   background-color: #fff;
   color: #444;
 }

@@ -28,8 +28,11 @@
 (defn grid [pixels]
   [:div.grid
    (for [row (range height)
-         :let [i (* row width)]]
-     ^{:key i} [grid-row pixels i])])
+         col (range width)
+         :let [y (* row width)
+               i (+ y col)
+               c (nth pixels i)]]
+     ^{:key i} [cell c])])
          ;col (range height))])
 
 (defn root []
