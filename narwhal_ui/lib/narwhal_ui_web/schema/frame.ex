@@ -1,4 +1,4 @@
-defmodule NarwhalUiWeb.Schema.Types do
+defmodule NarwhalUiWeb.Schema.Frame do
   @moduledoc false
 
   use Absinthe.Schema.Notation

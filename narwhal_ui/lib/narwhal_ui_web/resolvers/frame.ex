@@ -10,4 +10,9 @@ defmodule NarwhalUiWeb.Resolvers.Frame do
     # TODO: Frame.hex_grid should just return stuff like this
     {:ok, parent |> Frame.hex_grid() |> List.flatten}
   end
+
+  def all_saved_frames(_parent, _args, _resolution) do
+    {:ok, []}
+  end
+
 end
