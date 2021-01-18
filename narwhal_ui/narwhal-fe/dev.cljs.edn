@@ -1,5 +1,7 @@
-^{:watch-dirs ["test" "src"]
-  :css-dirs ["resources/public/css"]
-  :auto-testing true
-   }
-{:main narwhal.narwhal-fe}
+^{:watch-dirs   ["test" "src"]
+  :css-dirs     ["resources/public/css"]
+  :auto-testing true}
+
+{:main            narwhal.narwhal-fe
+ :closure-defines {"re_frame.trace.trace_enabled_QMARK_" true}
+ :preloads        [day8.re-frame-10x.preload]}
