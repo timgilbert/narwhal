@@ -1,22 +1,23 @@
 (ns ^:figwheel-hooks narwhal.main
   (:require [reagent.dom :as rdom]
-            [narwhal.grid :as grid]))
+            [re-frame.core :as rf]
+            [narwhal.app :as app]
+            [narwhal.router :as router]
+            narwhal.events
+            narwhal.subs))
 
-(defn root []
-  (let [pixels (grid/random-pixels)]
-    [:div
-     [grid/grid pixels]]))
-
-(defn mount [el]
-  (rdom/render [root] el))
-
-(defn mount-app-element []
+(defn mount-app-element! []
   (when-let [el (js/document.getElementById "app")]
-    (mount el)))
+    (rdom/render [app/app] el)))
+
+(defn start! []
+  (router/start!)
+  (rf/dispatch-sync [:initialize-db])
+  (mount-app-element!))
 
 ;; conditionally start your application based on the presence of an "app" element
 ;; this is particularly helpful for testing this ns without launching the app
-(mount-app-element)
+(start!)
 
 ;; specify reload hook with ^;after-load metadata
 ;(defn ^:after-load on-reload []

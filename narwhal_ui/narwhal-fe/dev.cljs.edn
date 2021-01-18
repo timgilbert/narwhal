@@ -4,5 +4,6 @@
 
 {:main            narwhal.main
  :closure-defines {"re_frame.trace.trace_enabled_QMARK_" true}
- :preloads        [day8.re-frame-10x.preload]
+ :preloads        [day8.re-frame-10x.preload
+                   dirac.runtime.preload]
  :open-url        false}
