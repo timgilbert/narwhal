@@ -47,6 +47,11 @@ defmodule Unicorn.Frame do
     end)
   end
 
+  @spec pixels(t()) :: [Color.t()]
+  def pixels(frame) do
+    List.flatten(frame.items)
+  end
+
   # TODO: this probably belongs in the hardware module
   @spec unicorn_binary(t()) :: binary
   def unicorn_binary(frame) do

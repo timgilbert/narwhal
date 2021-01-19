@@ -8,11 +8,15 @@ defmodule NarwhalUiWeb.Resolvers.Frame do
 
   def pixels(parent, _args, _resolution) do
     # TODO: Frame.hex_grid should just return stuff like this
-    {:ok, parent |> Frame.hex_grid() |> List.flatten}
+    {:ok, parent |> Frame.pixels() |> List.flatten}
   end
 
   def all_saved_frames(_parent, _args, _resolution) do
     {:ok, []}
+  end
+
+  def create_frame(_parent, _args, _resolution) do
+    {:ok, %{frame: Frame.rand()}}
   end
 
 end
