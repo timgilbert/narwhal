@@ -10,25 +10,31 @@ defmodule NarwhalUiWeb.Schema do
 
   query do
     @desc "Get a random frame"
-    field :random_frame, :frame do
+    field :random_frame, non_null(:frame) do
       resolve &NarwhalUiWeb.Resolvers.Frame.rand/3
     end
 
+    @desc "Get a solid-color frame"
+    field :solid_frame, non_null(:frame) do
+      arg :color, :rgb_color, description: "The color to set the frame to (default black)"
+      resolve &NarwhalUiWeb.Resolvers.Frame.solid/3
+    end
+
     @desc "List all saved frames"
-    field :saved_frames, list_of(:frame) do
+    field :saved_frames, non_null(list_of(:named_frame)) do
       resolve &NarwhalUiWeb.Resolvers.Frame.all_saved_frames/3
     end
 
     @desc "List all saved timelines"
-    field :saved_timelines, list_of(:timeline) do
-      resolve &NarwhalUiWeb.Resolvers.Frame.all_saved_frames/3
+    field :saved_timelines, list_of(:named_timeline) do
+      resolve &NarwhalUiWeb.Resolvers.Timeline.all_saved_timelines/3
     end
   end
 
   mutation do
-    @desc "Create a new frame"
+    @desc "Create a new named frame"
     field :create_frame, :create_frame_response do
-      arg :input, non_null(:new_frame)
+      arg :input, non_null(:new_named_frame)
       resolve &NarwhalUiWeb.Resolvers.Frame.create_frame/3
     end
   end
