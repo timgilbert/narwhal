@@ -1,11 +1,20 @@
 (ns narwhal.events
-  (:require [re-frame.core :as rf]))
+  (:require [re-frame.core :as rf]
+            [re-graph.core :as re-graph]
+            [narwhal.graphql :as graphql]))
 
-(rf/reg-event-db :initialize-db
+(def re-graph-options
+  {:ws   nil
+   :http {}})
+
+(rf/reg-event-fx :initialize-db
   (fn [_db _]
-    {:page/active :home/home}))
+    {:db {:page/active :home/home}
+     :fx [[:dispatch [::re-graph/init re-graph-options]]
+          [:dispatch [:route/navigate {:page :home/home}]]]}))
 
-(rf/reg-event-db :route/go
-  (fn [db [_ {:keys [page slug]}]]
-    (assoc db :page/active page
-              :page/slug slug)))
+(rf/reg-event-fx :route/navigate
+  (fn [{:keys [db]} [_ {:keys [page slug title]}]]
+    (let [nav-info #:page{:active page :title title :slug slug}]
+      {:db (assoc db :nav/page nav-info)})))
+

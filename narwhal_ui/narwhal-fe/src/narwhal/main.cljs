@@ -1,10 +1,12 @@
 (ns ^:figwheel-hooks narwhal.main
   (:require [reagent.dom :as rdom]
             [re-frame.core :as rf]
+            [re-graph.core :as re-graph]
             [narwhal.app :as app]
             [narwhal.router :as router]
             narwhal.events
             narwhal.subs))
+
 
 (defn mount-app-element! []
   (when-let [el (js/document.getElementById "app")]
@@ -12,6 +14,7 @@
 
 (defn start! []
   (router/start!)
+  ;(re-graph/init re-graph-options)
   (rf/dispatch-sync [:initialize-db])
   (mount-app-element!))
 

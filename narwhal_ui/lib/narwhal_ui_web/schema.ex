@@ -33,7 +33,7 @@ defmodule NarwhalUiWeb.Schema do
 
   mutation do
     @desc "Create a new named frame"
-    field :create_frame, :create_frame_response do
+    field :save_frame, :save_frame_response do
       arg :input, non_null(:new_named_frame)
       resolve &NarwhalUiWeb.Resolvers.Frame.create_frame/3
     end

@@ -8,7 +8,8 @@
   ;metosin/reitit             {:mvn/version "0.5.11"}
   binaryage/dirac            {:mvn/version "1.7.2"}
   bidi/bidi                  {:mvn/version "2.1.6"}
-  clj-commons/pushy          {:mvn/version "0.3.10"}}
+  clj-commons/pushy          {:mvn/version "0.3.10"}
+  lambdaisland/glogi         {:mvn/version "1.0.74"}}
 
  :paths
  ["src" "resources"]

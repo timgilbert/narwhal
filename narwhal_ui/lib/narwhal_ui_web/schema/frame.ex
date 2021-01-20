@@ -21,7 +21,7 @@ defmodule NarwhalUiWeb.Schema.Frame do
   end
 
   @desc "Response from a create frame mutation"
-  object :create_frame_response do
+  object :save_frame_response do
     field :named_frame, non_null(:named_frame), description: "The frame that was just created"
   end
 

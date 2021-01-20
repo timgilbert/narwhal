@@ -1,4 +1,4 @@
-(ns narwhal.grid
+(ns narwhal.views.grid
   (:require [goog.string :as gstring]))
 
 (def height 16)
