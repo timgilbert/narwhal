@@ -16,6 +16,7 @@ defmodule NarwhalUiWeb.Router do
   scope "/", NarwhalUiWeb do
     pipe_through :browser
 
+    # TODO: should return this on anything not otherwise matched
     get "/", PageController, :index
   end
 

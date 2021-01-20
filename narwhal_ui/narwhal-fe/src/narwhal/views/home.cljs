@@ -9,7 +9,7 @@
     [:h2 "frames"]))
 
 (defn home [slug]
-  [:main
-   [:h1 "Home"]
-   [timeline-list]
-   [frame-list]])
+  [:article
+   [:img {:src "/images/sea-unicorn.jpg" :width 800 :height 583}]
+   [:h1.uk-heading-small.uk-heading-divider "Welcome to Narwhal"]
+   [:p "To get started, create a new timeline or a new frame."]])

@@ -17,5 +17,9 @@
         title   @(rf/subscribe [:page/title])
         handler (get handlers (or active :home/home))]
     [:div
-     [nav/nav title]
-     [handler slug]]))
+     [nav/top-nav title]
+     [:div.uk-grid.uk-grid-divider {:data-uk-grid ""}
+      [:div {:class "uk-width-1-6@s"}
+       [nav/side-nav]]
+      [:div {:class "uk-width-expand"}
+       [handler slug]]]]))
