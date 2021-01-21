@@ -18,6 +18,8 @@ defmodule NarwhalUiWeb.Router do
 
     # TODO: should return this on anything not otherwise matched
     get "/", PageController, :index
+    get "/frame", PageController, :index
+    get "/timeline", PageController, :index
   end
 
   forward "/graphql", Absinthe.Plug,

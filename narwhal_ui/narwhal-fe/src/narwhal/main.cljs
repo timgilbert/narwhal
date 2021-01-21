@@ -5,6 +5,7 @@
             [narwhal.app :as app]
             [narwhal.router :as router]
             narwhal.events
+            narwhal.graphql
             narwhal.subs))
 
 
@@ -16,6 +17,7 @@
   (router/start!)
   ;(re-graph/init re-graph-options)
   (rf/dispatch-sync [:initialize-db])
+  ;(rf/dispatch-sync [::re-graph/init {:ws nil :http {}}])
   (mount-app-element!))
 
 ;; conditionally start your application based on the presence of an "app" element

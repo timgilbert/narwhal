@@ -1,17 +1,14 @@
 /* some style */
 
-.grid {
+.pixel-grid {
   display: grid;
-  grid-template-columns: 30px 30px 30px 30px
-                         30px 30px 30px 30px
-                         30px 30px 30px 30px
-                         30px 30px 30px 30px;
+  width: 512px;
+  grid-template-columns: repeat(16, 30px);
+  grid-template-rows: repeat(16, 30px) [footer] 64px;
   gap: 2px;
-  background-color: #fff;
-  color: #444;
 }
 
-.cell {
+.pixel-cell {
   background-color: #444;
   color: #fff;
   font-size: 150%;
@@ -19,4 +16,10 @@
   min-height: 30px;
   width: 30px;
   min-width: 30px;
+  cursor: crosshair;
+}
+
+.pixel-footer {
+    grid-row: footer;
+    grid-column: 1 / 17;
 }

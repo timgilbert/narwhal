@@ -10,8 +10,7 @@
 (rf/reg-event-fx :initialize-db
   (fn [_db _]
     {:db {:page/active :home/home}
-     :fx [[:dispatch [::re-graph/init re-graph-options]]
-          [:dispatch [:route/navigate {:page :home/home}]]]}))
+     :fx [[:dispatch [::re-graph/init re-graph-options]]]}))
 
 (rf/reg-event-fx :route/navigate
   (fn [{:keys [db]} [_ {:keys [page slug title]}]]
