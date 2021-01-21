@@ -12,9 +12,12 @@
   (repeatedly (* height width) rand-color))
 
 (defn cell [color index]
-  [:div.pixel-cell {:style    {:background-color color}
-                    :on-click #(>evt [:frame-edit/click index])}
-   [:small (str index)]])
+  [:div.pixel-cell
+   (merge {:style    {:background-color color}
+           :on-click #(>evt [:frame-edit/click index])}
+          (when util/tooltips?
+            {:data-uk-tooltip (str "title: " index "; pos: bottom-left")}))
+   util/nbsp])
 
 (defn grid-footer []
   [:div.uk-flex.uk-flex-middle
@@ -25,10 +28,6 @@
 
 (defn grid [pixels]
   [:div.pixel-grid
-   (for [row (range height)
-         col (range width)
-         :let [y (* row width)
-               i (+ y col)
-               c (nth pixels i)]]
-     ^{:key i} [cell c i])
+   (for [[i color] (map-indexed vector (<sub [:grid/pixels]))]
+     ^{:key i} [cell color i])
    [:div.pixel-footer [grid-footer]]])

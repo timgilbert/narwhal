@@ -9,6 +9,7 @@
 (def >evt rf/dispatch)
 
 (def nbsp (gstring/unescapeEntities "&nbsp;"))
+(def tooltips? true)
 
 (def default-frame-name "*scratch*")
 (def default-timeline-name "*scratch*")
@@ -17,8 +18,6 @@
   ([route-name text]
    (link route-name nil text))
   ([route-name params text]
-   ;(js/console.log [route-name params text])
-   ;(js/console.log (apply bidi/path-for (concat [router/bidi-routes route-name] params)))
    (let [href (apply bidi/path-for (concat [router/bidi-routes route-name] params))]
      [:a {:href href} text])))
 

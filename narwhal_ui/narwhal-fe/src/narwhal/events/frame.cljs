@@ -12,19 +12,24 @@
 
 (rf/reg-event-fx
   :frame-edit/blank
-  (fn [{:keys []} _]
+  (fn [_ _]
     {:fx [[:dispatch [:graphql/query {:graphql/query :frame/blank}]]]}))
 
 (rf/reg-event-fx
   :frame-edit/random
-  (fn [{:keys []} _]
+  (fn [_ _]
     {:fx [[:dispatch [:graphql/query {:graphql/query :frame/random}]]]}))
 
 (rf/reg-event-db
   :frame/new-frame
   (fn [db [_ data]]
-    (js/console.log "DATA" data)
     (assoc-in db [::frames util/default-frame-name] data)))
+
+(rf/reg-event-fx
+  :frame/create-scratch
+  (fn [{:keys [db]} [_ {:page/keys [active title slug]}]]
+    (when (nil? (get-in db [::frames util/default-frame-name]))
+      {:fx [[:dispatch [:frame-edit/blank]]]})))
 
 (rf/reg-sub
   :grid/pixels

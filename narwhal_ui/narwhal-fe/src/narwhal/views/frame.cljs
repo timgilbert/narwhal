@@ -30,7 +30,7 @@
    [:ul.uk-iconnav.uk-iconnav-vertical
     [tool-icon ::pencil "pencil"]
     [tool-icon ::bucket "paint-bucket"]
-    [:li {:on-click #(>evt [:frame-edit/trash])} [util/icon "bolt"]]
+    [:li {:on-click #(>evt [:frame-edit/random])} [util/icon "bolt"]]
     [:li {:on-click #(>evt [:frame-edit/blank])} [util/icon "trash"]]]])
 
 (defn new-frame [slug]
