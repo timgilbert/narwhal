@@ -67,10 +67,11 @@
     [:li {:on-click #(>evt [:frame-edit/random])} [component/icon "bolt"]]
     [:li {:on-click #(>evt [:frame-edit/blank])} [component/icon "trash"]]]])
 
-(defn new-frame [slug]
-  [:div.uk-grid.uk-grid-divider {:data-uk-grid ""}
-   [:div {:class "uk-width-expand"}
-    [:h1 "new-frame"]
-    [grid/grid]]
-   [:div {:class "uk-width-1-6@s"}
-    [controls]]])
+(defn frame-editor []
+  (let [frame-id (<sub [:frame/active-frame-id])]
+    [:div.uk-grid.uk-grid-divider {:data-uk-grid ""}
+     [:div {:class "uk-width-expand"}
+      [grid/header]
+      [grid/grid frame-id]]
+     [:div {:class "uk-width-1-6@s"}
+      [controls]]]))

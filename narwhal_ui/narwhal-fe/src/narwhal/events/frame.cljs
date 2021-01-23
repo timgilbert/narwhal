@@ -2,9 +2,53 @@
   (:require [narwhal.views.grid :as grid]
             [re-frame.core :as rf]
             [narwhal.util :as util :refer [<sub >evt]]
-            [re-graph.core :as re-graph]))
+            [re-graph.core :as re-graph]
+            [vimsical.re-frame.cofx.inject :as inject]))
 
 ;; Frame events
+(defn active-frame-id [db]
+  ;; TODO: check :page/slug etc
+  (get-in db [::frames ::active-frame-id] util/default-frame-id))
+
+(defn frame-by-id [db frame-id]
+  (get-in db [::frames ::named frame-id]))
+
+(defn pixel-by-frame-id [db frame-id pixel-index]
+  (get-in (frame-by-id db frame-id) [:pixels pixel-index]))
+
+(defn active-frame [db]
+  (frame-by-id db (active-frame-id db)))
+
+(rf/reg-sub
+  :frame/active-frame-id
+  (fn [db _] (active-frame-id db)))
+
+(rf/reg-sub
+  ::frames-by-id
+  (fn [db _] (get-in db [::frames ::named])))
+
+(rf/reg-sub
+  :frame/frame-by-id
+  :<- [::frames-by-id]
+  (fn [frames [_ frame-id]] (get frames frame-id)))
+
+(rf/reg-sub
+  :frame/active-frame
+  :<- [::frames-by-id]
+  :<- [:frame/active-frame-id]
+  (fn [[frames active-id] _]
+    (get frames active-id)))
+
+(rf/reg-sub
+  :frame/active-frame-name
+  (fn [db _]
+    ;; TODO: fix up
+    util/default-frame-name))
+
+(rf/reg-sub
+  :frame/dirty?
+  (fn [db _]
+    (get-in db [::frames ::dirty?])))
 
 (rf/reg-event-fx
   :frame-edit/blank
@@ -19,12 +63,12 @@
 (rf/reg-event-db
   :frame/new-frame
   (fn [db [_ data]]
-    (assoc-in db [::frames util/default-frame-name] data)))
+    (assoc-in db [::frames ::named util/default-frame-id] data)))
 
 (rf/reg-event-fx
   :frame/create-scratch
   (fn [{:keys [db]} [_ {:page/keys [active title slug]}]]
-    (when (nil? (get-in db [::frames util/default-frame-name]))
+    (when (nil? (get-in db [::frames ::named util/default-frame-id]))
       {:fx [[:dispatch [:frame-edit/blank]]]})))
 
 ;; Palette events
@@ -57,33 +101,43 @@
 
 (rf/reg-sub
   :grid/pixels
-  (fn [db _]
-    (get-in db [::frames util/default-frame-name :pixels])))
+  :<- [:frame/active-frame]
+  (fn [active-frame _]
+    (js/console.log "active" active-frame)
+    (get active-frame :pixels)))
 
 (rf/reg-event-fx
   :grid/click
-  (fn [{:keys [db]} [_ index]]
+  (fn [{:keys [db]} [_ frame-id index]]
     (let [color (active-color db)
-          next (case (active-tool db)
-                 :tools/pencil [:pencil/click color index]
-                 :tools/bucket [:bucket/click color index])]
+          next  (case (active-tool db)
+                  :tools/pencil [:pencil/click frame-id index color]
+                  :tools/bucket [:bucket/click frame-id index color])]
       (if next {:dispatch next}
                {}))))
 
-(defn pencil-click [db color index]
-  (assoc-in db [::frames util/default-frame-name :pixels index] color))
+(defn pencil-click [db frame-id index color]
+  (if (= (pixel-by-frame-id db frame-id index) color)
+    db
+    (-> db
+        (assoc-in [::frames ::dirty?] true)
+        (assoc-in [::frames ::named frame-id :pixels index] color))))
 
-(defn bucket-click [db color index]
-  (let [frame (get-in db [::frames util/default-frame-name])
-        total (* (:height frame) (:width frame))
+(defn bucket-click [db frame-id _index color]
+  (let [frame  (frame-by-id db frame-id)
+        total  (* (:height frame) (:width frame))
         pixels (into [] (repeat total color))]
-    (assoc-in db [::frames util/default-frame-name :pixels] pixels)))
+    (-> db
+        (assoc-in [::frames ::dirty?] true)
+        (assoc-in [::frames ::named frame-id :pixels] pixels))))
 
 (rf/reg-event-db
   :pencil/click
-  (fn [db [_ color index]] (pencil-click db color index)))
+  (fn [db [_ frame-id index color]]
+    (pencil-click db frame-id index color)))
 
 (rf/reg-event-db
   :bucket/click
-  (fn [db [_ color index]] (bucket-click db color index)))
+  (fn [db [_ frame-id index color]]
+    (bucket-click db frame-id index color)))
 

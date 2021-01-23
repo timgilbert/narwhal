@@ -8,7 +8,7 @@
 (def handlers
   {:home/home    home/home
    :timeline/new timeline/new-timeline
-   :frame/new    frame/new-frame})
+   :frame/new    frame/frame-editor})
 
 (defn app
   []

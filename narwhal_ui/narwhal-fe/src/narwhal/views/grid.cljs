@@ -11,10 +11,10 @@
 (defn random-pixels []
   (repeatedly (* height width) rand-color))
 
-(defn cell [color index]
+(defn cell [frame-id color index]
   [:div.pixel-cell
    (merge {:style    {:background-color color}
-           :on-click #(>evt [:grid/click index])}
+           :on-click #(>evt [:grid/click frame-id index])}
           (when util/tooltips?
             {:data-uk-tooltip (str "title: " index "; pos: bottom-left")}))
    util/nbsp])
@@ -26,8 +26,15 @@
      [:input.uk-input.uk-form-width-medium
       {:type "text" :placeholder "Frame name"}]]]])
 
-(defn grid []
-  [:div.pixel-grid
-   (for [[i color] (map-indexed vector (<sub [:grid/pixels]))]
-     ^{:key i} [cell color i])
-   [:div.pixel-footer [grid-footer]]])
+(defn header []
+  (let [ital (if (<sub [:frame/dirty?]) :i :span)]
+    [:h1
+     [ital (<sub [:frame/active-frame-name])]]))
+
+(defn grid [frame-id]
+  (let [pixels (<sub [:grid/pixels frame-id])]
+    (when pixels
+      [:div.pixel-grid
+       (for [[i color] (map-indexed vector pixels)]
+         ^{:key i} [cell frame-id color i])
+       [:div.pixel-footer [grid-footer]]])))

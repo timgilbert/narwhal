@@ -13,4 +13,6 @@
 (def black (::color/black color/named))
 
 (def default-frame-name "*scratch*")
+(def default-frame-id ::scratch-frame)
 (def default-timeline-name "*scratch*")
+(def default-timeline-id ::scratch-timeline)
