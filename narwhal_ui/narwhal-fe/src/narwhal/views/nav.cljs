@@ -1,5 +1,6 @@
 (ns narwhal.views.nav
   (:require [narwhal.util :as util :refer [<sub]]
+            [narwhal.views.component :as component]
             [re-frame.core :as rf]))
 
 (defn top-nav [title]
@@ -12,8 +13,8 @@
        [:span "Narwhal"]]]]]
    [:div.uk-navbar-right
     [:ul.uk-navbar-nav
-     [:li [util/link :timeline/new "New Timeline"]]
-     [:li [util/link :frame/new "New Frame"]]
+     [:li [component/link :timeline/new "New Timeline"]]
+     [:li [component/link :frame/new "New Frame"]]
      ;; TODO: below should be conditional based on elixir settings
      [:li [:a {:href "/dashboard"} "Dashboard"]]]]])
 
@@ -26,11 +27,11 @@
        [:a {:href "#"} "Timelines"]
        [:ul.uk-sub-nav
         [:li [:a {:href "/timeline"}
-              [util/icon "plus-circle"]
+              [component/icon "plus-circle"]
               "Create Timeline"]]]]
       [:li {:class (str "uk-parent" frame-class)}
        [:a {:href "#"} "Frames"]
        [:ul.uk-sub-nav
         [:li [:a {:href "/frame"}
-              [util/icon "plus-circle"]
+              [component/icon "plus-circle"]
               "Create Frame"]]]]]]))

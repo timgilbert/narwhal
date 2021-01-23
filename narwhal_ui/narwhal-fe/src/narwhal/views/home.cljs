@@ -1,5 +1,5 @@
 (ns narwhal.views.home
-  (:require [narwhal.util :as util]))
+  (:require [narwhal.views.component :as component]))
 
 (defn timeline-list []
   (let [timeline []]
@@ -15,7 +15,7 @@
    [:h1.uk-heading-small.uk-heading-divider "Welcome to Narwhal"]
    [:p "To get started, create a new timeline or a new frame."]
    [:p
-    [util/icon "github"]
+    [component/icon "github"]
     [:span.uk-text-middle [:a {:href "https://github.com/timgilbert/narwhal"}
                            " Github"]]]
    [:p (str "This site uses images from 'Narwhal by Kelly Robinson "

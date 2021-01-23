@@ -14,7 +14,7 @@
 (defn cell [color index]
   [:div.pixel-cell
    (merge {:style    {:background-color color}
-           :on-click #(>evt [:frame-edit/click index])}
+           :on-click #(>evt [:grid/click index])}
           (when util/tooltips?
             {:data-uk-tooltip (str "title: " index "; pos: bottom-left")}))
    util/nbsp])
@@ -26,7 +26,7 @@
      [:input.uk-input.uk-form-width-medium
       {:type "text" :placeholder "Frame name"}]]]])
 
-(defn grid [pixels]
+(defn grid []
   [:div.pixel-grid
    (for [[i color] (map-indexed vector (<sub [:grid/pixels]))]
      ^{:key i} [cell color i])

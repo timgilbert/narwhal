@@ -3,7 +3,7 @@
             [narwhal.views.home :as home]
             [narwhal.views.timeline :as timeline]
             [narwhal.views.frame :as frame]
-            [re-frame.core :as rf]))
+            [narwhal.util :as util :refer [<sub]]))
 
 (def handlers
   {:home/home    home/home
@@ -12,9 +12,9 @@
 
 (defn app
   []
-  (let [active  @(rf/subscribe [:page/active])
-        slug    @(rf/subscribe [:page/slug])
-        title   @(rf/subscribe [:page/title])
+  (let [active  (<sub [:page/active])
+        slug    (<sub [:page/slug])
+        title   (<sub [:page/title])
         handler (get handlers (or active :home/home))]
     [:div
      [nav/top-nav title]

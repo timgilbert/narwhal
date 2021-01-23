@@ -1,10 +1,6 @@
 # narwhal-fe
 
-FIXME: Write a one-line description of your library/project.
-
-## Overview
-
-FIXME: Write a paragraph about the library/project and highlight its goals.
+Front-end for narwhal.
 
 ## Development
 
@@ -29,9 +25,8 @@ To create a production build run:
 	rm -rf target/public
 	clojure -A:fig:min
 
+## TODO
 
-## License
-
-Copyright © 2018 FIXME
-
-Distributed under the Eclipse Public License either version 1.0 or (at your option) any later version.
+- Custom cursors
+- glogi logging + dev mode
+- Color picker, better palette
