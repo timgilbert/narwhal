@@ -40,6 +40,13 @@
     (get frames active-id)))
 
 (rf/reg-sub
+  :frame/frame-name
+  :<- [::frames-by-id]
+  (fn [frames [_ frame-id]]
+    ;; TODO: fix up
+    (-> frames (get frame-id) (get :name))))
+
+(rf/reg-sub
   :frame/active-frame-name
   (fn [db _]
     ;; TODO: fix up
@@ -60,16 +67,33 @@
   (fn [_ _]
     {:fx [[:dispatch [:graphql/query {:graphql/query :frame/random}]]]}))
 
+(defn add-defaults [data]
+  (merge {:id   util/default-frame-id
+          :name util/default-frame-name}
+         data))
+
 (rf/reg-event-db
   :frame/new-frame
   (fn [db [_ data]]
-    (assoc-in db [::frames ::named util/default-frame-id] data)))
+    (assoc-in db [::frames ::named util/default-frame-id] (add-defaults data))))
 
 (rf/reg-event-fx
   :frame/create-scratch
   (fn [{:keys [db]} [_ {:page/keys [active title slug]}]]
     (when (nil? (get-in db [::frames ::named util/default-frame-id]))
       {:fx [[:dispatch [:frame-edit/blank]]]})))
+
+(rf/reg-event-db
+  :frame/update-title
+  (fn [db [_ frame-id {:keys [values] :as evt}]]
+    (let [new-name (get values "name")
+          ;; TODO: Figure out a better way to deal with the namespaces below
+          new-db   (dissoc db :narwhal.views.frame/frame-edit?)]
+      (if (not= new-name "")
+        (-> new-db
+            (assoc-in [::frames ::named frame-id :name] new-name)
+            (assoc [::frames ::dirty?] true))
+        new-db))))
 
 ;; Palette events
 
@@ -103,7 +127,6 @@
   :grid/pixels
   :<- [:frame/active-frame]
   (fn [active-frame _]
-    (js/console.log "active" active-frame)
     (get active-frame :pixels)))
 
 (rf/reg-event-fx

@@ -28,7 +28,7 @@
   (fn [{:keys [db]} [_ query {:keys [data errors] :as payload}]]
     (let [dispatch (get-in queries [query ::dispatch])
           process  (get-in queries [query ::process] identity)]
-      (js/console.log "d" query "handler" dispatch "payload " payload)
+      (js/console.log "q" query "handler" dispatch "payload " payload)
       (merge {:db (update-in db [::in-flight?] dissoc query)}
              (when dispatch
                {:dispatch (conj dispatch (process data))})))))

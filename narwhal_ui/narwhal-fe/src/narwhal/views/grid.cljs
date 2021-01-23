@@ -26,15 +26,9 @@
      [:input.uk-input.uk-form-width-medium
       {:type "text" :placeholder "Frame name"}]]]])
 
-(defn header []
-  (let [ital (if (<sub [:frame/dirty?]) :i :span)]
-    [:h1
-     [ital (<sub [:frame/active-frame-name])]]))
-
 (defn grid [frame-id]
   (let [pixels (<sub [:grid/pixels frame-id])]
     (when pixels
       [:div.pixel-grid
        (for [[i color] (map-indexed vector pixels)]
-         ^{:key i} [cell frame-id color i])
-       [:div.pixel-footer [grid-footer]]])))
+         ^{:key i} [cell frame-id color i])])))
