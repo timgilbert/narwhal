@@ -60,12 +60,12 @@
 (rf/reg-event-fx
   :frame-edit/blank
   (fn [_ _]
-    {:fx [[:dispatch [:graphql/query {:graphql/query :frame/blank}]]]}))
+    {:fx [[:dispatch [:graphql/query {:graphql/query :frame-gql/blank}]]]}))
 
 (rf/reg-event-fx
   :frame-edit/random
   (fn [_ _]
-    {:fx [[:dispatch [:graphql/query {:graphql/query :frame/random}]]]}))
+    {:fx [[:dispatch [:graphql/query {:graphql/query :frame-gql/random}]]]}))
 
 (defn add-defaults [data]
   (merge {:id   util/default-frame-id
@@ -73,9 +73,10 @@
          data))
 
 (rf/reg-event-db
-  :frame/new-frame
+  :frame-gql/frame-loaded
   (fn [db [_ data]]
-    (assoc-in db [::frames ::named util/default-frame-id] (add-defaults data))))
+    (assoc-in db [::frames ::named util/default-frame-id]
+              (add-defaults data))))
 
 (rf/reg-event-fx
   :frame/create-scratch
@@ -83,17 +84,43 @@
     (when (nil? (get-in db [::frames ::named util/default-frame-id]))
       {:fx [[:dispatch [:frame-edit/blank]]]})))
 
+;; Called when the user has submitted an update to the frame-name form
+;; NB: Should probably validate versus the list of named frames
 (rf/reg-event-db
   :frame/update-title
   (fn [db [_ frame-id {:keys [values] :as evt}]]
-    (let [new-name (get values "name")
+    (let [new-name (:name values)
           ;; TODO: Figure out a better way to deal with the namespaces below
           new-db   (dissoc db :narwhal.views.frame/frame-edit?)]
       (if (not= new-name "")
         (-> new-db
             (assoc-in [::frames ::named frame-id :name] new-name)
-            (assoc [::frames ::dirty?] true))
+            (assoc-in [::frames ::dirty?] true))
         new-db))))
+
+(rf/reg-event-fx
+  :frame/save-frame
+  (fn [{:keys [db]} [_ frame-id]]
+    (let [frame     (frame-by-id db frame-id)
+          gql-query (if (= frame-id util/default-frame-id)
+                      :frame-gql/create-frame :frame-gql/update-frame)]
+      {:dispatch [:graphql/query #:graphql{:query gql-query
+                                           :vars  {:frame    frame
+                                                   :frame-id frame-id}}]})))
+
+(rf/reg-event-fx
+  :frame-gql/frame-created
+  (fn [{:keys [db]} [_ data]]
+    (js/console.log "Created!" data)
+    ;; Update saved frame list in db
+    ;; Redirect to edit page for new ID
+    {}))
+
+(rf/reg-event-fx
+  :frame/revert-frame
+  (fn [{:keys [db]} [_ frame-id]]
+    (js/console.log "Revert" frame-id)
+    {}))
 
 ;; Palette events
 

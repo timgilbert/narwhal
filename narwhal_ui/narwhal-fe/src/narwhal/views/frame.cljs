@@ -99,8 +99,9 @@
       :name        "name"
       :on-change   handle-change
       :on-blur     handle-blur
-      :value       (values "name")
-      :placeholder (values "name")}]
+      :value       (:name values)
+      :auto-focus  "autoFocus"
+      :placeholder (:placeholder values)}]
     [:button.uk-button.uk-button-primary
      {:type     "submit"
       :disabled submitting?}
@@ -113,12 +114,14 @@
 
 (defn edit-frame-name [frame-id]
   (let [curr-name (<sub [:frame/frame-name frame-id])
-        form-id   (str "edit-frame-name." frame-id)]
+        init-name (if (= curr-name util/default-frame-name)
+                    "" curr-name)]
     [fork/form
-     {:initial-values    {"name" curr-name}
+     {:initial-values    {:name        init-name
+                          :placeholder curr-name}
       :prevent-default?  true
-      :form-id           form-id
       :clean-on-unmount? true
+      :keywordize-keys   true
       :path              [::edit-name-form]
       :on-submit         #(>evt [:frame/update-title frame-id %])}
      edit-frame-name-form]))
@@ -129,12 +132,28 @@
     [edit-frame-name frame-id]
     [display-frame-name frame-id]))
 
+(defn save-controls [frame-id]
+  ;; TODO: change buttons when editing/creating
+  ;; TODO: no revert on *scratch*
+  (let [disabled? (if (<sub [:frame/dirty?]) false true)]
+    [:div.uk-flex
+     [:button.uk-button.uk-button-primary
+      {:on-click #(>evt [:frame/save-frame frame-id])
+       :disabled disabled?}
+      [component/icon "cloud-upload"]
+      " Save"]
+     [:button.uk-button.uk-button-default
+      {:on-click #(>evt [:frame/revert-frame frame-id])
+       :disabled disabled?}
+      [component/icon "refresh"]
+      " Revert"]]))
 
 (defn frame-editor []
   (let [frame-id (<sub [:frame/active-frame-id])]
     [:div.uk-grid.uk-grid-divider {:data-uk-grid ""}
      [:div {:class "uk-width-expand"}
       [grid/grid frame-id]
-      [frame-name frame-id]]
+      [frame-name frame-id]
+      [save-controls frame-id]]
      [:div {:class "uk-width-1-6@s"}
       [controls]]]))

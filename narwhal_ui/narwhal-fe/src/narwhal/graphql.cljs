@@ -3,14 +3,20 @@
             [re-graph.core :as re-graph]))
 
 (def queries
-  {:frame/random
-   {::dispatch [:frame/new-frame]
+  {:frame-gql/random
+   {::dispatch [:frame-gql/frame-loaded]
     ::process  :frame
     ::text     "
 { frame: randomFrame { height width pixels } }
 "}
-   :frame/blank
-   {::dispatch [:frame/new-frame]
+   :frame-gql/blank
+   {::dispatch [:frame-gql/frame-loaded]
+    ::process  :frame
+    ::text     "
+{ frame: solidFrame(color:\"000000\") { height width pixels } }
+"}
+   :frame-gql/create-frame
+   {::dispatch [:frame-gql/frame-created]
     ::process  :frame
     ::text     "
 { frame: solidFrame(color:\"000000\") { height width pixels } }

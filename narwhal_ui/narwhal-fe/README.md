@@ -30,3 +30,5 @@ To create a production build run:
 - Custom cursors
 - glogi logging + dev mode
 - Color picker, better palette
+- Tiny thumbnails for frames - canvas? svg? in-memory image?
+- Handle gql errors
