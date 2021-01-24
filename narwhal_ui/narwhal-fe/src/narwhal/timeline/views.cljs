@@ -5,3 +5,8 @@
             [narwhal.util :as util :refer [<sub >evt]]
             narwhal.timeline.events
             narwhal.timeline.subs))
+
+(defn new-timeline []
+  [:div
+   [:h1 "timelines"]
+   [:p "coming soon!"]])

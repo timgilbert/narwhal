@@ -1,6 +1,6 @@
 (ns narwhal.views.component
   (:require [bidi.bidi :as bidi]
-            [narwhal.router :as router]
+            [narwhal.app.router :as router]
             [narwhal.util :as util :refer [<sub >evt]]
             [re-frame.core :as rf]))
 

@@ -1,4 +1,4 @@
-(ns narwhal.router
+(ns narwhal.app.router
   (:require [bidi.bidi :as bidi]
             [pushy.core :as pushy]
             [re-frame.core :as rf]

@@ -1,12 +1,10 @@
 (ns ^:figwheel-hooks narwhal.main
   (:require [reagent.dom :as rdom]
             [re-frame.core :as rf]
-            [re-graph.core :as re-graph]
             [lambdaisland.glogi.console :as glogi-console]
             [lambdaisland.glogi :as log]
-            [narwhal.app :as app]
-            [narwhal.router :as router]
-            narwhal.events
+            [narwhal.app.views :as app]
+            [narwhal.app.router :as router]
             narwhal.graphql))
 
 (defn init-logging!
@@ -25,8 +23,7 @@
   ;(re-graph/init re-graph-options)
   (rf/dispatch-sync [:initialize-db])
   ;(rf/dispatch-sync [::re-graph/init {:ws nil :http {}}])
-  (mount-app-element!)
-  (log/info :hello #:message{:world "there" :val 23}))
+  (mount-app-element!))
 
 ;; conditionally start your application based on the presence of an "app" element
 ;; this is particularly helpful for testing this ns without launching the app
