@@ -7,8 +7,7 @@
             [narwhal.app :as app]
             [narwhal.router :as router]
             narwhal.events
-            narwhal.graphql
-            narwhal.subs))
+            narwhal.graphql))
 
 (defn init-logging!
   ([] (init-logging! :trace))

@@ -6,7 +6,7 @@
             [narwhal.nav.events :as events]
             [narwhal.nav.subs :as subs]))
 
-(defn top-nav [title]
+(defn top-nav []
   [:nav.uk-navbar-container {:data-uk-navbar ""}
    [:div.uk-navbar-left
     [:ul.uk-navbar-nav
@@ -21,29 +21,35 @@
      ;; TODO: below should be conditional based on elixir settings
      [:li [:a {:href "/dashboard"} "Dashboard"]]]]])
 
-(defn frame-nav-item [{:keys [id] :as frame}]
-  (let [href (str "/frame" (when (not= id util/default-frame-id) (str "/" id)))]
+(defn frame-nav-item
+  [{::subs/keys [item item-id active?]}]
+  (let [href (str "/frame" (when (not= item-id util/default-frame-id)
+                             (str "/" item-id)))
+        class (if active? "uk-active" "")]
     [:li
-     [:a {:href href}
-      (:name frame)]]))
+     [:a {:href href :class class}
+      (:name item)]]))
 
 (defn side-nav-menu
   [menu-sub last-component]
   (into [:ul.uk-sub-nav]
         (concat
-          (for [frame (<sub [menu-sub])]
-            ^{:key (str menu-sub (:id frame))}
-            [frame-nav-item frame])
+          (for [{::subs/keys [item-id] :as entry} (<sub menu-sub)
+                :let [key (log/spy (str menu-sub "." item-id))]]
+            ^{:key key}
+            [frame-nav-item entry]) ; TODO: handle timelines
+          ^{:key (str menu-sub ".default")}
           [last-component])))
 
 (defn side-nav []
   (let [active-attrs   {:class (str "uk-parent uk-active")}
         inactive-attrs {:class (str "uk-parent")}
-        timeline-attrs (if (<sub [:page/timeline?]) active-attrs inactive-attrs)
-        frame-attrs    (if (<sub [:page/frame?]) active-attrs inactive-attrs)]
+        timeline-attrs (if (<sub [::subs/page-type? :timeline-page])
+                         active-attrs inactive-attrs)
+        frame-attrs    (if (<sub [::subs/page-type? :frame-page])
+                         active-attrs inactive-attrs)]
     [:div
      [:ul.uk-nav.uk-nav-side.uk-nav-primary
-      ;{:data-uk-nav "{multiple:true}"}
       [:li timeline-attrs
        [:a {:href "#"} "Timelines"]
        [side-nav-menu ::subs/timelines

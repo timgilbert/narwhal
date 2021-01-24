@@ -2,16 +2,17 @@
   (:require [re-frame.core :as rf]
             [re-graph.core :as re-graph]
             [narwhal.util :as util]
-            [narwhal.events.frame :as frame-events]))
+            [narwhal.events.frame :as frame-events]
+            [narwhal.nav.db :as nav-db]))
 
 (def re-graph-options
   {:ws   nil
    :http {}})
 
 (defn initial-db []
-  {:page/active :home/home
-   :palette/active-color util/black
-   ::nav {::frames [] ::timelines []}})
+  (->
+    {:palette/active-color util/black}
+    nav-db/init-db))
 
 (rf/reg-event-fx :initialize-db
   (fn [_db _]

@@ -3,7 +3,9 @@
             [re-frame.core :as rf]
             [narwhal.color :as color]))
 
-(def <sub (comp deref rf/subscribe))
+(defn <sub [sub]
+  (let [sub-vec (if (keyword? sub) [sub] sub)]
+    (deref (rf/subscribe sub-vec))))
 
 (def >evt rf/dispatch)
 

@@ -6,7 +6,7 @@
 
 (rf/reg-sub
   ::frame-root
-  (fn [db _] (get-in db db/frame-path)))
+  (fn [db _] (get-in db (db/frame-path))))
 
 (rf/reg-sub
   ::all-frames

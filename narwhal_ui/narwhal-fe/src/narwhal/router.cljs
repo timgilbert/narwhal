@@ -1,33 +1,34 @@
 (ns narwhal.router
   (:require [bidi.bidi :as bidi]
             [pushy.core :as pushy]
-            [re-frame.core :as rf]))
+            [re-frame.core :as rf]
+            [narwhal.nav.db :as nav-db]))
 
 (def pages
   "Big list of our top-level pages, along with their routes and any events
   we should fire off when we navigate to them"
-  {:home/home     {::url   ""
-                   ::title "Home"}
-   :timeline/new  {::url   "timeline"
-                   ::title "New Timeline"}
-   :timeline/edit {::url   "timeline/"
-                   ::param [:slug]
-                   ::title "Edit Timeline"}
-   :frame/new     {::url      "frame"
-                   ::title    "New Frame"
-                   ::dispatch [:frame/create-scratch]}
-   :frame/edit    {::url   "frame/"
-                   ::param [:slug]
-                   ::title "Edit Frame"}})
+  {:home-page/home     {::url   ""
+                        ::title "Home"}
+   :timeline-page/new  {::url   "timeline"
+                        ::title "New Timeline"}
+   :timeline-page/edit {::url   "timeline/"
+                        ::param [:id]
+                        ::title "Edit Timeline"}
+   :frame-page/new     {::url      "frame"
+                        ::title    "New Frame"
+                        ::dispatch [:frame/create-scratch]}
+   :frame-page/edit    {::url   "frame/"
+                        ::param [:id]
+                        ::title "Edit Frame"}})
 
 (rf/reg-event-fx
   :route/navigate
-  (fn [{:keys [db]} [_ {:keys [page slug title]}]]
-    (let [nav-info #:page{:active page :title title :slug slug}]
+  (fn [{:keys [db]} [_ destination]]
+    (let [config (get pages (:route/page destination))]
       (merge
-        {:db (assoc db :nav/page nav-info)}
-        (when-let [dispatch (get-in pages [page ::dispatch])]
-          {:dispatch (conj dispatch nav-info)})))))
+        {:db (nav-db/set-page db destination)}
+        (when-let [dispatch (::dispatch config)]
+          {:dispatch (conj dispatch destination)})))))
 
 (defn gen-bidi-routes [pages]
   (let [r-map (->> (for [[page {::keys [url param]}] pages]
@@ -40,8 +41,8 @@
 
 (def history
   (let [dispatch #(rf/dispatch [:route/navigate
-                                {:page (:handler %)
-                                 :slug (get-in % [:route-params :slug])}])
+                                #:route{:page (:handler %)
+                                        :id   (get-in % [:route-params :id])}])
         match    #(bidi/match-route bidi-routes %)]
     (pushy/pushy dispatch match)))
 

@@ -6,7 +6,7 @@
 
 (rf/reg-sub
   ::timeline-root
-  (fn [db _] (get-in db db/frame-path)))
+  (fn [db _] (get-in db db/timeline-path)))
 
 (rf/reg-sub
   ::all-timelines

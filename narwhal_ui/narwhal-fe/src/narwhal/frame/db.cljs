@@ -3,8 +3,13 @@
             [re-frame.core :as rf]
             [narwhal.util :as util :refer [<sub >evt]]))
 
-(def frame-path [:f/frames])
+(defn frame-path
+  ([& rest]
+   (concat [:f/frames] rest)))
+
+(defn init-db [db]
+  (assoc-in db (frame-path) {}))
 
 (defn replace-all-frames
   [db frame-list]
-  (assoc-in db frame-path (group-by :id frame-list)))
+  (assoc-in db (frame-path) (group-by :id frame-list)))

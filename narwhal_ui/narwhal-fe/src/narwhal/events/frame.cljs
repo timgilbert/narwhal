@@ -91,8 +91,8 @@
     {:fx [[:dispatch [:graphql/query {:graphql/query :frame-gql/random}]]]}))
 
 (defn with-blank-metadata [frame-data]
-  (merge {:id   util/default-frame-id
-          :name util/default-frame-name
+  (merge {:id    util/default-frame-id
+          :name  util/default-frame-name
           :frame frame-data}))
 
 (rf/reg-event-db
@@ -140,9 +140,10 @@
       (log/debug "Created!" data)
       ;; Update saved frame list in db
       ;; Redirect to edit page for new ID
-      {:db (assoc-in db [:narwhal.events/nav :narwhal.events/frames]
-                     (:allFrames data))
-       :dispatch [:route/navigate {:page :frame/edit :slug new-frame-id}]})))
+      {:db       (assoc-in db [:narwhal.events/nav :narwhal.events/frames]
+                           (:allFrames data))
+       :dispatch [:route/navigate #:route{:page :frame-page/edit
+                                          :id   new-frame-id}]})))
 
 (rf/reg-event-fx
   :frame/revert-frame
