@@ -20,8 +20,17 @@
    {::dispatch [:nav-gql/nav-loaded]
     ::text     "
 {
-  frames: allFrames {id name}
+  frames: allFrames { ...FrameFields }
   timelines: allTimelines {id name}
+}
+fragment FrameFields on FrameMetadata {
+  id
+  name
+  frame {
+    height
+    width
+    pixels
+  }
 }
 "}
    :frame-gql/create-frame

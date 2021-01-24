@@ -23,7 +23,7 @@
   (init-logging!)
   (router/start!)
   ;(re-graph/init re-graph-options)
-  (rf/dispatch-sync (log/spy [:initialize-db]))
+  (rf/dispatch-sync [:initialize-db])
   ;(rf/dispatch-sync [::re-graph/init {:ws nil :http {}}])
   (mount-app-element!)
   (log/info :hello #:message{:world "there" :val 23}))

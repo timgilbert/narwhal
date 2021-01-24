@@ -12,4 +12,5 @@
 
 (defn replace-all-frames
   [db frame-list]
-  (assoc-in db (frame-path) (group-by :id frame-list)))
+  (let [frame-map (reduce (fn [acc f] (assoc acc (:id f) f)) {} frame-list)]
+    (assoc-in db (frame-path) frame-map)))

@@ -13,9 +13,8 @@
   :<- [::frame-root]
   (fn [root _]
     (->> root
-         (map second)
-         (sort-by :name) ; TODO: more sort options
-         (into []))))
+         vals
+         (sort-by :name)))) ; TODO: more sort options
 
 (rf/reg-sub
   ::frame
