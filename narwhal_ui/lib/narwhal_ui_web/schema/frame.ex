@@ -14,19 +14,22 @@ defmodule NarwhalUiWeb.Schema.Frame do
   end
 
   @desc "A frame that has been saved with a name"
-  object :named_frame do
+  object :frame_metadata do
     field :id, non_null(:string), description: "The unique ID of the saved frame"
     field :name, non_null(:string), description: "The display name of the frame"
     field :frame, non_null(:frame), description: "The frame data"
   end
 
   @desc "Response from a create frame mutation"
-  object :save_frame_response do
-    field :named_frame, non_null(:named_frame), description: "The frame that was just created"
+  object :create_frame_response do
+    field :frame, non_null(:frame_metadata),
+          description: "The frame that was just created"
+    field :all_frames, non_null(list_of(non_null(:frame_metadata))),
+          description: "The new list of all saved frames"
   end
 
   @desc "Input object for a new frame"
-  input_object :new_named_frame do
+  input_object :new_frame_metadata do
     field :name, non_null(:string), description: "Name of the new frame"
     field :frame, non_null(:new_frame_data) do
       description "The data for the frame we're saving"

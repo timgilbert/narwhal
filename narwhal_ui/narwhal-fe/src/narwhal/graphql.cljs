@@ -19,7 +19,18 @@
    {::dispatch [:frame-gql/frame-created]
     ::process  :frame
     ::text     "
-{ frame: solidFrame(color:\"000000\") { height width pixels } }
+mutation m($i: NewNamedFrame!) {
+  createFrame(input: $i) {
+    frame {
+      id
+      name
+    }
+    allFrames {
+      id
+      name
+    }
+  }
+}
 "}})
 
 (rf/reg-event-fx

@@ -1,6 +1,8 @@
 defmodule NarwhalUiWeb.Resolvers.Frame do
   @moduledoc false
+  require Logger
   alias Unicorn.Frame
+  alias NarwhalUi.Repo
 
   def rand(_parent, _args, _resolution) do
     {:ok, Frame.rand()}
@@ -22,8 +24,10 @@ defmodule NarwhalUiWeb.Resolvers.Frame do
     {:ok, []}
   end
 
-  def create_frame(_parent, _args, _resolution) do
-    {:ok, %{frame: Frame.rand()}}
+  def create_frame(_parent, %{input: input}, _resolution) do
+    Logger.debug(inspect input)
+    {:ok, metadata} = Repo.insert_new_frame(input)
+    {:ok, %{frame: metadata, all_frames: [metadata]}}
   end
 
 end

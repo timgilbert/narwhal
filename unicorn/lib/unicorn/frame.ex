@@ -1,13 +1,22 @@
 defmodule Unicorn.Frame do
   # TODO: replace with single-list implementation instead of nested list
-
   alias Unicorn.Color
+  require Logger
+
   defstruct height: 16, width: 16, items: []
   @type t :: %__MODULE__{height: non_neg_integer, width: non_neg_integer, items: any}
 
   @start_of_file 0x72
   @spec default_color :: Color.t()
   def default_color, do: Color.black()
+
+  def new(%{height: height, width: width, pixels: pixels}) do
+    %__MODULE__{
+      items: pixels,
+      height: height,
+      width: width
+    }
+  end
 
   @spec new(keyword()) :: t()
   def new(options \\ []) do

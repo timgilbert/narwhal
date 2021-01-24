@@ -5,6 +5,7 @@ defmodule NarwhalUiWeb.Schema do
 
   import_types NarwhalUiWeb.Schema.Color
   import_types NarwhalUiWeb.Schema.Frame
+  import_types NarwhalUiWeb.Schema.General
   import_types NarwhalUiWeb.Schema.Timeline
   import_types NarwhalUiWeb.Schema.Effect
 
@@ -21,7 +22,8 @@ defmodule NarwhalUiWeb.Schema do
     end
 
     @desc "List all saved frames"
-    field :saved_frames, non_null(list_of(:named_frame)) do
+    field :saved_frames, non_null(list_of(:frame_metadata)) do
+      arg :options, :sort_options, description: "Sort options for the frames"
       resolve &NarwhalUiWeb.Resolvers.Frame.all_saved_frames/3
     end
 
@@ -33,8 +35,8 @@ defmodule NarwhalUiWeb.Schema do
 
   mutation do
     @desc "Create a new named frame"
-    field :save_frame, :save_frame_response do
-      arg :input, non_null(:new_named_frame)
+    field :create_frame, :create_frame_response do
+      arg :input, non_null(:new_frame_metadata)
       resolve &NarwhalUiWeb.Resolvers.Frame.create_frame/3
     end
   end

@@ -5,6 +5,10 @@ defmodule NarwhalUi.Application do
 
   use Application
 
+  # TODO: move to config
+#  @cubdb_data_dir Application.get_env(:playlist_log, PlaylistLog.Repo)[:data_dir]
+  @cubdb_data_dir "/tmp/cubdb"
+
   def start(_type, _args) do
     children = [
       # Start the Telemetry supervisor
@@ -12,7 +16,11 @@ defmodule NarwhalUi.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: NarwhalUi.PubSub},
       # Start the Endpoint (http/https)
-      NarwhalUiWeb.Endpoint
+      NarwhalUiWeb.Endpoint,
+      CubDB.child_spec(
+        data_dir: @cubdb_data_dir,
+        name: :cubdb
+      )
       # Start a worker by calling: NarwhalUi.Worker.start_link(arg)
       # {NarwhalUi.Worker, arg}
     ]
