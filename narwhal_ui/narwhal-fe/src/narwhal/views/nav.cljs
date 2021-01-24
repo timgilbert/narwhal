@@ -18,20 +18,38 @@
      ;; TODO: below should be conditional based on elixir settings
      [:li [:a {:href "/dashboard"} "Dashboard"]]]]])
 
+(defn frame-nav-item [frame]
+  [:li
+   [:a {:href (str "/frame/" (:id frame))}
+    (:name frame)]])
+
+(defn side-nav-menu
+  [menu-sub last-component]
+  (into [:ul.uk-sub-nav]
+        (concat
+          (for [frame (<sub [menu-sub])]
+            ^{:key (str menu-sub (:id frame))}
+            [frame-nav-item frame])
+          [last-component])))
+
 (defn side-nav []
-  (let [timeline-class (if (<sub [:page/timeline?]) " uk-active" "")
-        frame-class    (if (<sub [:page/frame?]) " uk-active" "")]
+  (let [active-attrs   {:class (str "uk-parent uk-active")}
+        inactive-attrs {:class (str "uk-parent")}
+        timeline-attrs (if (<sub [:page/timeline?]) active-attrs inactive-attrs)
+        frame-attrs    (if (<sub [:page/frame?]) active-attrs inactive-attrs)]
     [:div
-     [:ul.uk-nav-primary.uk-nav-parent-icon {:data-uk-nav ""}
-      [:li {:class (str "uk-parent" timeline-class)}
+     [:ul.uk-nav.uk-nav-side.uk-nav-primary
+      ;{:data-uk-nav "{multiple:true}"}
+      [:li timeline-attrs
        [:a {:href "#"} "Timelines"]
-       [:ul.uk-sub-nav
+       [side-nav-menu :timeline/all-timelines
         [:li [:a {:href "/timeline"}
               [component/icon "plus-circle"]
               "Create Timeline"]]]]
-      [:li {:class (str "uk-parent" frame-class)}
+
+      [:li frame-attrs
        [:a {:href "#"} "Frames"]
-       [:ul.uk-sub-nav
-        [:li [:a {:href "/frame"}
+       [side-nav-menu :frame/all-frames
+        [:li [:a {:href "/timeline"}
               [component/icon "plus-circle"]
-              "Create Frame"]]]]]]))
+              "Create Timeline"]]]]]]))

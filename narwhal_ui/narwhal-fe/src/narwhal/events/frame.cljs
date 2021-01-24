@@ -5,6 +5,11 @@
             [re-graph.core :as re-graph]
             [vimsical.re-frame.cofx.inject :as inject]))
 
+;; temp timeline
+(rf/reg-sub
+  :timeline/all-timelines
+  (constantly []))
+
 ;; Frame events
 (defn active-frame-id [db]
   ;; TODO: check :page/slug etc
@@ -31,6 +36,15 @@
   :frame/frame-by-id
   :<- [::frames-by-id]
   (fn [frames [_ frame-id]] (get frames frame-id)))
+
+(rf/reg-sub
+  :frame/all-frames
+  :<- [::frames-by-id]
+  (fn [frames _]
+    (->> frames
+         ;; TODO: could sort here
+         (map second)
+         (into []))))
 
 (rf/reg-sub
   :frame/active-frame
@@ -121,6 +135,9 @@
   (fn [{:keys [db]} [_ frame-id]]
     (js/console.log "Revert" frame-id)
     {}))
+
+;; Frame lists
+
 
 ;; Palette events
 

@@ -43,6 +43,7 @@ mutation m($i: NewNamedFrame!) {
 (rf/reg-event-fx
   ::query-return
   (fn [{:keys [db]} [_ query {:keys [data errors] :as payload}]]
+    ;; TODO: if errors, set them in the db somewhere and dispatch
     (let [dispatch (get-in queries [query ::dispatch])
           process  (get-in queries [query ::process] identity)]
       (js/console.log "q" query "handler" dispatch "payload " payload)
