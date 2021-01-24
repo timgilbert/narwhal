@@ -1,5 +1,6 @@
 (ns narwhal.graphql
-  (:require [re-frame.core :as rf]
+  (:require [lambdaisland.glogi :as log]
+            [re-frame.core :as rf]
             [re-graph.core :as re-graph]))
 
 (def queries
@@ -50,7 +51,7 @@ fragment FrameFields on FrameMetadata {
     (let [{::keys [text mutation?]} (get queries query)
           event-name (if mutation? ::re-graph/mutate ::re-graph/query)
           event [event-name ::query-id text (or vars {}) [::query-return query]]]
-      (js/console.log "Event:" event)
+      (log/debug "Event:" event)
       {:db       (assoc-in db [::in-flight? query] true)
        :dispatch event})))
 
@@ -60,7 +61,7 @@ fragment FrameFields on FrameMetadata {
     (doseq [message (map :message errors)
             :let [note (str "GraphQL errors from " query ": " message)]]
       (.notification js/UIkit note #js {:status "danger"})
-      (js/console.warn note))
+      (log/warn :gql-err note))
     {:db (update-in db [::in-flight?] dissoc query)}))
 
 (rf/reg-event-fx
@@ -70,7 +71,7 @@ fragment FrameFields on FrameMetadata {
       {:dispatch [::query-errors query errors]}
       (let [dispatch (get-in queries [query ::dispatch])
             process  (get-in queries [query ::process] identity)]
-        (js/console.log "q" query "handler" dispatch "payload " payload)
+        (log/debug "q" query "handler" dispatch "payload " payload)
         (merge {:db (update-in db [::in-flight?] dissoc query)}
                (when dispatch
                  {:dispatch (conj dispatch (process data))}))))))

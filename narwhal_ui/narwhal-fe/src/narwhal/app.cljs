@@ -1,5 +1,6 @@
 (ns narwhal.app
-  (:require [narwhal.views.nav :as nav]
+  (:require [lambdaisland.glogi :as log]
+            [narwhal.views.nav :as nav]
             [narwhal.views.home :as home]
             [narwhal.views.timeline :as timeline]
             [narwhal.views.frame :as frame]
@@ -17,7 +18,7 @@
         slug    (<sub [:page/slug])
         title   (<sub [:page/title])
         handler (get handlers (or active :home/home))]
-    (js/console.log "[active slug title]" [active slug title])
+    (log/debug :foo [active slug title])
     [:div
      [nav/top-nav title]
      [:div.uk-grid.uk-grid-divider {:data-uk-grid ""}

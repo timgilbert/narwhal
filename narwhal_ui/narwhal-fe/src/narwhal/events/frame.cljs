@@ -1,9 +1,9 @@
 (ns narwhal.events.frame
-  (:require [narwhal.views.grid :as grid]
+  (:require [lambdaisland.glogi :as log]
             [re-frame.core :as rf]
-            [narwhal.util :as util :refer [<sub >evt]]
-            [re-graph.core :as re-graph]
-            [vimsical.re-frame.cofx.inject :as inject]))
+            [narwhal.views.grid :as grid]
+            [narwhal.util :as util :refer [<sub >evt]]))
+
 
 ;; temp timeline
 (rf/reg-sub
@@ -59,7 +59,7 @@
   :<- [::frames-by-id]
   :<- [:frame/active-frame-id]
   (fn [[frames active-id] _]
-    (js/console.log "[frames active-id]" [frames active-id])
+    (log/debug "[frames active-id]" [frames active-id])
     (get frames active-id)))
 
 (rf/reg-sub
@@ -98,8 +98,8 @@
 (rf/reg-event-db
   :frame-gql/frame-loaded
   (fn [db [_ frame-data]]
-    (js/console.log "frame-data" frame-data)
-    (js/console.log "meta" (with-blank-metadata frame-data))
+    (log/debug "frame-data" frame-data)
+    (log/debug "meta" (with-blank-metadata frame-data))
     (assoc-in db [::frames ::named util/default-frame-id]
               (with-blank-metadata frame-data))))
 
@@ -137,7 +137,7 @@
   :frame-gql/frame-created
   (fn [{:keys [db]} [_ data]]
     (let [new-frame-id (-> data :frame :id)]
-      (js/console.log "Created!" data)
+      (log/debug "Created!" data)
       ;; Update saved frame list in db
       ;; Redirect to edit page for new ID
       {:db (assoc-in db [:narwhal.events/nav :narwhal.events/frames]
@@ -147,7 +147,7 @@
 (rf/reg-event-fx
   :frame/revert-frame
   (fn [{:keys [db]} [_ frame-id]]
-    (js/console.log "Revert" frame-id)
+    (log/debug "Revert" frame-id)
     {}))
 
 ;; Frame lists
@@ -185,7 +185,7 @@
   :grid/pixels
   :<- [:frame/active-frame]
   (fn [active-frame _]
-    (js/console.log "active-frame" active-frame)
+    (log/debug "active-frame" active-frame)
     (get-in active-frame [:frame :pixels])))
 
 (rf/reg-event-fx
