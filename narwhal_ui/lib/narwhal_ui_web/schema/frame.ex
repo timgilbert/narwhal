@@ -45,11 +45,35 @@ defmodule NarwhalUiWeb.Schema.Frame do
     end
   end
 
-  @desc "Input object for an updated frame"
-  input_object :updated_frame do
-    field :id, non_null(:string), description: "The unique ID of the frame to update"
-    field :name, :string, description: "If non-null, update the frame's name"
-    field :frame, :new_frame_data, description: "If set, update the frame data"
+  @desc "Input object for an updated frame. Note that we currently require the entire object."
+  input_object :update_frame_request do
+    field :id, non_null(:string),
+          description: "The ID of the frame we're updating"
+    field :name, non_null(:string),
+          description: "If non-null, update the frame's name"
+    field :frame, non_null(:new_frame_data),
+          description: "If non-null, update the frame's data"
+  end
+
+  @desc "Input object for a frame deletion"
+  input_object :deleted_frame_request do
+    field :id, non_null(:string), description: "The ID of the frame to delete"
+  end
+
+  @desc "Response from a delete frame mutation"
+  object :delete_frame_response do
+    field :frame_id, non_null(:string),
+          description: "The ID of the frame that was just removed"
+    field :all_frames, non_null(list_of(non_null(:frame_metadata))),
+          description: "The new list of all saved frames"
+  end
+
+  @desc "Response from an update frame mutation"
+  object :update_frame_response do
+    field :frame, non_null(:frame_metadata),
+          description: "The frame that was just updated"
+    field :all_frames, non_null(list_of(non_null(:frame_metadata))),
+          description: "The new list of all saved frames"
   end
 
 end

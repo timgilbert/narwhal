@@ -20,14 +20,26 @@ defmodule NarwhalUiWeb.Resolvers.Frame do
     {:ok, parent |> Frame.pixels() |> List.flatten}
   end
 
-  def all_saved_frames(_parent, _args, _resolution) do
-    {:ok, []}
+  def all_saved_frames(_parent, args, _resolution) do
+    {:ok, frames} = Repo.all_frames(args)
   end
 
   def create_frame(_parent, %{input: input}, _resolution) do
     Logger.debug(inspect input)
     {:ok, metadata} = Repo.insert_new_frame(input)
-    {:ok, %{frame: metadata, all_frames: [metadata]}}
+    {:ok, all_frames} = Repo.all_frames(nil)
+    {:ok, %{frame: metadata, all_frames: all_frames}}
+  end
+
+  def update_frame(_parent, %{input: %{id: id} = input}, _resolution) do
+    if Repo.frame_exists?(id) do
+      Logger.debug(inspect input)
+      {:ok, metadata} = Repo.update_frame(input)
+      {:ok, all_frames} = Repo.all_frames(nil)
+      {:ok, %{frame: metadata, all_frames: all_frames}}
+    else
+      {:error, %{message: "Frame with id '#{id}' does not exist!"}}
+    end
   end
 
 end

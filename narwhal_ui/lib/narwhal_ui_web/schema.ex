@@ -22,7 +22,7 @@ defmodule NarwhalUiWeb.Schema do
     end
 
     @desc "List all saved frames"
-    field :saved_frames, non_null(list_of(:frame_metadata)) do
+    field :frames, non_null(list_of(:frame_metadata)) do
       arg :options, :sort_options, description: "Sort options for the frames"
       resolve &NarwhalUiWeb.Resolvers.Frame.all_saved_frames/3
     end
@@ -38,6 +38,18 @@ defmodule NarwhalUiWeb.Schema do
     field :create_frame, :create_frame_response do
       arg :input, non_null(:new_frame_metadata)
       resolve &NarwhalUiWeb.Resolvers.Frame.create_frame/3
+    end
+
+    @desc "Delete a frame"
+    field :delete_frame, :delete_frame_response do
+      arg :input, non_null(:deleted_frame_request)
+      resolve &NarwhalUiWeb.Resolvers.Frame.delete_frame/3
+    end
+
+    @desc "Delete a frame"
+    field :update_frame, :update_frame_response do
+      arg :input, non_null(:update_frame_request)
+      resolve &NarwhalUiWeb.Resolvers.Frame.update_frame/3
     end
   end
 end
