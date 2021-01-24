@@ -68,7 +68,7 @@ fragment FrameFields on FrameMetadata {
   ::query-return
   (fn [{:keys [db]} [_ query {:keys [data errors] :as payload}]]
     (if errors
-      {:dispatch [::query-errors query errors]}
+      {:dispatch [::qmv narwhal.views.component query errors]}
       (let [dispatch (get-in queries [query ::dispatch])
             process  (get-in queries [query ::process] identity)]
         (log/debug "q" query "handler" dispatch "payload " payload)
