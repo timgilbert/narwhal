@@ -56,7 +56,7 @@ defmodule NarwhalUi.Repo do
     get_frame(frame_id) != nil
   end
 
-  def all_frames(args) do
+  def all_frames(args \\ %{}) do
     select_all(Frame, args)
   end
 

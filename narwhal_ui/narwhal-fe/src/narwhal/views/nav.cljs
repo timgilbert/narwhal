@@ -18,10 +18,11 @@
      ;; TODO: below should be conditional based on elixir settings
      [:li [:a {:href "/dashboard"} "Dashboard"]]]]])
 
-(defn frame-nav-item [frame]
-  [:li
-   [:a {:href (str "/frame/" (:id frame))}
-    (:name frame)]])
+(defn frame-nav-item [{:keys [id] :as frame}]
+  (let [href (str "/frame" (when (not= id util/default-frame-id) (str "/" id)))]
+    [:li
+     [:a {:href href}
+      (:name frame)]]))
 
 (defn side-nav-menu
   [menu-sub last-component]
@@ -42,14 +43,14 @@
       ;{:data-uk-nav "{multiple:true}"}
       [:li timeline-attrs
        [:a {:href "#"} "Timelines"]
-       [side-nav-menu :timeline/all-timelines
+       [side-nav-menu :nav/timelines
         [:li [:a {:href "/timeline"}
               [component/icon "plus-circle"]
               "Create Timeline"]]]]
 
       [:li frame-attrs
        [:a {:href "#"} "Frames"]
-       [side-nav-menu :frame/all-frames
-        [:li [:a {:href "/timeline"}
+       [side-nav-menu :nav/frames
+        [:li [:a {:href "/frame"}
               [component/icon "plus-circle"]
-              "Create Timeline"]]]]]]))
+              "Create Frame"]]]]]]))

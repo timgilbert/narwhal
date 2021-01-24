@@ -10,6 +10,13 @@
   :timeline/all-timelines
   (constantly []))
 
+;; nav helpers
+(defn set-saved-frames [db frame-list]
+  (let [frames-by-id (into {}
+                           (for [f frame-list]
+                             [(:id f) f]))]
+    (assoc-in db [::frames ::named] frames-by-id)))
+
 ;; Frame events
 (defn active-frame-id [db]
   ;; TODO: check :page/slug etc
@@ -19,7 +26,7 @@
   (get-in db [::frames ::named frame-id]))
 
 (defn pixel-by-frame-id [db frame-id pixel-index]
-  (get-in (frame-by-id db frame-id) [:pixels pixel-index]))
+  (get-in (frame-by-id db frame-id) [:frame :pixels pixel-index]))
 
 (defn active-frame [db]
   (frame-by-id db (active-frame-id db)))
@@ -41,9 +48,10 @@
   :frame/all-frames
   :<- [::frames-by-id]
   (fn [frames _]
+    ;(js/console.log "frames" frames)
     (->> frames
-         ;; TODO: could sort here
          (map second)
+         (sort-by :name)
          (into []))))
 
 (rf/reg-sub
@@ -51,6 +59,7 @@
   :<- [::frames-by-id]
   :<- [:frame/active-frame-id]
   (fn [[frames active-id] _]
+    (js/console.log "[frames active-id]" [frames active-id])
     (get frames active-id)))
 
 (rf/reg-sub
@@ -81,16 +90,18 @@
   (fn [_ _]
     {:fx [[:dispatch [:graphql/query {:graphql/query :frame-gql/random}]]]}))
 
-(defn add-defaults [data]
+(defn with-blank-metadata [frame-data]
   (merge {:id   util/default-frame-id
-          :name util/default-frame-name}
-         data))
+          :name util/default-frame-name
+          :frame frame-data}))
 
 (rf/reg-event-db
   :frame-gql/frame-loaded
-  (fn [db [_ data]]
+  (fn [db [_ frame-data]]
+    (js/console.log "frame-data" frame-data)
+    (js/console.log "meta" (with-blank-metadata frame-data))
     (assoc-in db [::frames ::named util/default-frame-id]
-              (add-defaults data))))
+              (with-blank-metadata frame-data))))
 
 (rf/reg-event-fx
   :frame/create-scratch
@@ -117,18 +128,21 @@
   (fn [{:keys [db]} [_ frame-id]]
     (let [frame     (frame-by-id db frame-id)
           gql-query (if (= frame-id util/default-frame-id)
-                      :frame-gql/create-frame :frame-gql/update-frame)]
-      {:dispatch [:graphql/query #:graphql{:query gql-query
-                                           :vars  {:frame    frame
-                                                   :frame-id frame-id}}]})))
+                      :frame-gql/create-frame :frame-gql/update-frame)
+          args      #:graphql{:query gql-query
+                              :vars  {:i (dissoc frame :id)}}]
+      {:dispatch [:graphql/query args]})))
 
 (rf/reg-event-fx
   :frame-gql/frame-created
   (fn [{:keys [db]} [_ data]]
-    (js/console.log "Created!" data)
-    ;; Update saved frame list in db
-    ;; Redirect to edit page for new ID
-    {}))
+    (let [new-frame-id (-> data :frame :id)]
+      (js/console.log "Created!" data)
+      ;; Update saved frame list in db
+      ;; Redirect to edit page for new ID
+      {:db (assoc-in db [:narwhal.events/nav :narwhal.events/frames]
+                     (:allFrames data))
+       :dispatch [:route/navigate {:page :frame/edit :slug new-frame-id}]})))
 
 (rf/reg-event-fx
   :frame/revert-frame
@@ -171,7 +185,8 @@
   :grid/pixels
   :<- [:frame/active-frame]
   (fn [active-frame _]
-    (get active-frame :pixels)))
+    (js/console.log "active-frame" active-frame)
+    (get-in active-frame [:frame :pixels])))
 
 (rf/reg-event-fx
   :grid/click
@@ -188,7 +203,7 @@
     db
     (-> db
         (assoc-in [::frames ::dirty?] true)
-        (assoc-in [::frames ::named frame-id :pixels index] color))))
+        (assoc-in [::frames ::named frame-id :frame :pixels index] color))))
 
 (defn bucket-click [db frame-id _index color]
   (let [frame  (frame-by-id db frame-id)
@@ -196,7 +211,7 @@
         pixels (into [] (repeat total color))]
     (-> db
         (assoc-in [::frames ::dirty?] true)
-        (assoc-in [::frames ::named frame-id :pixels] pixels))))
+        (assoc-in [::frames ::named frame-id :frame :pixels] pixels))))
 
 (rf/reg-event-db
   :pencil/click

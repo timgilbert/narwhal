@@ -42,4 +42,14 @@ defmodule NarwhalUiWeb.Resolvers.Frame do
     end
   end
 
+  def delete_frame(_parent, %{input: %{id: id} = input}, _resolution) do
+    if Repo.frame_exists?(id) do
+      {:ok, metadata} = Repo.delete_frame(id)
+      {:ok, all_frames} = Repo.all_frames()
+      {:ok, %{frame_id: id, all_frames: all_frames}}
+    else
+      {:error, %{message: "Frame with id '#{id}' does not exist!"}}
+    end
+  end
+
 end

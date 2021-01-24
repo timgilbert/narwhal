@@ -8,7 +8,8 @@
 (def handlers
   {:home/home    home/home
    :timeline/new timeline/new-timeline
-   :frame/new    frame/frame-editor})
+   :frame/new    frame/frame-editor
+   :frame/edit   frame/frame-editor})
 
 (defn app
   []
@@ -16,6 +17,7 @@
         slug    (<sub [:page/slug])
         title   (<sub [:page/title])
         handler (get handlers (or active :home/home))]
+    (js/console.log "[active slug title]" [active slug title])
     [:div
      [nav/top-nav title]
      [:div.uk-grid.uk-grid-divider {:data-uk-grid ""}

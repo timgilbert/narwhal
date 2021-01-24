@@ -22,13 +22,13 @@ defmodule NarwhalUiWeb.Schema do
     end
 
     @desc "List all saved frames"
-    field :frames, non_null(list_of(:frame_metadata)) do
+    field :all_frames, non_null(list_of(:frame_metadata)) do
       arg :options, :sort_options, description: "Sort options for the frames"
       resolve &NarwhalUiWeb.Resolvers.Frame.all_saved_frames/3
     end
 
     @desc "List all saved timelines"
-    field :saved_timelines, list_of(:named_timeline) do
+    field :all_timelines, list_of(:named_timeline) do
       resolve &NarwhalUiWeb.Resolvers.Timeline.all_saved_timelines/3
     end
   end
