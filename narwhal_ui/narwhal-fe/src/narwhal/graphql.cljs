@@ -36,11 +36,33 @@ fragment FrameFields on FrameMetadata {
    :frame-gql/create-frame
    {::dispatch  [:frame-gql/frame-created]
     ::mutation? true
+    ::process   :result
     ::text      "
 mutation ($i: NewFrameMetadata!) {
-  createFrame(input: $i) {
-    frame { ...FrameFields }
+  result: createFrame(input: $i) {
+    frame { id }
     allFrames { id name  }
+  }
+}
+fragment FrameFields on FrameMetadata {
+  id
+  name
+  frame {
+    height
+    width
+    pixels
+  }
+}
+"}
+   :frame-gql/update-frame
+   {::dispatch  [:frame-gql/frame-updated]
+    ::mutation? true
+    ::process   :result
+    ::text      "
+mutation ($i: UpdateFrameRequest!) {
+  result: updateFrame(input: $i) {
+    frame { ...FrameFields }
+    allFrames { ...FrameFields }
   }
 }
 fragment FrameFields on FrameMetadata {

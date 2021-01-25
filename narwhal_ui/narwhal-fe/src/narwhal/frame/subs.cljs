@@ -18,7 +18,7 @@
   (fn [root _]
     (->> root
          vals
-         (sort-by :name)))) ; TODO: more sort options
+         (sort-by :name))))                                 ; TODO: more sort options
 
 (rf/reg-sub
   ::frame
@@ -43,14 +43,16 @@
   ::dirty?
   :<- [::dirty-root]
   (fn [dirty-root [_ frame-id]]
-    (get-in dirty-root frame-id false)))
+    (log/debug :dirt dirty-root)
+    (log/debug :dirt frame-id)
+    (get dirty-root frame-id)))
 
 ;; ----------------------------------------------------------------------
 ;; Title stuff
 (rf/reg-sub
   ::editing-title?
-  (fn [db _]
-    (get db (db/frame-path :f/editing?) false)))
+  (fn [db [_ frame-id]]
+    (get-in db (db/frame-path :f/editing? frame-id) false)))
 
 (rf/reg-sub
   ::frame-name

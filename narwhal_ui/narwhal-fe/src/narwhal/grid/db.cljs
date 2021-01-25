@@ -23,7 +23,7 @@
   (assoc-in db (grid-path :palette/active-color) color))
 
 ;; ----------------------------------------------------------------------
-;; rework
+;; Pixel manipulation
 
 (defn pixel-by-frame-id [db frame-id pixel-index]
   (get-in (frame-db/frame-by-id db frame-id)
@@ -54,10 +54,9 @@
         pixels (into [] (repeat total color))]
     (-> db
         (frame-db/set-dirty frame-id)
-        (set-all-pixels-by-frame-id frame-id (log/spy  pixels)))))
-
+        (set-all-pixels-by-frame-id frame-id pixels))))
 
 (defn init-db [db]
   (-> db
-      (set-active-palette-color "#000000")
+      (set-active-palette-color "#ffffff")
       (set-active-tool :tools/pencil)))

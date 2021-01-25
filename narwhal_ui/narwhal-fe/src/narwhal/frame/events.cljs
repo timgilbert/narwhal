@@ -5,8 +5,35 @@
             [narwhal.frame.db :as db]))
 
 ;; ----------------------------------------------------------------------
-;; Pages and slugs
+;; Title stuff
 
+;; Called when the user has submitted an update to the frame-name form
+;; NB: Should probably validate versus the list of named frames
+(rf/reg-event-db
+  ::update-title
+  (fn [db [_ frame-id {:keys [values] :as evt}]]
+    (let [new-name (:name values)
+          ;; TODO: Figure out a better way to deal with the namespaces below
+          new-db   (update-in db (db/frame-path :f/editing?)
+                              dissoc frame-id)]
+      (if (not= new-name "")
+        (-> new-db
+            (db/set-dirty frame-id)
+            (db/set-frame-name frame-id new-name))
+        new-db))))
+
+(rf/reg-event-db
+  ::title-clicked
+  (fn [db [_ frame-id]]
+    (assoc-in db (db/frame-path :f/editing? frame-id) true)))
+
+(rf/reg-event-db
+  ::title-cancel-clicked
+  (fn [db [_ frame-id]]
+    (update-in db (db/frame-path :f/editing?) dissoc frame-id)))
+
+;; ----------------------------------------------------------------------
+;; Wipe frame (refactor)
 (rf/reg-event-fx
   :frame-edit/blank
   (fn [_ _]
@@ -31,27 +58,14 @@
     (when (nil? (get-in db [::frames ::named util/default-frame-id]))
       {:fx [[:dispatch [:frame-edit/blank]]]})))
 
-;; Called when the user has submitted an update to the frame-name form
-;; NB: Should probably validate versus the list of named frames
-(rf/reg-event-db
-  :frame/update-title
-  (fn [db [_ frame-id {:keys [values] :as evt}]]
-    (let [new-name (:name values)
-          ;; TODO: Figure out a better way to deal with the namespaces below
-          new-db   (dissoc db :narwhal.views.frame/frame-edit?)]
-      (if (not= new-name "")
-        (-> new-db
-            (assoc-in [::frames ::named frame-id :name] new-name)
-            (assoc-in [::frames ::dirty?] true))
-        new-db))))
-
+;; ----------------------------------------------------------------------
+;; Frame persistence
 (rf/reg-event-fx
-  :frame/save-frame
+  ::create-frame
   (fn [{:keys [db]} [_ frame-id]]
+    (assert (= frame-id util/default-frame-id))
     (let [frame     (db/frame-by-id db frame-id)
-          gql-query (if (= frame-id util/default-frame-id)
-                      :frame-gql/create-frame :frame-gql/update-frame)
-          args      #:graphql{:query gql-query
+          args      #:graphql{:query :frame-gql/create-frame
                               :vars  {:i (dissoc frame :id)}}]
       {:dispatch [:graphql/query args]})))
 
@@ -67,8 +81,29 @@
        :dispatch [:route/navigate #:route{:page :frame-page/edit
                                           :id   new-frame-id}]})))
 
+;; Save an update to an existing frame
 (rf/reg-event-fx
-  :frame/revert-frame
+  ::save-frame
   (fn [{:keys [db]} [_ frame-id]]
-    (log/debug "Revert" frame-id)
-    {}))
+    (let [frame     (db/frame-by-id db frame-id)
+          args      #:graphql{:query :frame-gql/update-frame
+                              :vars  {:i frame}}]
+      {:dispatch [:graphql/query args]})))
+
+(rf/reg-event-db
+  :frame-gql/frame-updated
+  (fn [db [_ payload]]
+    ;; Would be nice to assert on the returned id here or something
+    (let [frame-id (-> payload :frame :id)]
+      (log/info "Updated frame" frame-id)
+      (-> db
+          (db/set-clean frame-id)
+          (db/replace-all-frames (:allFrames payload))))))
+
+;; Revert an edited frame back to its saved version
+(rf/reg-event-fx
+  ::revert-frame
+  (fn [{:keys [db]} [_ frame-id]]
+    (log/debug "Revert!" frame-id)))
+    ;{:dispatch [:graphql/query #:graphql{:query :frame-gql/get-frame-by-id
+    ;                                     :vars  {:i frame-id}}]}))
