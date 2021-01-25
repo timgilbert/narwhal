@@ -31,4 +31,5 @@ To create a production build run:
 - Color picker, better palette
 - Tiny thumbnails for frames - canvas? svg? in-memory image?
 - Multiple scratch frames
+- Delete frame UI
 - Routing might be a little hosed up
