@@ -21,3 +21,56 @@
   :<- [::frame-root]
   (fn [root [_ frame-id]]
     (get root frame-id)))
+
+;; ----------------------------------------------------------------------
+;; rework this
+
+(rf/reg-sub
+  :frame/active-frame-id
+  (fn [db _] (db/active-frame-id db)))
+
+(rf/reg-sub
+  ::frames-by-id
+  (fn [db _] (get-in db [::frames ::named])))
+
+(rf/reg-sub
+  :frame/frame-by-id
+  :<- [::frames-by-id]
+  (fn [frames [_ frame-id]] (get frames frame-id)))
+
+(rf/reg-sub
+  :frame/all-frames
+  :<- [::frames-by-id]
+  (fn [frames _]
+    ;(js/console.log "frames" frames)
+    (->> frames
+         (map second)
+         (sort-by :name)
+         (into []))))
+
+(rf/reg-sub
+  :frame/active-frame
+  :<- [::frames-by-id]
+  :<- [:frame/active-frame-id]
+  (fn [[frames active-id] _]
+    (log/debug "[frames active-id]" [frames active-id])
+    (get frames active-id)))
+
+(rf/reg-sub
+  :frame/frame-name
+  :<- [::frames-by-id]
+  (fn [frames [_ frame-id]]
+    ;; TODO: fix up
+    (-> frames (get frame-id) (get :name))))
+
+(rf/reg-sub
+  :frame/active-frame-name
+  (fn [db _]
+    ;; TODO: fix up
+    util/default-frame-name))
+
+(rf/reg-sub
+  :frame/dirty?
+  (fn [db _]
+    (get-in db [::frames ::dirty?])))
+

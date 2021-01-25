@@ -70,7 +70,7 @@
       {:type "text" :placeholder "Frame name"}]]]])
 
 (defn grid [frame-id]
-  (let [pixels (<sub [:grid/pixels frame-id])]
+  (let [pixels (<sub [::subs/pixels frame-id])]
     (when pixels
       [:div.pixel-grid
        (for [[i color] (map-indexed vector pixels)]

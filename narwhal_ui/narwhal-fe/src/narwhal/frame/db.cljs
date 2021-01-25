@@ -22,3 +22,9 @@
 (defn init-db [db]
   (-> db
       (replace-all-frames [])))
+
+(defn with-blank-metadata [frame-data]
+  (merge {:id    util/default-frame-id
+          :name  util/default-frame-name
+          :frame frame-data}))
+
