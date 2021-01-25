@@ -34,7 +34,7 @@
   [menu-sub last-component]
   (into [:ul.uk-sub-nav]
         (concat
-          (for [{::subs/keys [item-id] :as entry} (log/spy (<sub menu-sub))
+          (for [{::subs/keys [item-id] :as entry} (<sub menu-sub)
                 :let [key (str menu-sub "." item-id)]]
             ^{:key key}
             [frame-nav-item entry]) ; TODO: handle timelines

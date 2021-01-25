@@ -15,7 +15,7 @@
 
 (rf/reg-sub
   ::pixels
-  (fn [_ frame-id]
+  (fn [[_ frame-id]]
     (rf/subscribe [::frame-subs/frame frame-id]))
   (fn [frame]
     (get-in frame [:frame :pixels])))

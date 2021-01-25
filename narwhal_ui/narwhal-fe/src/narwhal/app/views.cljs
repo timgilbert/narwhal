@@ -31,7 +31,6 @@
   (let [active  (<sub ::nav-subs/active-page)
         item-id (<sub ::nav-subs/active-id)
         handler (get handlers (or active :home-page/home))]
-    (log/debug :nav [active item-id])
     [:div
      [nav/top-nav]
      [:div.uk-grid.uk-grid-divider {:data-uk-grid ""}

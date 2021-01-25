@@ -6,7 +6,6 @@
             [narwhal.frame.subs :as frame-subs]
             [narwhal.timeline.subs :as timeline-subs]))
 
-
 ;; ----------------------------------------------------------------------
 ;; Pages and slugs
 (rf/reg-sub
@@ -45,11 +44,8 @@
   :<- [::page-type? :frame]
   :<- [::active-id]
   (fn [[frames frame-page? active-id] _]
-    (log/debug :all-frames frames)
-    (log/debug :all-frames (str frames))
-    (log/debug :all-frames (map :id frames))
     (for [frame frames
-          :let [item-id (:id (log/spy frame))
+          :let [item-id (:id frame)
                 active? (and frame-page? (= item-id active-id))]]
       {::active? active?
        ::item-id item-id

@@ -5,9 +5,12 @@
             [narwhal.frame.db :as db]
             [narwhal.nav.subs :as nav-subs]))
 
+;; ----------------------------------------------------------------------
+;; Frame stuff
+
 (rf/reg-sub
   ::frame-root
-  (fn [db _] (get-in db (db/frame-path))))
+  (fn [db _] (get-in db (db/frame-path :f/all))))
 
 (rf/reg-sub
   ::all-frames
@@ -22,6 +25,39 @@
   :<- [::frame-root]
   (fn [root [_ frame-id]]
     (get root frame-id)))
+
+(rf/reg-sub
+  ::scratch?
+  (fn [[_ frame-id]]
+    (rf/subscribe [::frame frame-id]))
+  (fn [frame]
+    (let [frame-id (:id frame)]
+      (or (nil? frame-id) (= frame-id util/default-frame-id)))))
+
+(rf/reg-sub
+  ::dirty-root
+  (fn [db _]
+    (get-in db (db/frame-path :f/dirty?))))
+
+(rf/reg-sub
+  ::dirty?
+  :<- [::dirty-root]
+  (fn [dirty-root [_ frame-id]]
+    (get-in dirty-root frame-id false)))
+
+;; ----------------------------------------------------------------------
+;; Title stuff
+(rf/reg-sub
+  ::editing-title?
+  (fn [db _]
+    (get db (db/frame-path :f/editing?) false)))
+
+(rf/reg-sub
+  ::frame-name
+  (fn [[_ frame-id]]
+    (rf/subscribe [::frame frame-id]))
+  (fn [frame]
+    (:name frame)))
 
 ;; ----------------------------------------------------------------------
 ;; rework this
@@ -44,7 +80,6 @@
   :frame/all-frames
   :<- [::frames-by-id]
   (fn [frames _]
-    ;(js/console.log "frames" frames)
     (->> frames
          (map second)
          (sort-by :name)

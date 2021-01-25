@@ -16,7 +16,7 @@
 ;; Palette events
 
 (rf/reg-event-db
-  :palette/set-active-color
+  ::set-active-color
   (fn [db [_ color]]
     (db/set-active-palette-color db color)))
 

@@ -9,7 +9,7 @@
 
 (defn replace-all-frames
   [db frame-list]
-  (assoc-in db (frame-path)
+  (assoc-in db (frame-path :f/all)
             (->> frame-list
                  ;; Why isn't (group-by) ever useful for anything?
                  (map (fn [f]
@@ -17,7 +17,7 @@
                  (into {}))))
 
 (defn frame-by-id [db frame-id]
-  (get-in db (frame-path) frame-id))
+  (get-in db (frame-path :f/all frame-id)))
 
 (defn init-db [db]
   (-> db
@@ -28,3 +28,10 @@
           :name  util/default-frame-name
           :frame frame-data}))
 
+(defn set-dirty
+  [db frame-id]
+  (assoc-in db (frame-path :f/dirty? frame-id) true))
+
+(defn set-clean
+  [db frame-id]
+  (update-in db (frame-path :f/dirty?) dissoc frame-id))

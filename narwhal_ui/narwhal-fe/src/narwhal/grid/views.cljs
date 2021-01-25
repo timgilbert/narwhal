@@ -1,7 +1,9 @@
 (ns narwhal.grid.views
-  (:require [narwhal.util.util :as util :refer [<sub >evt]]
+  (:require [lambdaisland.glogi :as log]
+            [narwhal.util.util :as util :refer [<sub >evt]]
             [narwhal.grid.events :as events]
             [narwhal.grid.subs :as subs]
+            [narwhal.frame.subs :as frame-subs]
             [narwhal.util.color :as color]
             [narwhal.util.component :as component]))
 
@@ -30,19 +32,18 @@
   [:div.palette-swatch
    {:style    {:background-color color
                :cursor           :crosshair}
-    :on-click #(>evt [:palette/set-active-color color])}
+    :on-click #(>evt [::events/set-active-color color])}
    util/nbsp])
 
 (defn color-palette []
-  (let [active (<sub [::subs/active-color])]
-    [:div
-     [:p "Palette"]
-     [:div.palette-grid
-      [:div.palette-selected.palette-swatch
-       {:style {:background-color active}}
-       util/nbsp]
-      (for [[i c] (map-indexed vector palette-colors)]
-        ^{:key i} [color-preset c])]]))
+  [:div
+   [:p "Palette"]
+   [:div.palette-grid
+    [:div.palette-selected.palette-swatch
+     {:style {:background-color (<sub [::subs/active-color])}}
+     util/nbsp]
+    (for [[i c] (map-indexed vector palette-colors)]
+      ^{:key i} [color-preset c])]])
 
 (defn controls []
   [:div
