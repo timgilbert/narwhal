@@ -28,7 +28,7 @@ To create a production build run:
 ## TODO
 
 - Custom cursors
-- glogi logging + dev mode
 - Color picker, better palette
 - Tiny thumbnails for frames - canvas? svg? in-memory image?
-- Handle gql errors
+- Multiple scratch frames
+- Routing might be a little hosed up

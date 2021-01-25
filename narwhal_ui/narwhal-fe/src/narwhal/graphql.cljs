@@ -4,14 +4,14 @@
             [re-graph.core :as re-graph]))
 
 (def queries
-  {:frame-gql/random
-   {::dispatch [:frame-gql/frame-loaded]
+  {:frame-gql/new-random-frame
+   {::dispatch [:frame-gql/scratch-frame-loaded]
     ::process  :frame
     ::text     "
 { frame: randomFrame { height width pixels } }
 "}
-   :frame-gql/blank
-   {::dispatch [:frame-gql/frame-loaded]
+   :frame-gql/new-blank-frame
+   {::dispatch [:frame-gql/scratch-frame-loaded]
     ::process  :frame
     ::text     "
 { frame: solidFrame(color:\"000000\") { height width pixels } }
@@ -41,7 +41,7 @@ fragment FrameFields on FrameMetadata {
 mutation ($i: NewFrameMetadata!) {
   result: createFrame(input: $i) {
     frame { id }
-    allFrames { id name  }
+    allFrames { ...FrameFields }
   }
 }
 fragment FrameFields on FrameMetadata {
@@ -99,7 +99,7 @@ fragment FrameFields on FrameMetadata {
   ::query-return
   (fn [{:keys [db]} [_ query {:keys [data errors] :as payload}]]
     (if errors
-      {:dispatch [::qmv narwhal.util.component query errors]}
+      {:dispatch [::query-errors narwhal.util.component query errors]}
       (let [dispatch (get-in queries [query ::dispatch])
             process  (get-in queries [query ::process] identity)]
         (log/debug "q" query "handler" dispatch "payload " payload)

@@ -24,10 +24,11 @@
 (defn frame-by-id [db frame-id]
   (get-in db (frame-path :f/all frame-id)))
 
-(defn with-blank-metadata [frame-data]
-  (merge {:id    util/default-frame-id
-          :name  util/default-frame-name
-          :frame frame-data}))
+(defn with-scratch-metadata [frame-data]
+  (merge {:id       util/default-frame-id
+          :scratch? true ; for future use
+          :name     util/default-frame-name
+          :frame    frame-data}))
 
 (defn set-frame-name
   [db frame-id new-name]

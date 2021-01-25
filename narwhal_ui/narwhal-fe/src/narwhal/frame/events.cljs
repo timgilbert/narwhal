@@ -35,28 +35,35 @@
 ;; ----------------------------------------------------------------------
 ;; Wipe frame (refactor)
 (rf/reg-event-fx
-  :frame-edit/blank
+  ::new-blank-frame
   (fn [_ _]
-    {:fx [[:dispatch [:graphql/query {:graphql/query :frame-gql/blank}]]]}))
+    {:dispatch [:graphql/query {:graphql/query
+                                :frame-gql/new-blank-frame}]}))
 
+;; TODO: instead of this, randomize colors via grid controls
 (rf/reg-event-fx
-  :frame-edit/random
+  ::new-random-frame
   (fn [_ _]
-    {:fx [[:dispatch [:graphql/query {:graphql/query :frame-gql/random}]]]}))
+    {:dispatch [:graphql/query {:graphql/query
+                                :frame-gql/new-random-frame}]}))
 
-(rf/reg-event-db
-  :frame-gql/frame-loaded
-  (fn [db [_ frame-data]]
-    (log/debug "frame-data" frame-data)
-    (log/debug "meta" (db/with-blank-metadata frame-data))
-    (assoc-in db [::frames ::named util/default-frame-id]
-              (db/with-blank-metadata frame-data))))
+;; GraphQL return event from either of the above
+(rf/reg-event-fx
+  :frame-gql/scratch-frame-loaded
+  (fn [{:keys [db]} [_ frame-data]]
+    (let [new-frame    (db/with-scratch-metadata frame-data)
+          new-frame-id (:id new-frame)]
+      (log/spy new-frame)
+      {:dispatch [:route/navigate #:route{:page :frame-page/new}]
+       :db       (-> db
+                     (db/replace-single-frame new-frame)
+                     (db/set-clean new-frame-id))})))
 
 (rf/reg-event-fx
   :frame/create-scratch
-  (fn [{:keys [db]} [_ {:page/keys [active title slug]}]]
-    (when (nil? (get-in db [::frames ::named util/default-frame-id]))
-      {:fx [[:dispatch [:frame-edit/blank]]]})))
+  (fn [_ _]
+    (log/debug :frame/create-scratch "Argh, get rid of me already")
+    {}))
 
 ;; ----------------------------------------------------------------------
 ;; Frame persistence
@@ -64,9 +71,9 @@
   ::create-frame
   (fn [{:keys [db]} [_ frame-id]]
     (assert (= frame-id util/default-frame-id))
-    (let [frame     (db/frame-by-id db frame-id)
-          args      #:graphql{:query :frame-gql/create-frame
-                              :vars  {:i (dissoc frame :id)}}]
+    (let [frame (db/frame-by-id db frame-id)
+          args  #:graphql{:query :frame-gql/create-frame
+                          :vars  {:i (dissoc frame :id :scratch?)}}]
       {:dispatch [:graphql/query args]})))
 
 (rf/reg-event-fx
@@ -85,9 +92,9 @@
 (rf/reg-event-fx
   ::save-frame
   (fn [{:keys [db]} [_ frame-id]]
-    (let [frame     (db/frame-by-id db frame-id)
-          args      #:graphql{:query :frame-gql/update-frame
-                              :vars  {:i frame}}]
+    (let [frame (db/frame-by-id db frame-id)
+          args  #:graphql{:query :frame-gql/update-frame
+                          :vars  {:i frame}}]
       {:dispatch [:graphql/query args]})))
 
 (rf/reg-event-db

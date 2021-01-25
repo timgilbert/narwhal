@@ -43,9 +43,7 @@
   ::dirty?
   :<- [::dirty-root]
   (fn [dirty-root [_ frame-id]]
-    (log/debug :dirt dirty-root)
-    (log/debug :dirt frame-id)
-    (get dirty-root frame-id)))
+    (get dirty-root frame-id false)))
 
 ;; ----------------------------------------------------------------------
 ;; Title stuff

@@ -4,6 +4,7 @@
             [narwhal.util.component :as component]
             [narwhal.util.util :as util :refer [<sub >evt]]
             [narwhal.nav.events :as events]
+            [narwhal.frame.events :as frame-events]
             [narwhal.nav.subs :as subs]))
 
 (defn top-nav []
@@ -60,6 +61,7 @@
       [:li frame-attrs
        [:a {:href "#"} "Frames"]
        [side-nav-menu ::subs/frames
-        [:li [:a {:href "/frame"}
+        [:li [:button.uk-button.uk-button-link
+              {:on-click #(>evt [::frame-events/new-blank-frame])}
               [component/icon "plus-circle"]
-              "Create Frame"]]]]]]))
+              " Create Frame"]]]]]]))
