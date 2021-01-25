@@ -1,8 +1,8 @@
 (ns narwhal.frame.views
   (:require [lambdaisland.glogi :as log]
             [re-frame.core :as rf]
-            [narwhal.views.component :as component]
-            [narwhal.util :as util :refer [<sub >evt]]
+            [narwhal.util.component :as component]
+            [narwhal.util.util :as util :refer [<sub >evt]]
             [narwhal.frame.events :as events]
             [narwhal.frame.subs :as subs]
             [fork.re-frame :as fork]

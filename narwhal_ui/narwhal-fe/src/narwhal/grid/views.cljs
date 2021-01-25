@@ -1,9 +1,9 @@
 (ns narwhal.grid.views
-  (:require [narwhal.util :as util :refer [<sub >evt]]
+  (:require [narwhal.util.util :as util :refer [<sub >evt]]
             [narwhal.grid.events :as events]
             [narwhal.grid.subs :as subs]
-            [narwhal.color :as color]
-            [narwhal.views.component :as component]))
+            [narwhal.util.color :as color]
+            [narwhal.util.component :as component]))
 
 (defn tool-icon [tool icon-name]
   (let [selected? (= (<sub [::subs/active-tool]) tool)

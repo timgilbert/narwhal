@@ -1,6 +1,6 @@
 (ns narwhal.grid.db
   (:require [lambdaisland.glogi :as log]
-            [narwhal.util :as util :refer [<sub >evt]]
+            [narwhal.util.util :as util :refer [<sub >evt]]
             [narwhal.frame.db :as frame-db]))
 
 ;; ----------------------------------------------------------------------

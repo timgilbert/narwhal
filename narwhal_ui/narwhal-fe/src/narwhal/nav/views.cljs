@@ -1,8 +1,8 @@
 (ns narwhal.nav.views
   (:require [lambdaisland.glogi :as log]
             [re-frame.core :as rf]
-            [narwhal.views.component :as component]
-            [narwhal.util :as util :refer [<sub >evt]]
+            [narwhal.util.component :as component]
+            [narwhal.util.util :as util :refer [<sub >evt]]
             [narwhal.nav.events :as events]
             [narwhal.nav.subs :as subs]))
 

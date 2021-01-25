@@ -1,7 +1,7 @@
-(ns narwhal.util
+(ns narwhal.util.util ; doubly useful
   (:require [goog.string :as gstring]
             [re-frame.core :as rf]
-            [narwhal.color :as color]))
+            [narwhal.util.color :as color]))
 
 (defn <sub [sub]
   (let [sub-vec (if (keyword? sub) [sub] sub)]

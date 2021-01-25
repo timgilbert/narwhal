@@ -1,4 +1,4 @@
-(ns narwhal.color)
+(ns narwhal.util.color)
 
 (def named
   "HTML5 named colors, cribbed from https://github.com/thi-ng/color/blob/master/src/presets.org"

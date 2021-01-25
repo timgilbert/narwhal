@@ -1,7 +1,7 @@
 (ns narwhal.timeline.subs
   (:require [lambdaisland.glogi :as log]
             [re-frame.core :as rf]
-            [narwhal.util :as util :refer [<sub >evt]]
+            [narwhal.util.util :as util :refer [<sub >evt]]
             [narwhal.timeline.db :as db]))
 
 (rf/reg-sub

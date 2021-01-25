@@ -3,7 +3,7 @@
             [narwhal.nav.db :as nav-db]
             [narwhal.frame.db :as frame-db]
             [narwhal.grid.db :as grid-db]
-            [narwhal.util :as util]))
+            [narwhal.util.util :as util]))
 
 (defn initial-db [db]
   (-> db

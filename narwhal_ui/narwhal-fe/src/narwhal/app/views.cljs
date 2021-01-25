@@ -4,8 +4,8 @@
             [narwhal.nav.subs :as nav-subs]
             [narwhal.timeline.views :as timeline]
             [narwhal.frame.views :as frame]
-            [narwhal.util :as util :refer [<sub]]
-            [narwhal.views.component :as component]
+            [narwhal.util.util :as util :refer [<sub]]
+            [narwhal.util.component :as component]
             narwhal.app.events))
 
 (defn home-page []

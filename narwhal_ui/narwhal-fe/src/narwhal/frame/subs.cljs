@@ -1,8 +1,9 @@
 (ns narwhal.frame.subs
   (:require [lambdaisland.glogi :as log]
             [re-frame.core :as rf]
-            [narwhal.util :as util :refer [<sub >evt]]
-            [narwhal.frame.db :as db]))
+            [narwhal.util.util :as util :refer [<sub >evt]]
+            [narwhal.frame.db :as db]
+            [narwhal.nav.subs :as nav-subs]))
 
 (rf/reg-sub
   ::frame-root
@@ -27,7 +28,8 @@
 
 (rf/reg-sub
   :frame/active-frame-id
-  (fn [db _] (db/active-frame-id db)))
+  :<- [::nav-subs/active-id]
+  (fn [active-id _] active-id))
 
 (rf/reg-sub
   ::frames-by-id
