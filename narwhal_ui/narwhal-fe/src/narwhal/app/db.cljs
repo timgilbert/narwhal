@@ -2,10 +2,11 @@
   (:require [lambdaisland.glogi :as log]
             [narwhal.nav.db :as nav-db]
             [narwhal.frame.db :as frame-db]
+            [narwhal.grid.db :as grid-db]
             [narwhal.util :as util]))
 
 (defn initial-db [db]
   (-> db
-      (merge {:palette/active-color util/black})
       nav-db/init-db
-      frame-db/init-db))
+      frame-db/init-db
+      grid-db/init-db))

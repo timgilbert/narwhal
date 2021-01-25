@@ -4,4 +4,6 @@
             [narwhal.util :as util :refer [<sub >evt]]
             [narwhal.frame.db :as db]))
 
+;; ----------------------------------------------------------------------
+;; Pages and slugs
 

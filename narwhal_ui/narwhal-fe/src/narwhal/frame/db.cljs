@@ -7,9 +7,6 @@
   ([& rest]
    (concat [:f/frames] rest)))
 
-(defn init-db [db]
-  (assoc-in db (frame-path) {}))
-
 (defn replace-all-frames
   [db frame-list]
   (assoc-in db (frame-path)
@@ -18,3 +15,10 @@
                  (map (fn [f]
                         [(:id f) f]))
                  (into {}))))
+
+(defn frame-by-id [db frame-id]
+  (get-in db (frame-path) frame-id))
+
+(defn init-db [db]
+  (-> db
+      (replace-all-frames [])))

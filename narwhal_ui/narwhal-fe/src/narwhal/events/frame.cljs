@@ -1,7 +1,7 @@
 (ns narwhal.events.frame
   (:require [lambdaisland.glogi :as log]
             [re-frame.core :as rf]
-            [narwhal.views.grid :as grid]
+            [narwhal.grid.views :as grid]
             [narwhal.util :as util :refer [<sub >evt]]))
 
 
@@ -154,73 +154,9 @@
 ;; Frame lists
 
 
-;; Palette events
-
-(rf/reg-event-db
-  :palette/set-active-color
-  (fn [db [_ color]]
-    (assoc db :palette/active-color color)))
-
-(defn active-color [db]
-  (get db :palette/active-color util/black))
-
-(rf/reg-sub
-  :palette/active-color
-  (fn [db _] (active-color db)))
-
-;; Grid events - TODO: these probably can have their own namespace
-
-(rf/reg-event-db
-  :grid/set-active-tool
-  (fn [db [_ tool]]
-    (assoc db :grid/active-tool tool)))
-
-(defn active-tool [db]
-  (get db :grid/active-tool :tools/pencil))
-
-(rf/reg-sub
-  :grid/active-tool
-  (fn [db _] (active-tool db)))
-
 (rf/reg-sub
   :grid/pixels
   :<- [:frame/active-frame]
   (fn [active-frame _]
     (log/debug "active-frame" active-frame)
     (get-in active-frame [:frame :pixels])))
-
-(rf/reg-event-fx
-  :grid/click
-  (fn [{:keys [db]} [_ frame-id index]]
-    (let [color (active-color db)
-          next  (case (active-tool db)
-                  :tools/pencil [:pencil/click frame-id index color]
-                  :tools/bucket [:bucket/click frame-id index color])]
-      (if next {:dispatch next}
-               {}))))
-
-(defn pencil-click [db frame-id index color]
-  (if (= (pixel-by-frame-id db frame-id index) color)
-    db
-    (-> db
-        (assoc-in [::frames ::dirty?] true)
-        (assoc-in [::frames ::named frame-id :frame :pixels index] color))))
-
-(defn bucket-click [db frame-id _index color]
-  (let [frame  (frame-by-id db frame-id)
-        total  (* (:height frame) (:width frame))
-        pixels (into [] (repeat total color))]
-    (-> db
-        (assoc-in [::frames ::dirty?] true)
-        (assoc-in [::frames ::named frame-id :frame :pixels] pixels))))
-
-(rf/reg-event-db
-  :pencil/click
-  (fn [db [_ frame-id index color]]
-    (pencil-click db frame-id index color)))
-
-(rf/reg-event-db
-  :bucket/click
-  (fn [db [_ frame-id index color]]
-    (bucket-click db frame-id index color)))
-

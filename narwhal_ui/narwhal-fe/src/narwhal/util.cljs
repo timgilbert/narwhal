@@ -18,3 +18,12 @@
 (def default-frame-id ::scratch-frame)
 (def default-timeline-name "*scratch*")
 (def default-timeline-id ::scratch-timeline)
+
+(defn rand-color []
+  (let [b ["0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "a" "b" "c" "d" "e" "f"]]
+    (apply str (concat "#" (repeatedly 6 #(rand-nth b))))))
+
+(defn random-pixels
+  ([] random-pixels 16 16)
+  ([height width]
+   (repeatedly (* height width) rand-color)))
