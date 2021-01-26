@@ -31,7 +31,9 @@
     (rf/subscribe [::frame frame-id]))
   (fn [frame]
     (let [frame-id (:id frame)]
-      (or (nil? frame-id) (= frame-id util/default-frame-id)))))
+      (or (:scratch? frame)
+          (nil? frame-id)
+          (= frame-id util/default-frame-id)))))
 
 (rf/reg-sub
   ::dirty-root

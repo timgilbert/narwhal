@@ -74,6 +74,27 @@ fragment FrameFields on FrameMetadata {
     pixels
   }
 }
+"}
+   :frame-gql/delete-frame
+   {::dispatch  [:frame-gql/frame-deleted]
+    ::mutation? true
+    ::process   :result
+    ::text      "
+mutation ($i: DeletedFrameRequest!) {
+  result: deleteFrame(input: $i) {
+    frameId
+    allFrames { ...FrameFields }
+  }
+}
+fragment FrameFields on FrameMetadata {
+  id
+  name
+  frame {
+    height
+    width
+    pixels
+  }
+}
 "}})
 
 (rf/reg-event-fx
@@ -99,7 +120,7 @@ fragment FrameFields on FrameMetadata {
   ::query-return
   (fn [{:keys [db]} [_ query {:keys [data errors] :as payload}]]
     (if errors
-      {:dispatch [::query-errors narwhal.util.component query errors]}
+      {:dispatch [::query-errors query errors]}
       (let [dispatch (get-in queries [query ::dispatch])
             process  (get-in queries [query ::process] identity)]
         (log/debug "q" query "handler" dispatch "payload " payload)

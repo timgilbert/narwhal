@@ -107,10 +107,28 @@
           (db/set-clean frame-id)
           (db/replace-all-frames (:allFrames payload))))))
 
+;; Delete a frame
+(rf/reg-event-fx
+  ::delete-frame
+  (fn [_ [_ frame-id]]
+    {:dispatch [:graphql/query
+                #:graphql{:query :frame-gql/delete-frame
+                          :vars  {:i {:id frame-id}}}]}))
+
+;; TODO: second delete crashes this with a re-graph error, why?
+(rf/reg-event-fx
+  :frame-gql/frame-deleted
+  (fn [db [_ payload]]
+    (log/info "Deleted frame" (:frameId payload))
+    {:db       (db/replace-all-frames db (:allFrames payload))
+     ;; TODO: need a frame landing page
+     :dispatch [:route/navigate #:route{:page :home-page/home}]}))
+
 ;; Revert an edited frame back to its saved version
 (rf/reg-event-fx
   ::revert-frame
   (fn [{:keys [db]} [_ frame-id]]
+    ;; TODO: implement me
     (log/debug "Revert!" frame-id)))
-    ;{:dispatch [:graphql/query #:graphql{:query :frame-gql/get-frame-by-id
-    ;                                     :vars  {:i frame-id}}]}))
+;{:dispatch [:graphql/query #:graphql{:query :frame-gql/get-frame-by-id
+;                                     :vars  {:i frame-id}}]}))

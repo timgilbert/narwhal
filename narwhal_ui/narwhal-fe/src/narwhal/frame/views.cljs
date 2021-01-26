@@ -81,6 +81,26 @@
    [component/icon "cloud-upload"]
    " Save"])
 
+(defn delete-button [frame-id]
+  (let [disabled? (<sub [::subs/scratch? frame-id])]
+    [:button.uk-button.uk-button-text.uk-button-danger
+     (if disabled?
+       {:disabled true}
+       {:on-click #(>evt [::events/delete-frame frame-id])})
+     " Delete frame"]))
+
+(defn actions-dropdown [frame-id]
+  [:div
+   [:button.uk-button.uk-button-default
+    "Actions " [component/icon "triangle-down"]]
+   [:div {:data-uk-dropdown ""}
+    [:ul.uk-nav.uk-dropdown-nav
+     [:li [delete-button frame-id]]
+     [:li [:a "Duplicate"]]
+     [:li [:a "Fill"]]
+     [:li [:a "Randomize"]]]]])
+
+
 (defn save-controls [frame-id]
   ;; TODO: change buttons when editing/creating
   ;; TODO: no revert on *scratch*
@@ -93,7 +113,8 @@
       {:on-click #(>evt [::events/revert-frame frame-id])
        :disabled disabled?}
       [component/icon "refresh"]
-      " Revert"]]))
+      " Revert"]
+     [actions-dropdown frame-id]]))
 
 (defn frame-editor
   [frame-id]

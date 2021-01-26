@@ -15,8 +15,7 @@
                         ::param [:id]
                         ::title "Edit Timeline"}
    :frame-page/new     {::url      "frame"
-                        ::title    "New Frame"
-                        ::dispatch [:frame/create-scratch]}
+                        ::title    "New Frame"}
    :frame-page/edit    {::url   "frame/"
                         ::param [:id]
                         ::title "Edit Frame"}})
