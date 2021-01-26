@@ -10,6 +10,8 @@ defmodule Unicorn.Frame do
   @spec default_color :: Color.t()
   def default_color, do: Color.black()
 
+  def new(options \\ [])
+
   def new(%{height: height, width: width, pixels: pixels}) do
     %__MODULE__{
       items: pixels,
@@ -19,7 +21,7 @@ defmodule Unicorn.Frame do
   end
 
   @spec new(keyword()) :: t()
-  def new(options \\ []) do
+  def new(options) do
     %{height: height, width: width, color: color} =
       Enum.into(options, %{height: 16, width: 16, color: default_color()})
 

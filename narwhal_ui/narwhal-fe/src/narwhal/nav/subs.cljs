@@ -47,9 +47,10 @@
     (for [frame frames
           :let [item-id (:id frame)
                 active? (and frame-page? (= item-id active-id))]]
-      {::active? active?
-       ::item-id item-id
-       ::item    frame})))
+      {::active?  active?
+       ::item-id  item-id
+       ::scratch? (:scratch? frame)
+       ::item     frame})))
 
 ;; ----------------------------------------------------------------------
 ;; Timelines

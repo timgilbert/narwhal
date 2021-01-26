@@ -3,7 +3,7 @@ defmodule NarwhalUi.FrameMetadata do
   require Logger
   alias Unicorn.Frame
 
-  @type t :: %__MODULE__{name: string, id: string, frame: %Frame{}}
+  @type t :: %__MODULE__{name: String.t(), id: String.t(), frame: %Frame{}}
   defstruct [:name, :id, :frame, :created_at, :updated_at]
 
   def new(id, %{name: name, frame: frame}) do

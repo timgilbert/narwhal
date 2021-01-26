@@ -14,12 +14,12 @@ defmodule Unicorn.Fx.Map do
 
   @spec lighten() :: Unicorn.Fx.Map.Struct.t()
   def lighten() do
-    %Unicorn.Fx.Map.Struct{pixel_fn: &Color.lighten/1}
+    %Unicorn.Fx.Map.Struct{pixel_fn: &Color.lighten/3}
   end
 
   @spec darken() :: Unicorn.Fx.Map.Struct.t()
   def darken() do
-    %Unicorn.Fx.Map.Struct{pixel_fn: &Color.darken/1}
+    %Unicorn.Fx.Map.Struct{pixel_fn: &Color.darken/3}
   end
 
   defimpl Unicorn.Fx.Effect, for: Struct do
