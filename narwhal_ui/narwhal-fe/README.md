@@ -29,7 +29,10 @@ To create a production build run:
 
 - Custom cursors
 - Color picker, better palette
-- Tiny thumbnails for frames - canvas? svg? in-memory image?
 - Multiple scratch frames
 - Frame landing page with thumbnails
 - Routing might be a little hosed up
+- Grid customization:
+  - Non-interactive (no hover/events)
+  - No gaps (for thumbnails)
+  - rasterize and cache?

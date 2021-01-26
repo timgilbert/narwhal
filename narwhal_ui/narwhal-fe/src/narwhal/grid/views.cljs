@@ -55,7 +55,7 @@
     [:li {:on-click #(>evt [:frame-edit/random])} [component/icon "bolt"]]
     [:li {:on-click #(>evt [:frame-edit/blank])} [component/icon "trash"]]]])
 
-(defn cell [frame-id color index]
+(defn html-cell [frame-id color index]
   [:div.pixel-cell
    (merge {:style    {:background-color color}
            :on-click #(>evt [::events/click frame-id index])}
@@ -70,9 +70,59 @@
      [:input.uk-input.uk-form-width-medium
       {:type "text" :placeholder "Frame name"}]]]])
 
-(defn grid [frame-id]
+(defn html-grid [frame-id]
   (let [pixels (<sub [::subs/pixels frame-id])]
     (when pixels
       [:div.pixel-grid
        (for [[i color] (map-indexed vector pixels)]
-         ^{:key i} [cell frame-id color i])])))
+         ^{:key i} [html-cell frame-id color i])])))
+
+;; ----------------------------------------------------------------------
+;; SVG stuff
+
+;; This could be less messy
+(defn svg-cell [frame-id {::keys [x y cell-size color pixel-index]}]
+  (let [attrs (merge
+                {:x        x
+                 :y        y
+                 :height   cell-size
+                 :width    cell-size
+                 :fill     color
+                 :stroke   "black"
+                 :on-click #(>evt [::events/click frame-id pixel-index])
+                 :style    {:cursor "crosshair"}}
+                (when util/tooltips?
+                  {:data-uk-tooltip (str "title: " pixel-index
+                                         "; pos: bottom-left")}))]
+
+    [:rect attrs]))
+
+(defn grid [frame-id grid-size]
+  (let [{:keys [height width pixels]} (<sub [::subs/frame-data frame-id])
+        cell-size  30
+        cell-gap   3
+        cell-total (+ cell-size cell-gap)
+        view-box   (str "0 0 "
+                        (+ cell-gap (* width cell-total))
+                        " "
+                        (+ cell-gap (* height cell-total)))]
+    [:svg {:xmlns    "http://www.w3.org/2000/svg"
+           :version  "1.1"
+           :view-box view-box
+           :width    (or grid-size 530)
+           :height   (or grid-size 530)}
+     (concat
+       [^{:key "bounding-box"}
+        [:rect {:width "100%" :height "100%" :fill "white"}]]
+       (for [i (range width)
+             j (range height)
+             :let [index (+ i (* j height))
+                   color (nth pixels index)
+                   x     (+ cell-gap (* i cell-total))
+                   y     (+ cell-gap (* j cell-total))]]
+         ^{:key index}
+         [svg-cell frame-id {::x           x
+                             ::y           y
+                             ::color       color
+                             ::cell-size   cell-size
+                             ::pixel-index index}]))]))
