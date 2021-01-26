@@ -94,8 +94,88 @@
                 (when util/tooltips?
                   {:data-uk-tooltip (str "title: " pixel-index
                                          "; pos: bottom-left")}))]
-
     [:rect attrs]))
+
+(defn ^:private base-svg-cell
+  [{::keys [cell-size x y color props tooltip-fn]
+    :as    attrs}]
+  (let [tooltip-attr (when tooltip-fn
+                       {:data-uk-tooltip (tooltip-fn attrs)})]
+    [:rect
+     (merge {:x      x
+             :y      y
+             :height cell-size
+             :width  cell-size
+             :fill   color}
+            props
+            tooltip-attr)]))
+
+(defn ^:private grid-edit-tooltip
+  [{::keys [i j pixel-index]}]
+  (str "title:" pixel-index " (" i "," j ");pos:bottom-left"))
+
+(defn ^:private svg-edit-cell
+  [{::keys [frame-id pixel-index] :as attrs}]
+  (let [on-click #(>evt [::events/click frame-id pixel-index])]
+    [base-svg-cell
+     (merge attrs
+            {::tooltip-fn grid-edit-tooltip
+             ::props      {:stroke   "black"
+                           :style    {:cursor "crosshair"}
+                           :on-click on-click}})]))
+
+(defn ^:private svg-thumb-cell
+  [{::keys [frame-id pixel-index] :as attrs}]
+  [base-svg-cell (merge attrs {::tooltip-fn grid-edit-tooltip
+                               ::props      {:stroke "white"
+                                             :stroke-width 3}})])
+
+(defn ^:private base-grid
+  [{::keys [frame-id grid-length cell-gap-pct cell-component]}]
+  (let [{:keys [height width pixels]} (<sub [::subs/frame-data frame-id])
+        cell-size  100
+        cell-gap   cell-gap-pct
+        cell-total (+ cell-size cell-gap)
+        view-box   (str "0 0 "
+                        (+ cell-gap (* width cell-total))
+                        " "
+                        (+ cell-gap (* height cell-total)))]
+    [:svg {:xmlns    "http://www.w3.org/2000/svg"
+           :version  "1.1"
+           :view-box view-box
+           :width    grid-length
+           :height   grid-length}
+     (concat
+       [^{:key "bounding-box"}
+        [:rect {:width "100%" :height "100%" :fill "white"}]]
+       (for [i (range width)
+             j (range height)
+             :let [index (+ i (* j height))
+                   color (nth pixels index)
+                   x     (+ cell-gap (* i cell-total))
+                   y     (+ cell-gap (* j cell-total))]]
+         ^{:key index}
+         [cell-component {::frame-id    frame-id
+                          ::x           x
+                          ::y           y
+                          ::i           i
+                          ::j           j
+                          ::color       color
+                          ::cell-size   cell-size
+                          ::pixel-index index}]))]))
+
+(defn edit-grid [frame-id]
+  [base-grid {::frame-id       frame-id
+              ::tooltip-fn     grid-edit-tooltip
+              ::grid-length    "600px"
+              ::cell-gap-pct   10
+              ::cell-component svg-edit-cell}])
+
+(defn thumbnail-grid [frame-id size]
+  [base-grid {::frame-id       frame-id
+              ::grid-length    (or size "600px")
+              ::cell-gap-pct   0
+              ::cell-component svg-thumb-cell}])
 
 (defn grid [frame-id grid-size]
   (let [{:keys [height width pixels]} (<sub [::subs/frame-data frame-id])

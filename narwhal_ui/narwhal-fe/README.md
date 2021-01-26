@@ -36,3 +36,5 @@ To create a production build run:
   - Non-interactive (no hover/events)
   - No gaps (for thumbnails)
   - rasterize and cache?
+    - Maybe [this?](https://github.com/pmkroeker/rasterize-svg/blob/master/src/rasterize.ts])
+  - circles??

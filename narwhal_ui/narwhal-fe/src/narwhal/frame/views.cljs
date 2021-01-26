@@ -121,7 +121,13 @@
   (let [frame-id (or frame-id util/default-frame-id)]
     [:div.uk-grid.uk-grid-divider {:data-uk-grid ""}
      [:div {:class "uk-width-expand"}
-      [grid/grid frame-id "600px"]
+      [:div
+       [:h3 "thumb"]
+       [grid/thumbnail-grid frame-id "1000px"]
+       [:h3 "edit"]]
+
+      [grid/edit-grid frame-id]
+      ;[grid/grid frame-id "600px"]
       [frame-name frame-id]
       [save-controls frame-id]]
      [:div {:class "uk-width-1-6@s"}
