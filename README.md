@@ -19,3 +19,5 @@ This is me trying to mess around with Elixir, [Nerves](http://nerves-project.org
   - Use as targets of tween effects, or as "replace with" effects
 - Lib: rejigger tween code to not produce intermediate steps
 - Lib: implementation should just be a single list
+- UI: gql interface to detect connected hardware
+  - Live-edit mode for grid if it's there

@@ -17,8 +17,8 @@
        [:span "Narwhal"]]]]]
    [:div.uk-navbar-right
     [:ul.uk-navbar-nav
-     [:li [component/link :timeline/new "New Timeline"]]
-     [:li [component/link :frame/new "New Frame"]]
+     [:li [component/link :timeline-page/list "Timelines"]]
+     [:li [component/link :frame-page/list "Frames"]]
      ;; TODO: below should be conditional based on elixir settings
      [:li [:a {:href "/dashboard"} "Dashboard"]]]]])
 

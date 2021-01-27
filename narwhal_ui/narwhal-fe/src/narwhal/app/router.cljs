@@ -9,13 +9,13 @@
   we should fire off when we navigate to them"
   {:home-page/home     {::url   ""
                         ::title "Home"}
-   :timeline-page/new  {::url   "timeline"
+   :timeline-page/list {::url   "timeline"
                         ::title "New Timeline"}
    :timeline-page/edit {::url   "timeline/"
                         ::param [:id]
                         ::title "Edit Timeline"}
-   :frame-page/new     {::url      "frame"
-                        ::title    "New Frame"}
+   :frame-page/list    {::url   "frame"
+                        ::title "Saved Frames"}
    :frame-page/edit    {::url   "frame/"
                         ::param [:id]
                         ::title "Edit Frame"}})
@@ -35,7 +35,8 @@
                    (into {}))]
     ["/" r-map]))
 
-(def bidi-routes (gen-bidi-routes pages))
+(def bidi-routes
+  (gen-bidi-routes pages))
 ;; This code cribbed from https://github.com/jacekschae/conduit/blob/master/src/conduit/router.cljs
 
 (def history

@@ -3,7 +3,8 @@
             [narwhal.nav.views :as nav]
             [narwhal.nav.subs :as nav-subs]
             [narwhal.timeline.views :as timeline]
-            [narwhal.frame.views :as frame]
+            [narwhal.frame.views.editor :as frame-edit]
+            [narwhal.frame.views.list :as frame-list]
             [narwhal.util.util :as util :refer [<sub]]
             [narwhal.util.component :as component]
             narwhal.app.events))
@@ -21,10 +22,10 @@
             "from the Noun Project'. Thanks!")]])
 
 (def handlers
-  {:home-page/home    home-page
-   :timeline-page/new timeline/new-timeline
-   :frame-page/new    frame/frame-editor
-   :frame-page/edit   frame/frame-editor})
+  {:home-page/home     home-page
+   :timeline-page/list timeline/timeline-list
+   :frame-page/list    frame-list/frame-list
+   :frame-page/edit    frame-edit/frame-editor})
 
 (defn app
   []

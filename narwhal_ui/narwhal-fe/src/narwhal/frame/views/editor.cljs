@@ -1,4 +1,4 @@
-(ns narwhal.frame.views
+(ns narwhal.frame.views.editor
   (:require [lambdaisland.glogi :as log]
             [re-frame.core :as rf]
             [narwhal.util.component :as component]
@@ -9,7 +9,7 @@
             [narwhal.grid.views :as grid]))
 
 ;; ----------------------------------------------------------------------
-;; Frame name
+;; Frame editor
 
 (defn display-frame-name [frame-id]
   (let [ital (if (<sub [::subs/dirty? frame-id]) :i :span)]
@@ -100,7 +100,6 @@
      [:li [:a "Fill"]]
      [:li [:a "Randomize"]]]]])
 
-
 (defn save-controls [frame-id]
   ;; TODO: change buttons when editing/creating
   ;; TODO: no revert on *scratch*
@@ -122,9 +121,12 @@
     [:div.uk-grid.uk-grid-divider {:data-uk-grid ""}
      [:div {:class "uk-width-expand"}
       [grid/edit-grid frame-id]
-      ;[grid/grid frame-id "600px"]
       [frame-name frame-id]
       [save-controls frame-id]]
      [:div {:class "uk-width-1-6@s"}
       [grid/controls]]]))
 
+(defn frame-list []
+  [:div
+   [:h1 "Saved Frames"]
+   [:p "coming soon!"]])
