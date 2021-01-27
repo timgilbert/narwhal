@@ -14,13 +14,21 @@
      [:li.uk-active
       [:a.brand {:href "/"}
        [:img {:class "logo" :src "/images/narwhal.svg" :height 50 :width 50}]
-       [:span "Narwhal"]]]]]
+       [:span "Narwhal"]]]
+     [:li [:button.uk-text
+           {:on-click #(>evt [:route/navigate
+                              #:route{:page :timeline-page/list}])}
+           "tl"]]
+     [:li [:button.uk-text
+           {:on-click #(>evt [:route/navigate
+                              #:route{:page :frame-page/list}])}
+           "fr"]]]]
    [:div.uk-navbar-right
     [:ul.uk-navbar-nav
      [:li [component/link :timeline-page/list "Timelines"]]
      [:li [component/link :frame-page/list "Frames"]]
      ;; TODO: below should be conditional based on elixir settings
-     [:li [:a {:href "/dashboard"} "Dashboard"]]]]])
+     [:li [:a {:href "/dashboard" :target "_new"} "Dashboard"]]]]])
 
 (defn frame-nav-item
   [{::subs/keys [item item-id active?]}]
