@@ -21,11 +21,19 @@
          ;; TODO: more sort options
          (sort-by #(-> % :name string/upper-case)))))
 
+;; TODO: rename to ::frame-meta
 (rf/reg-sub
   ::frame
   :<- [::frame-root]
   (fn [root [_ frame-id]]
     (get root frame-id)))
+
+(rf/reg-sub
+  ::frame-exists?
+  (fn [[_ frame-id]]
+    (rf/subscribe [::frame frame-id]))
+  (fn [frame]
+    (some? frame)))
 
 (rf/reg-sub
   ::scratch?

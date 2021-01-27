@@ -16,12 +16,10 @@
        [:img {:class "logo" :src "/images/narwhal.svg" :height 50 :width 50}]
        [:span "Narwhal"]]]
      [:li [:button.uk-text
-           {:on-click #(>evt [:route/navigate
-                              #:route{:page :timeline-page/list}])}
+           {:on-click #(>evt [:route/nav :timeline-page/list])}
            "tl"]]
      [:li [:button.uk-text
-           {:on-click #(>evt [:route/navigate
-                              #:route{:page :frame-page/list}])}
+           {:on-click #(>evt [:route/nav :frame-page/list])}
            "fr"]]]]
    [:div.uk-navbar-right
     [:ul.uk-navbar-nav

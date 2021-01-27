@@ -8,9 +8,10 @@
   {:ws   nil
    :http {}})
 
-(rf/reg-event-fx :initialize-db
-                 (fn [_db _]
-                   {:db (db/initial-db {})
-                    :fx [[:dispatch [::re-graph/init re-graph-options]]
-                         [:dispatch [:graphql/query {:graphql/query :nav-gql/nav}]]]}))
+(rf/reg-event-fx
+  ::initialize-app
+  (fn [_db _]
+    {:db (db/initial-db {})
+     :fx [[:dispatch [::re-graph/init re-graph-options]]
+          [:dispatch [:graphql/query {:graphql/query :nav-gql/nav}]]]}))
 

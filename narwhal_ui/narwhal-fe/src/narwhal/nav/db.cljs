@@ -14,4 +14,6 @@
 
 (defn init-db
   [db]
-  (set-page db {:route/page :home-page/home}))
+  (-> db
+      (set-page {:route/page :home-page/home})
+      (assoc :nav/current-route {:name :home-page/home})))

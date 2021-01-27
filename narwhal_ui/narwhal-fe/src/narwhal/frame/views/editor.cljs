@@ -119,8 +119,7 @@
    [revert-button frame-id]
    [actions-dropdown frame-id]])
 
-(defn frame-editor-page
-  [frame-id]
+(defn frame-editor [frame-id]
   [:div.uk-grid.uk-grid-divider {:data-uk-grid ""}
    [:div {:class "uk-width-expand"}
     [grid/edit-grid frame-id]
@@ -128,3 +127,10 @@
     [save-controls frame-id]]
    [:div {:class "uk-width-1-6@s"}
     [grid/controls]]])
+
+(defn frame-editor-page
+  [route]
+  (let [frame-id (-> route :path-params :frame-id)]
+    (if (<sub [::subs/frame-exists? frame-id])
+      [frame-editor frame-id]
+      [component/error-page "Can't find frame-id " frame-id])))

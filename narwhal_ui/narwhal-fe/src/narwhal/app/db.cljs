@@ -2,8 +2,7 @@
   (:require [lambdaisland.glogi :as log]
             [narwhal.nav.db :as nav-db]
             [narwhal.frame.db :as frame-db]
-            [narwhal.grid.db :as grid-db]
-            [narwhal.util.util :as util]))
+            [narwhal.grid.db :as grid-db]))
 
 (defn initial-db [db]
   (-> db
