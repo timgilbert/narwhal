@@ -1,7 +1,6 @@
 (ns narwhal.nav.subs
   (:require [lambdaisland.glogi :as log]
             [re-frame.core :as rf]
-            [narwhal.util.util :as util :refer [<sub >evt]]
             [narwhal.nav.db :as db]
             [narwhal.frame.subs :as frame-subs]
             [narwhal.timeline.subs :as timeline-subs]))

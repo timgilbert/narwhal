@@ -23,15 +23,17 @@
 
 (def handlers
   {:home-page/home     home-page
-   :timeline-page/list timeline/timeline-list
-   :frame-page/list    frame-list/frame-list
-   :frame-page/edit    frame-edit/frame-editor})
+   :timeline-page/list timeline/timeline-list-page
+   :frame-page/list    frame-list/frame-list-page
+   :frame-page/edit    frame-edit/frame-editor-page})
 
 (defn app
   []
   (let [active  (<sub ::nav-subs/active-page)
         item-id (<sub ::nav-subs/active-id)
         handler (get handlers (or active :home-page/home))]
+    (assert (some? active))
+    (assert (some? handler))
     [:div
      [nav/top-nav]
      [:div.uk-grid.uk-grid-divider {:data-uk-grid ""}

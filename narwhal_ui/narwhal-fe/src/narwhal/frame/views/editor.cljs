@@ -45,10 +45,10 @@
 
 (defn edit-frame-name [frame-id]
   (let [curr-name (<sub [::subs/frame-name frame-id])
-        init-name (if (= curr-name util/default-frame-name)
-                    "" curr-name)]
+        scratch?  (<sub [::subs/frame-name frame-id])
+        init-name (if scratch? "" curr-name)]
     [fork/form
-     {:props             {::scratch? (<sub [::subs/scratch? frame-id])
+     {:props             {::scratch? scratch?
                           ::dirty?   (<sub [::subs/dirty? frame-id])
                           ::frame-id frame-id}
       :initial-values    {:name        init-name
@@ -66,28 +66,37 @@
     [display-frame-name frame-id]))
 
 (defn frame-create-button
-  [frame-id disabled?]
+  [frame-id]
   [:button.uk-button.uk-button-primary
    {:on-click #(>evt [::events/create-frame frame-id])
-    :disabled disabled?}
+    :disabled (<sub [::subs/clean? frame-id])}
    [component/icon "cloud-upload"]
    " Create"])
 
 (defn frame-save-button
-  [frame-id disabled?]
+  [frame-id]
   [:button.uk-button.uk-button-primary
    {:on-click #(>evt [::events/save-frame frame-id])
-    :disabled disabled?}
+    :disabled (<sub [::subs/clean? frame-id])}
    [component/icon "cloud-upload"]
    " Save"])
 
+;; TODO: should delete scratch frames (from memory) too
 (defn delete-button [frame-id]
-  (let [disabled? (<sub [::subs/scratch? frame-id])]
+  (let [scratch? (<sub [::subs/scratch? frame-id])]
     [:button.uk-button.uk-button-text.uk-button-danger
-     (if disabled?
+     (if scratch?
        {:disabled true}
        {:on-click #(>evt [::events/delete-frame frame-id])})
      " Delete frame"]))
+
+(defn revert-button [frame-id]
+  [:button.uk-button.uk-button-default
+   {:on-click #(>evt [::events/revert-frame frame-id])
+    :disabled (or (<sub [::subs/clean? frame-id])
+                  (<sub [::subs/scratch? frame-id]))}
+   [component/icon "refresh"]
+   " Revert"])
 
 (defn actions-dropdown [frame-id]
   [:div
@@ -103,30 +112,19 @@
 (defn save-controls [frame-id]
   ;; TODO: change buttons when editing/creating
   ;; TODO: no revert on *scratch*
-  (let [disabled? (if (<sub [::subs/dirty? frame-id]) false true)]
-    [:div.uk-flex
-     (if (<sub [::subs/scratch? frame-id])
-       [frame-create-button frame-id disabled?]
-       [frame-save-button frame-id disabled?])
-     [:button.uk-button.uk-button-default
-      {:on-click #(>evt [::events/revert-frame frame-id])
-       :disabled disabled?}
-      [component/icon "refresh"]
-      " Revert"]
-     [actions-dropdown frame-id]]))
+  [:div.uk-flex
+   (if (<sub [::subs/scratch? frame-id])
+     [frame-create-button frame-id]
+     [frame-save-button frame-id])
+   [revert-button frame-id]
+   [actions-dropdown frame-id]])
 
-(defn frame-editor
+(defn frame-editor-page
   [frame-id]
-  (let [frame-id (or frame-id util/default-frame-id)]
-    [:div.uk-grid.uk-grid-divider {:data-uk-grid ""}
-     [:div {:class "uk-width-expand"}
-      [grid/edit-grid frame-id]
-      [frame-name frame-id]
-      [save-controls frame-id]]
-     [:div {:class "uk-width-1-6@s"}
-      [grid/controls]]]))
-
-(defn frame-list []
-  [:div
-   [:h1 "Saved Frames"]
-   [:p "coming soon!"]])
+  [:div.uk-grid.uk-grid-divider {:data-uk-grid ""}
+   [:div {:class "uk-width-expand"}
+    [grid/edit-grid frame-id]
+    [frame-name frame-id]
+    [save-controls frame-id]]
+   [:div {:class "uk-width-1-6@s"}
+    [grid/controls]]])

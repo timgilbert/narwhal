@@ -51,26 +51,20 @@
 (rf/reg-event-fx
   :frame-gql/scratch-frame-loaded
   (fn [{:keys [db]} [_ frame-data]]
-    (let [new-frame    (db/with-scratch-metadata frame-data)
+    (let [new-frame    (db/with-scratch-metadata db frame-data)
           new-frame-id (:id new-frame)]
       (log/spy new-frame)
-      {:dispatch [:route/navigate #:route{:page :frame-page/new}]
+      {:dispatch [:route/navigate #:route{:page :frame-page/edit
+                                          :id   new-frame-id}]
        :db       (-> db
                      (db/replace-single-frame new-frame)
                      (db/set-clean new-frame-id))})))
-
-(rf/reg-event-fx
-  :frame/create-scratch
-  (fn [_ _]
-    (log/debug :frame/create-scratch "Argh, get rid of me already")
-    {}))
 
 ;; ----------------------------------------------------------------------
 ;; Frame persistence
 (rf/reg-event-fx
   ::create-frame
   (fn [{:keys [db]} [_ frame-id]]
-    (assert (= frame-id util/default-frame-id))
     (let [frame (db/frame-by-id db frame-id)
           args  #:graphql{:query :frame-gql/create-frame
                           :vars  {:i (dissoc frame :id :scratch?)}}]
@@ -83,8 +77,9 @@
       (log/debug "Created!" data)
       ;; Update saved frame list in db
       ;; Redirect to edit page for new ID
-      {:db       (assoc-in db [:narwhal.events/nav :narwhal.events/frames]
-                           (:allFrames data))
+      {:db       (-> db
+                     (db/set-clean new-frame-id)
+                     (db/replace-all-frames (:allFrames data)))
        :dispatch [:route/navigate #:route{:page :frame-page/edit
                                           :id   new-frame-id}]})))
 

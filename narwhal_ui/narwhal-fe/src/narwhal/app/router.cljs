@@ -1,5 +1,6 @@
 (ns narwhal.app.router
-  (:require [bidi.bidi :as bidi]
+  (:require [lambdaisland.glogi :as log]
+            [bidi.bidi :as bidi]
             [pushy.core :as pushy]
             [re-frame.core :as rf]
             [narwhal.nav.db :as nav-db]))
@@ -25,7 +26,7 @@
   (fn [{:keys [db]} [_ destination]]
     (let [config (get pages (:route/page destination))]
       (merge
-        {:db (nav-db/set-page db destination)}
+        {:db (nav-db/set-page db (log/spy destination))}
         (when-let [dispatch (::dispatch config)]
           {:dispatch (conj dispatch destination)})))))
 

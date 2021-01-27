@@ -1,8 +1,9 @@
 (ns narwhal.frame.subs
   (:require [lambdaisland.glogi :as log]
             [re-frame.core :as rf]
-            [narwhal.util.util :as util :refer [<sub >evt]]
-            [narwhal.frame.db :as db]))
+            [narwhal.util.util :as util]
+            [narwhal.frame.db :as db]
+            [clojure.string :as string]))
 
 ;; ----------------------------------------------------------------------
 ;; Frame stuff
@@ -17,7 +18,8 @@
   (fn [root _]
     (->> root
          vals
-         (sort-by :name))))             ; TODO: more sort options
+         ;; TODO: more sort options
+         (sort-by #(-> % :name string/upper-case)))))
 
 (rf/reg-sub
   ::frame
@@ -30,10 +32,7 @@
   (fn [[_ frame-id]]
     (rf/subscribe [::frame frame-id]))
   (fn [frame]
-    (let [frame-id (:id frame)]
-      (or (:scratch? frame)
-          (nil? frame-id)
-          (= frame-id util/default-frame-id)))))
+    (:scratch? frame false)))
 
 (rf/reg-sub
   ::dirty-root
@@ -45,6 +44,13 @@
   :<- [::dirty-root]
   (fn [dirty-root [_ frame-id]]
     (get dirty-root frame-id false)))
+
+(rf/reg-sub
+  ::clean?
+  (fn [[_ frame-id]]
+    (rf/subscribe [::dirty? frame-id]))
+  (fn [dirty?]
+    (not dirty?)))
 
 ;; ----------------------------------------------------------------------
 ;; Title stuff

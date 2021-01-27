@@ -6,7 +6,7 @@
             narwhal.timeline.events
             narwhal.timeline.subs))
 
-(defn timeline-list []
+(defn timeline-list-page []
   [:div
    [:h1 "Timelines"]
    [:p "coming soon!"]])

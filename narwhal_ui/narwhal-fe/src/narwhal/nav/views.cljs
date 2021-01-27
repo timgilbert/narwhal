@@ -24,8 +24,7 @@
 
 (defn frame-nav-item
   [{::subs/keys [item item-id active?]}]
-  (let [href (str "/frame" (when (not= item-id util/default-frame-id)
-                             (str "/" item-id)))
+  (let [href (str "/frame/" item-id) ; TODO: use route/whatever
         class (if active? "uk-active" "")]
     [:li
      [:a {:href href :class class}
