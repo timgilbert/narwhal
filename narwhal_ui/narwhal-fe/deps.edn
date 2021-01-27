@@ -7,8 +7,6 @@
                                  :exclusions  [re-graph.hato/re-graph.hato]}
   fork/fork                     {:mvn/version "2.2.5"}
   re-frame-utils/re-frame-utils {:mvn/version "0.1.0"}
-  bidi/bidi                     {:mvn/version "2.1.6"}
-  clj-commons/pushy             {:mvn/version "0.3.10"}
   metosin/reitit                {:mvn/version "0.5.11"}
   lambdaisland/glogi            {:mvn/version "1.0.74"}}
 
