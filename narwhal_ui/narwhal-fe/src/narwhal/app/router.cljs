@@ -1,8 +1,13 @@
 (ns narwhal.app.router
   (:require [lambdaisland.glogi :as log]
-            [bidi.bidi :as bidi]
-            [pushy.core :as pushy]
+            ;[bidi.bidi :as bidi]
+            ;[pushy.core :as pushy]
+            [reagent.core :as reagent]
             [re-frame.core :as rf]
+            [reitit.frontend :as retit]
+            [reitit.frontend.easy :as rfe]
+            [reitit.coercion.spec :as rss]
+            [reitit.frontend.controllers :as rfc]
             [narwhal.nav.db :as nav-db]))
 
 (def pages
@@ -21,35 +26,49 @@
                         ::param [:id]
                         ::title "Edit Frame"}})
 
+(def routes
+    [["/"
+      ["" :home-page/home]
+      ["frame" :frame-page/list]
+      ["frame/:frame-id" :frame-page/edit]
+      ["timeline" :timeline-page/list]
+      ["timeline/:timeline-id" :timeline-page/edit]]])
+
+(def router
+  (retit/router routes {:data {:coercion rss/coercion}}))
+
+;; Triggering navigation from events.
+(rf/reg-fx
+  :route/navigate!
+  (fn [route]
+    (apply rfe/push-state route)))
+
 (rf/reg-event-fx
-  :route/navigate
-  (fn [{:keys [db]} [_ destination]]
-    (let [config (get pages (:route/page destination))]
-      (merge
-        {:db (nav-db/set-page db (log/spy destination))}
-        (when-let [dispatch (::dispatch config)]
-          {:dispatch (conj dispatch destination)})))))
+  :route/nav
+  (fn [_cofx [_ & route]]
+    {:route/navigate! route}))
 
-(defn gen-bidi-routes [pages]
-  (let [r-map (->> (for [[page {::keys [url param]}] pages]
-                     [url (if param {param page} page)])
-                   (into {}))]
-    ["/" r-map]))
+(rf/reg-sub
+  :route/current-route
+  (fn [db]
+    (:route/current-route db)))
 
-(def bidi-routes
-  (gen-bidi-routes pages))
-;; This code cribbed from https://github.com/jacekschae/conduit/blob/master/src/conduit/router.cljs
+(rf/reg-event-db
+  :route/navigated
+  (fn [db [_ new-match]]
+    (let [old-match   (:route/current-route db)
+          controllers (rfc/apply-controllers (:controllers old-match) new-match)]
+      (assoc db :route/current-route
+                (assoc new-match :controllers controllers)))))
 
-(def history
-  (let [dispatch #(rf/dispatch [:route/navigate
-                                #:route{:page (:handler %)
-                                        :id   (get-in % [:route-params :id])}])
-        match    #(bidi/match-route bidi-routes %)]
-    (pushy/pushy dispatch match)))
+(defn on-navigate [match history]
+  (log/spy [match history])
+  (when match
+    (rf/dispatch [:route/navigated match])))
 
 (defn start! []
-  (pushy/start! history))
-
-(defn set-token!
-  [token]
-  (pushy/set-token! history token))
+  (rfe/start!
+    router
+    on-navigate
+    ;; set to false to enable HistoryAPI
+    {:use-fragment true}))

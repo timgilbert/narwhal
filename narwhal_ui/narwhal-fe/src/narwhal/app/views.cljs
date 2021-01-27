@@ -29,11 +29,13 @@
 
 (defn app
   []
-  (let [active  (<sub ::nav-subs/active-page)
-        item-id (<sub ::nav-subs/active-id)
-        handler (get handlers (or active :home-page/home))]
-    (assert (some? active))
-    (assert (some? handler))
+  (let [handler home-page item-id ""]
+        ;active  (<sub ::nav-subs/active-page)]
+    ;    item-id (<sub ::nav-subs/active-id)
+    ;    handler (get handlers (or active :home-page/home))]
+    ;(assert (some? active))
+    ;(assert (some? handler))
+    (log/spy (:data (<sub :route/current-route)))
     [:div
      [nav/top-nav]
      [:div.uk-grid.uk-grid-divider {:data-uk-grid ""}
