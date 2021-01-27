@@ -8,7 +8,6 @@
 (rf/reg-fx
   ::navigate!
   (fn [route]
-    (log/warn ::navigate! route)
     (apply rfe/push-state route)))
 
 (rf/reg-event-fx

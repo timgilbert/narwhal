@@ -5,47 +5,51 @@
             [narwhal.util.util :as util :refer [<sub >evt]]
             [narwhal.nav.events :as events]
             [narwhal.frame.events :as frame-events]
-            [narwhal.nav.subs :as subs]))
+            [narwhal.nav.subs :as subs]
+            [narwhal.frame.subs :as frame-subs]))
 
 (defn top-nav []
   [:nav.uk-navbar-container {:data-uk-navbar ""}
    [:div.uk-navbar-left
     [:ul.uk-navbar-nav
-     [:li.uk-active
+     [:li (when (<sub [::subs/page-type? :home-page])
+            {:class "uk-active"})
       [:a.brand {:href "/"}
        [:img {:class "logo" :src "/images/narwhal.svg" :height 50 :width 50}]
-       [:span "Narwhal"]]]
-     [:li [:button.uk-text
-           {:on-click #(>evt [:route/nav :timeline-page/list])}
-           "tl"]]
-     [:li [:button.uk-text
-           {:on-click #(>evt [:route/nav :frame-page/list])}
-           "fr"]]]]
+       [:span "Narwhal"]]]]]
    [:div.uk-navbar-right
     [:ul.uk-navbar-nav
-     [:li [component/link :timeline-page/list "Timelines"]]
-     [:li [component/link :frame-page/list "Frames"]]
+     [:li (when (<sub [::subs/page-type? :timeline-page])
+            {:class "uk-active"})
+      [component/link :timeline-page/list "Timelines"]]
+     [:li (when (<sub [::subs/page-type? :frame-page])
+            {:class "uk-active"})
+      [component/link :frame-page/list "Frames"]]
      ;; TODO: below should be conditional based on elixir settings
      [:li [:a {:href "/dashboard" :target "_new"} "Dashboard"]]]]])
 
 (defn frame-nav-item
-  [{::subs/keys [item item-id active?]}]
-  (let [href (str "/frame/" item-id) ; TODO: use route/whatever
-        class (if active? "uk-active" "")]
-    [:li
-     [:a {:href href :class class}
-      (:name item)]]))
+  [{::subs/keys [item-id item active?] :as e}]
+  [:li {:class (if active? "uk-active" "")}
+   [component/link
+    :frame-page/edit
+    {:frame-id item-id}
+    {}
+    (str (:name item)
+         (when (<sub [::frame-subs/dirty? item-id]) " *"))]])
 
 (defn side-nav-menu
   [menu-sub last-component]
-  (into [:ul.uk-sub-nav]
-        (concat
-          (for [{::subs/keys [item-id] :as entry} (<sub menu-sub)
-                :let [key (str menu-sub "." item-id)]]
-            ^{:key key}
-            [frame-nav-item entry]) ; TODO: handle timelines
-          ^{:key (str menu-sub ".default")}
-          [last-component])))
+  (into
+    [:ul.uk-nav-sub]
+    (concat
+      (for [{::subs/keys [item-id] :as entry} (<sub menu-sub)
+            :let [key (str menu-sub "." item-id)]]
+        ;; TODO: handle timelines
+        ^{:key key}
+        [frame-nav-item entry])
+      ^{:key (str menu-sub ".default")}
+      [last-component])))
 
 (defn side-nav []
   (let [active-attrs   {:class (str "uk-parent uk-active")}
@@ -55,18 +59,17 @@
         frame-attrs    (if (<sub [::subs/page-type? :frame-page])
                          active-attrs inactive-attrs)]
     [:div
-     [:ul.uk-nav.uk-nav-side.uk-nav-primary
+     [:ul.uk-nav.uk-nav-side.uk-nav-default.uk-nav-center
       [:li timeline-attrs
-       [:a {:href "#"} "Timelines"]
+       [component/link :timeline-page/list "Timelines"]
        [side-nav-menu ::subs/timelines
         [:li [:a {:href "/timeline"}
               [component/icon "plus-circle"]
-              "Create Timeline"]]]]
+              " [new timeline]"]]]]
 
       [:li frame-attrs
-       [:a {:href "#"} "Frames"]
+       [component/link :frame-page/list "Frames"]
        [side-nav-menu ::subs/frames
-        [:li [:button.uk-button.uk-button-link
-              {:on-click #(>evt [::frame-events/new-blank-frame])}
+        [:li [:a {:href "" :on-click #(>evt [::frame-events/new-blank-frame])}
               [component/icon "plus-circle"]
-              " Create Frame"]]]]]]))
+              " [new frame]"]]]]]]))

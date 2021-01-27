@@ -18,7 +18,7 @@
 (rf/reg-sub
   ::frame-data
   (fn [[_ frame-id]]
-    (rf/subscribe [::frame-subs/frame frame-id]))
+    (rf/subscribe [::frame-subs/frame-meta-by-id frame-id]))
   (fn [frame-metadata]
     (-> frame-metadata :frame)))
 

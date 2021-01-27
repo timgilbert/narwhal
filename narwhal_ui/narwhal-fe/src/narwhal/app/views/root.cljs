@@ -19,14 +19,11 @@
 
 (defn app
   []
-  (let [;handler home/home-page
-        ;item-id ""
-        route   (<sub ::router-subs/current-route)
+  (let [route   (<sub ::router-subs/current-route)
         page    (or (-> route :data :name) :home-page/home)
-        handler (get handlers page)]
-    (log/info :route route)
-    ;(assert (some? active))
-    ;(assert (some? handler))
+        handler (get handlers page component/error-page)]
+    (assert (some? route))
+    (assert (some? handler))
     [:div
      [nav/top-nav]
      [:div.uk-grid.uk-grid-divider {:data-uk-grid ""}

@@ -12,7 +12,7 @@
         class     (if selected? "uk-active" "")]
     [:li {:on-click #(>evt [::events/set-active-tool tool])
           :class    class}
-     [component/icon icon-name selected?]]))
+     [component/icon icon-name (when selected? {:class "uk-icon-button"})]]))
 
 (def palette-colors
   [(::color/black color/named)

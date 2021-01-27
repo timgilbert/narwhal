@@ -20,3 +20,10 @@
   ([] random-pixels 16 16)
   ([height width]
    (repeatedly (* height width) rand-color)))
+
+(defn signal
+  "Produce a re-frame signal function which combines the given subscription
+  name with whatever args were in the query vector."
+  [sub]
+  (fn [query-vector]
+    (rf/subscribe (into [sub] (rest query-vector)))))

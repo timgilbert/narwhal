@@ -18,7 +18,7 @@
 
 (defn frame-list
   []
-  (let [frame-meta (<sub [::subs/all-frames])]
+  (let [frame-meta (<sub [::subs/all-frame-metadata])]
     [:div.uk-flex.uk-flex-wrap.uk-flex-wrap-around
      (for [{:keys [id name] :as f} frame-meta]
        ^{:key id}

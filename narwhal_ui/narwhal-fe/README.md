@@ -29,12 +29,7 @@ To create a production build run:
 
 - Custom cursors
 - Color picker, better palette
-- Multiple scratch frames
-- Frame landing page with thumbnails
-- Routing might be a little hosed up
 - Grid customization:
-  - Non-interactive (no hover/events)
   - No gaps (for thumbnails)
   - rasterize and cache?
     - Maybe [this?](https://github.com/pmkroeker/rasterize-svg/blob/master/src/rasterize.ts])
-  - circles??

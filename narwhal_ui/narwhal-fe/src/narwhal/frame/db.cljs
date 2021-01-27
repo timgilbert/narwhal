@@ -59,6 +59,9 @@
   [db frame-id]
   (update-in db (frame-path :f/dirty?) dissoc frame-id))
 
+(defn dirty? [db frame-id]
+  (get-in db (frame-path :f/dirty? frame-id) false))
+
 (defn init-db [db]
   (-> db
       (replace-all-frames [])))

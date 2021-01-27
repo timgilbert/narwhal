@@ -12,6 +12,6 @@
   ::initialize-app
   (fn [_db _]
     {:db (db/initial-db {})
-     :fx [[:dispatch [::re-graph/init re-graph-options]]
+     :fx [[:dispatch [::re-graph/init :rg-instance re-graph-options]]
           [:dispatch [:graphql/query {:graphql/query :nav-gql/nav}]]]}))
 

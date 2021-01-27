@@ -101,8 +101,11 @@ fragment FrameFields on FrameMetadata {
   :graphql/query
   (fn [{:keys [db]} [_ {:graphql/keys [query vars]}]]
     (let [{::keys [text mutation?]} (get queries query)
-          event-name (if mutation? ::re-graph/mutate ::re-graph/query)
-          event [event-name ::query-id text (or vars {}) [::query-return query]]]
+          event-name (if mutation?
+                       ::re-graph/mutate
+                       ::re-graph/query)
+          event      [event-name :rg-instance text (or vars {})
+                      [::query-return query]]]
       (log/debug "Event:" event)
       {:db       (assoc-in db [::in-flight? query] true)
        :dispatch event})))

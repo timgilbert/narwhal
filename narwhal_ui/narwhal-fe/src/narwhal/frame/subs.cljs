@@ -13,7 +13,7 @@
   (fn [db _] (get-in db (db/frame-path :f/all))))
 
 (rf/reg-sub
-  ::all-frames
+  ::all-frame-metadata
   :<- [::frame-root]
   (fn [root _]
     (->> root
@@ -23,22 +23,20 @@
 
 ;; TODO: rename to ::frame-meta
 (rf/reg-sub
-  ::frame
+  ::frame-meta-by-id
   :<- [::frame-root]
   (fn [root [_ frame-id]]
     (get root frame-id)))
 
 (rf/reg-sub
   ::frame-exists?
-  (fn [[_ frame-id]]
-    (rf/subscribe [::frame frame-id]))
+  (util/signal ::frame-meta-by-id)
   (fn [frame]
     (some? frame)))
 
 (rf/reg-sub
   ::scratch?
-  (fn [[_ frame-id]]
-    (rf/subscribe [::frame frame-id]))
+  (util/signal ::frame-meta-by-id)
   (fn [frame]
     (:scratch? frame false)))
 
@@ -55,8 +53,7 @@
 
 (rf/reg-sub
   ::clean?
-  (fn [[_ frame-id]]
-    (rf/subscribe [::dirty? frame-id]))
+  (util/signal ::dirty?)
   (fn [dirty?]
     (not dirty?)))
 
@@ -67,9 +64,10 @@
   (fn [db [_ frame-id]]
     (get-in db (db/frame-path :f/editing? frame-id) false)))
 
+
 (rf/reg-sub
   ::frame-name
-  (fn [[_ frame-id]]
-    (rf/subscribe [::frame frame-id]))
+  (util/signal ::frame-meta-by-id)
+  ;:<- [::frame]
   (fn [frame]
     (:name frame)))

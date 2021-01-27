@@ -11,7 +11,6 @@
   (retit/router (routes/gen-routes)))
 
 (defn on-navigate [match history]
-  (log/spy [match history])
   (when match
     (rf/dispatch [::events/navigated match])))
 

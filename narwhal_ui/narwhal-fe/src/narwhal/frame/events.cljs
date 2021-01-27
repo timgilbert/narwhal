@@ -53,12 +53,10 @@
   (fn [{:keys [db]} [_ frame-data]]
     (let [new-frame    (db/with-scratch-metadata db frame-data)
           new-frame-id (:id new-frame)]
-      (log/spy new-frame)
-      {:dispatch [:route/navigate #:route{:page :frame-page/edit
-                                          :id   new-frame-id}]
+      {:dispatch [:route/nav :frame-page/edit {:frame-id new-frame-id}]
        :db       (-> db
                      (db/replace-single-frame new-frame)
-                     (db/set-clean new-frame-id))})))
+                     (db/set-dirty new-frame-id))})))
 
 ;; ----------------------------------------------------------------------
 ;; Frame persistence
@@ -80,8 +78,7 @@
       {:db       (-> db
                      (db/set-clean new-frame-id)
                      (db/replace-all-frames (:allFrames data)))
-       :dispatch [:route/navigate #:route{:page :frame-page/edit
-                                          :id   new-frame-id}]})))
+       :dispatch [:route/nav :frame-page/edit {:frame-id new-frame-id}]})))
 
 ;; Save an update to an existing frame
 (rf/reg-event-fx
@@ -116,8 +113,7 @@
   (fn [db [_ payload]]
     (log/info "Deleted frame" (:frameId payload))
     {:db       (db/replace-all-frames db (:allFrames payload))
-     ;; TODO: need a frame landing page
-     :dispatch [:route/navigate #:route{:page :home-page/home}]}))
+     :dispatch [:route/nav :frame-page/list]}))
 
 ;; Revert an edited frame back to its saved version
 (rf/reg-event-fx
