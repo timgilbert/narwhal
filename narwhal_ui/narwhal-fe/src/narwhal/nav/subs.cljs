@@ -58,8 +58,7 @@
   (fn [[frames frame-page? active-id] _]
     (for [frame frames
           :let [item-id (:id frame)
-                active? (= item-id active-id)
-                _ (log/spy [frame-page? active-id item-id])]]
+                active? (= item-id active-id)]]
       {::active?  active?
        ::item-id  item-id
        ::scratch? (:scratch? frame false)

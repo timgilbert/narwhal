@@ -30,13 +30,14 @@
 
 (defn frame-nav-item
   [{::subs/keys [item-id item active?] :as e}]
-  [:li {:class (if active? "uk-active" "")}
-   [component/link
-    :frame-page/edit
-    {:frame-id item-id}
-    {}
-    (str (:name item)
-         (when (<sub [::frame-subs/dirty? item-id]) " *"))]])
+  (let [dirty? (<sub [::frame-subs/dirty? item-id])]
+    [:li {:class (if active? "uk-active" "")}
+     [component/link
+      :frame-page/edit
+      {:frame-id item-id}
+      (when dirty? {:class "uk-text-italic"})
+      (str (:name item)
+           (when dirty? " *"))]]))
 
 (defn side-nav-menu
   [menu-sub last-component]

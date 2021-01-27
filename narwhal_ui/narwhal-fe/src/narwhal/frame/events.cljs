@@ -37,15 +37,13 @@
 (rf/reg-event-fx
   ::new-blank-frame
   (fn [_ _]
-    {:dispatch [:graphql/query {:graphql/query
-                                :frame-gql/new-blank-frame}]}))
+    {:dispatch [:graphql/run :frame-gql/new-blank-frame]}))
 
 ;; TODO: instead of this, randomize colors via grid controls
 (rf/reg-event-fx
   ::new-random-frame
   (fn [_ _]
-    {:dispatch [:graphql/query {:graphql/query
-                                :frame-gql/new-random-frame}]}))
+    {:dispatch [:graphql/run :frame-gql/new-random-frame]}))
 
 ;; GraphQL return event from either of the above
 (rf/reg-event-fx
@@ -63,10 +61,9 @@
 (rf/reg-event-fx
   ::create-frame
   (fn [{:keys [db]} [_ frame-id]]
-    (let [frame (db/frame-by-id db frame-id)
-          args  #:graphql{:query :frame-gql/create-frame
-                          :vars  {:i (dissoc frame :id :scratch?)}}]
-      {:dispatch [:graphql/query args]})))
+    (let [frame (db/frame-by-id db frame-id)]
+      {:dispatch [:graphql/run :frame-gql/create-frame
+                  (dissoc frame :id :scratch?)]})))
 
 (rf/reg-event-fx
   :frame-gql/frame-created
@@ -84,10 +81,8 @@
 (rf/reg-event-fx
   ::save-frame
   (fn [{:keys [db]} [_ frame-id]]
-    (let [frame (db/frame-by-id db frame-id)
-          args  #:graphql{:query :frame-gql/update-frame
-                          :vars  {:i frame}}]
-      {:dispatch [:graphql/query args]})))
+    (let [frame (db/frame-by-id db frame-id)]
+      {:dispatch [:graphql/run :frame-gql/update-frame frame]})))
 
 (rf/reg-event-db
   :frame-gql/frame-updated
@@ -103,9 +98,7 @@
 (rf/reg-event-fx
   ::delete-frame
   (fn [_ [_ frame-id]]
-    {:dispatch [:graphql/query
-                #:graphql{:query :frame-gql/delete-frame
-                          :vars  {:i {:id frame-id}}}]}))
+    {:dispatch [:graphql/run :frame-gql/delete-frame {:id frame-id}]}))
 
 ;; TODO: second delete crashes this with a re-graph error, why?
 (rf/reg-event-fx
@@ -118,8 +111,6 @@
 ;; Revert an edited frame back to its saved version
 (rf/reg-event-fx
   ::revert-frame
-  (fn [{:keys [db]} [_ frame-id]]
-    ;; TODO: implement me
-    (log/debug "Revert!" frame-id)))
-;{:dispatch [:graphql/query #:graphql{:query :frame-gql/get-frame-by-id
-;                                     :vars  {:i frame-id}}]}))
+  (fn [_ [_ frame-id]]
+    (log/debug "Revert!" frame-id)
+    {:dispatch [:graphql/run :frame-gql/get-frame-by-id frame-id]}))
