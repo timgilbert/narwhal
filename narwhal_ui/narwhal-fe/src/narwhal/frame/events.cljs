@@ -88,7 +88,8 @@
   :frame-gql/frame-reverted
   (fn [db [_ payload]]
     (let [frame-id (-> payload :id)]
-      (log/info "Updated frame" frame-id)
+      (assert (some? (db/frame-by-id db frame-id)))
+      (log/info "Reverted frame" frame-id)
       (-> db
           (db/set-clean frame-id)
           (db/replace-single-frame payload)))))
@@ -96,8 +97,8 @@
 (rf/reg-event-db
   :frame-gql/frame-updated
   (fn [db [_ payload]]
-    ;; Would be nice to assert on the returned id here or something
     (let [frame-id (-> payload :frame :id)]
+      (assert (some? (db/frame-by-id db frame-id)))
       (log/info "Updated frame" frame-id)
       (-> db
           (db/set-clean frame-id)
