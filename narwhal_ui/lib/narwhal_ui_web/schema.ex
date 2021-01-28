@@ -27,6 +27,12 @@ defmodule NarwhalUiWeb.Schema do
       resolve &NarwhalUiWeb.Resolvers.Frame.all_saved_frames/3
     end
 
+    @desc "Get a single frame by its ID"
+    field :frame, :frame_metadata do
+      arg :id, :string, description: "Sort options for the frames"
+      resolve &NarwhalUiWeb.Resolvers.Frame.frame_by_id/3
+    end
+
     @desc "List all saved timelines"
     field :all_timelines, list_of(:named_timeline) do
       resolve &NarwhalUiWeb.Resolvers.Timeline.all_saved_timelines/3

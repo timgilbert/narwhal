@@ -21,7 +21,11 @@ defmodule NarwhalUiWeb.Resolvers.Frame do
   end
 
   def all_saved_frames(_parent, args, _resolution) do
-    {:ok, frames} = Repo.all_frames(args)
+    Repo.all_frames(args)
+  end
+
+  def frame_by_id(_parent, %{id: frame_id}, _resolution) do
+    Repo.get_frame_meta(frame_id)
   end
 
   def create_frame(_parent, %{input: input}, _resolution) do
@@ -42,9 +46,9 @@ defmodule NarwhalUiWeb.Resolvers.Frame do
     end
   end
 
-  def delete_frame(_parent, %{input: %{id: id} = input}, _resolution) do
+  def delete_frame(_parent, %{input: %{id: id}}, _resolution) do
     if Repo.frame_exists?(id) do
-      {:ok, metadata} = Repo.delete_frame(id)
+      {:ok, _metadata} = Repo.delete_frame(id)
       {:ok, all_frames} = Repo.all_frames()
       {:ok, %{frame_id: id, all_frames: all_frames}}
     else

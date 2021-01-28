@@ -85,6 +85,15 @@
       {:dispatch [:graphql/run :frame-gql/update-frame frame]})))
 
 (rf/reg-event-db
+  :frame-gql/frame-reverted
+  (fn [db [_ payload]]
+    (let [frame-id (-> payload :id)]
+      (log/info "Updated frame" frame-id)
+      (-> db
+          (db/set-clean frame-id)
+          (db/replace-single-frame payload)))))
+
+(rf/reg-event-db
   :frame-gql/frame-updated
   (fn [db [_ payload]]
     ;; Would be nice to assert on the returned id here or something

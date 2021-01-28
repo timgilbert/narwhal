@@ -72,4 +72,11 @@ defmodule NarwhalUi.Repo do
     {:ok, metadata}
   end
 
+  def get_frame_meta(frame_id) do
+    frame_data = CubDB.get(@cubdb, key(%{frame_id: frame_id}))
+    Logger.debug(inspect frame_data)
+    {:ok, frame_data}
+  end
+
+
 end

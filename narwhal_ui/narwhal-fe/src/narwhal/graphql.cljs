@@ -16,6 +16,23 @@
     ::text     "
 { frame: solidFrame(color:\"000000\") { height width pixels } }
 "}
+   :frame-gql/get-frame-by-id
+   {::dispatch [:frame-gql/frame-reverted]
+    ::process  :result
+    ::text     "
+query ($i: String!) {
+  result: frame(id: $i) { ...FrameFields }
+}
+fragment FrameFields on FrameMetadata {
+  id
+  name
+  frame {
+    height
+    width
+    pixels
+  }
+}
+"}
    :nav-gql/nav
    {::dispatch [:nav-gql/nav-loaded]
     ::text     "
@@ -100,6 +117,7 @@ fragment FrameFields on FrameMetadata {
 (rf/reg-event-fx
   :graphql/run
   (fn [{:keys [db]} [_ query-name vars]]
+    (assert (contains? queries query-name))
     (let [{::keys [text mutation?]} (get queries query-name)
           send-vars  (if vars {:i vars} {})
           event-name (if mutation?
