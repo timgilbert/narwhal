@@ -7,7 +7,10 @@ defmodule NarwhalUiWeb.Schema.Timeline do
   object :timeline do
     field :effects, non_null(list_of(non_null(:effect))) do
       description "The effects in this timeline"
+      resolve &NarwhalUiWeb.Resolvers.Timeline.effects/3
     end
+    field :total, non_null(:integer), description: "The total number of steps in this timeline"
+    field :is_repeat, non_null(:boolean)
   end
 
   @desc "A saved timeline with a name and ID"
@@ -21,6 +24,13 @@ defmodule NarwhalUiWeb.Schema.Timeline do
   object :create_timeline_response do
     field :named_timeline, non_null(:named_timeline) do
       description "The frame that was just created"
+    end
+  end
+
+  @desc "Response from an empty timeline query"
+  object :empty_timeline_response do
+    field :timeline, non_null(:timeline) do
+      description "The empty timeline"
     end
   end
 

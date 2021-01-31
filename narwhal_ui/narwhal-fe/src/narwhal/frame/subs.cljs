@@ -21,7 +21,6 @@
          ;; TODO: more sort options
          (sort-by #(-> % :name string/upper-case)))))
 
-;; TODO: rename to ::frame-meta
 (rf/reg-sub
   ::frame-meta-by-id
   :<- [::frame-root]

@@ -5,6 +5,7 @@
             [narwhal.util.util :as util :refer [<sub >evt]]
             [narwhal.nav.events :as events]
             [narwhal.frame.events :as frame-events]
+            [narwhal.timeline.events :as timeline-events]
             [narwhal.nav.subs :as subs]
             [narwhal.frame.subs :as frame-subs]))
 
@@ -39,16 +40,27 @@
       (str (:name item)
            (when dirty? " *"))]]))
 
+(defn timeline-nav-item
+  [{::subs/keys [item-id item active?] :as e}]
+  (let [dirty? (<sub [::frame-subs/dirty? item-id])]
+    [:li {:class (if active? "uk-active" "")}
+     [component/link
+      :timeline-page/edit
+      {:timeline-id item-id}
+      (when dirty? {:class "uk-text-italic"})
+      (str (:name item)
+           (when dirty? " *"))]]))
+
 (defn side-nav-menu
-  [menu-sub last-component]
+  [menu-sub item-component last-component]
   (into
     [:ul.uk-nav-sub]
     (concat
       (for [{::subs/keys [item-id] :as entry} (<sub menu-sub)
-            :let [key (str menu-sub "." item-id)]]
-        ;; TODO: handle timelines
+            :let [key (str menu-sub "." item-id)
+                  _ (log/spy key)]]
         ^{:key key}
-        [frame-nav-item entry])
+        [item-component entry])
       ^{:key (str menu-sub ".default")}
       [last-component])))
 
@@ -63,14 +75,14 @@
      [:ul.uk-nav.uk-nav-side.uk-nav-default.uk-nav-center
       [:li timeline-attrs
        [component/link :timeline-page/list "Timelines"]
-       [side-nav-menu ::subs/timelines
-        [:li [:a {:href "/timeline"}
+       [side-nav-menu ::subs/timelines timeline-nav-item
+        [:li [:a {:href "" :on-click #(>evt [::timeline-events/new-empty-timeline])}
               [component/icon "plus-circle"]
               " [new timeline]"]]]]
 
       [:li frame-attrs
        [component/link :frame-page/list "Frames"]
-       [side-nav-menu ::subs/frames
+       [side-nav-menu ::subs/frames frame-nav-item
         [:li [:a {:href "" :on-click #(>evt [::frame-events/new-blank-frame])}
               [component/icon "plus-circle"]
               " [new frame]"]]]]]]))

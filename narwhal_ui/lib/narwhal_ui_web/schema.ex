@@ -37,6 +37,11 @@ defmodule NarwhalUiWeb.Schema do
     field :all_timelines, list_of(:named_timeline) do
       resolve &NarwhalUiWeb.Resolvers.Timeline.all_saved_timelines/3
     end
+
+    @desc "Return an empty timeline"
+    field :empty_timeline, :empty_timeline_response do
+      resolve &NarwhalUiWeb.Resolvers.Timeline.empty_timeline/3
+    end
   end
 
   mutation do

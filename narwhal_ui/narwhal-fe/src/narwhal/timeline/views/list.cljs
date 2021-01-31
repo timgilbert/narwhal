@@ -1,4 +1,4 @@
-(ns narwhal.timeline.views
+(ns narwhal.timeline.views.list
   (:require [lambdaisland.glogi :as log]
             [re-frame.core :as rf]
             [narwhal.util.component :as component]

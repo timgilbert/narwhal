@@ -3,7 +3,8 @@
             [narwhal.nav.views :as nav]
             [narwhal.nav.subs :as nav-subs]
             [narwhal.router.subs :as router-subs]
-            [narwhal.timeline.views :as timeline]
+            [narwhal.timeline.views.list :as timeline-list]
+            [narwhal.timeline.views.editor :as timeline-edit]
             [narwhal.frame.views.editor :as frame-edit]
             [narwhal.frame.views.list :as frame-list]
             [narwhal.app.views.home :as home]
@@ -13,7 +14,8 @@
 
 (def handlers
   {:home-page/home     home/home-page
-   :timeline-page/list timeline/timeline-list-page
+   :timeline-page/list timeline-list/timeline-list-page
+   :timeline-page/edit timeline-edit/timeline-edit-page
    :frame-page/list    frame-list/frame-list-page
    :frame-page/edit    frame-edit/frame-editor-page})
 

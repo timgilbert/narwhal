@@ -16,6 +16,22 @@
     ::text     "
 { frame: solidFrame(color:\"000000\") { height width pixels } }
 "}
+   :timeline-gql/new-empty-timeline
+   {::dispatch [:timeline-gql/empty-timeline-loaded]
+    ::process  :timeline
+    ::text     "
+query {
+  emptyTimeline {
+    timeline {
+      ... TimelineFragment
+    }
+  }
+}
+fragment TimelineFragment on Timeline {
+  effects {durationMs}
+  total
+}
+"}
    :frame-gql/get-frame-by-id
    {::dispatch [:frame-gql/frame-reverted]
     ::process  :result
