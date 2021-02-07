@@ -57,8 +57,7 @@
     [:ul.uk-nav-sub]
     (concat
       (for [{::subs/keys [item-id] :as entry} (<sub menu-sub)
-            :let [key (str menu-sub "." item-id)
-                  _ (log/spy key)]]
+            :let [key (str menu-sub "." item-id)]]
         ^{:key key}
         [item-component entry])
       ^{:key (str menu-sub ".default")}

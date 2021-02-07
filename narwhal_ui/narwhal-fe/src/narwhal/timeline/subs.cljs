@@ -29,3 +29,25 @@
   (fn [timeline]
     (some? timeline)))
 
+(rf/reg-sub
+  ::timeline-steps
+  (util/signal ::timeline-meta-by-id)
+  (fn [timeline]
+    (:steps timeline [])))
+
+(rf/reg-sub
+  ::timeline-step
+  (fn [_ timeline-id _step]
+    (rf/subscribe [::timeline-steps timeline-id]))
+  (fn [timeline-steps [_ _ step]]
+    (nth timeline-steps step nil)))
+
+(rf/reg-sub
+  ::edit-state-root
+  (fn [db _] (get-in db (db/timeline-path :t/edit))))
+
+(rf/reg-sub
+  ::effect-chosen
+  :<- [::edit-state-root]
+  (fn [root [_ timeline-id step]]
+    (get-in root [timeline-id step :t/selected-effect])))

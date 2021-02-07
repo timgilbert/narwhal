@@ -13,24 +13,13 @@
   ::update-title
   (fn [db [_ frame-id {:keys [values] :as evt}]]
     (let [new-name (:name values)
-          ;; TODO: Figure out a better way to deal with the namespaces below
-          new-db   (update-in db (db/frame-path :f/editing?)
-                              dissoc frame-id)]
-      (if (not= new-name "")
-        (-> new-db
+          old-name (db/frame-name db frame-id)
+          changed? (and (not= "" new-name) (not= new-name old-name))]
+      (if changed?
+        (-> db
             (db/set-dirty frame-id)
             (db/set-frame-name frame-id new-name))
-        new-db))))
-
-(rf/reg-event-db
-  ::title-clicked
-  (fn [db [_ frame-id]]
-    (assoc-in db (db/frame-path :f/editing? frame-id) true)))
-
-(rf/reg-event-db
-  ::title-cancel-clicked
-  (fn [db [_ frame-id]]
-    (update-in db (db/frame-path :f/editing?) dissoc frame-id)))
+        db))))
 
 ;; ----------------------------------------------------------------------
 ;; Wipe frame (refactor)

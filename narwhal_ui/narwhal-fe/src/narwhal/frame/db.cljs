@@ -47,6 +47,10 @@
      :name     scratch-name
      :frame    frame-data}))
 
+(defn frame-name
+  [db frame-id]
+  (get-in db (frame-path :f/all frame-id :name)))
+
 (defn set-frame-name
   [db frame-id new-name]
   (assoc-in db (frame-path :f/all frame-id :name) new-name))

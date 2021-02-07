@@ -58,11 +58,6 @@
 
 ;; ----------------------------------------------------------------------
 ;; Title stuff
-(rf/reg-sub
-  ::editing-title?
-  (fn [db [_ frame-id]]
-    (get-in db (db/frame-path :f/editing? frame-id) false)))
-
 
 (rf/reg-sub
   ::frame-name

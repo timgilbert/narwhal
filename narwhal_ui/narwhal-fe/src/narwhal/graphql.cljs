@@ -1,7 +1,33 @@
 (ns narwhal.graphql
   (:require [lambdaisland.glogi :as log]
             [re-frame.core :as rf]
+            [clojure.string :as string]
             [re-graph.core :as re-graph]))
+
+(def frame-meta-fragment "
+fragment FrameFields on FrameMetadata {
+  id
+  name
+  frame {
+    height
+    width
+    pixels
+  }
+}
+")
+
+(def timeline-meta-fragment "
+fragment TimelineFields on TimelineMetadata {
+  id
+  name
+  timeline {
+    effects {
+      durationMs
+    }
+    total
+  }
+}
+")
 
 (def queries
   {:frame-gql/new-random-frame
@@ -35,41 +61,26 @@ fragment TimelineFragment on Timeline {
    :frame-gql/get-frame-by-id
    {::dispatch [:frame-gql/frame-reverted]
     ::process  :result
+    ::frags    [frame-meta-fragment]
     ::text     "
 query ($i: String!) {
   result: frame(id: $i) { ...FrameFields }
 }
-fragment FrameFields on FrameMetadata {
-  id
-  name
-  frame {
-    height
-    width
-    pixels
-  }
-}
 "}
    :nav-gql/nav
    {::dispatch [:nav-gql/nav-loaded]
+    ::frags    [frame-meta-fragment]
     ::text     "
 {
   frames: allFrames { ...FrameFields }
   timelines: allTimelines {id name}
-}
-fragment FrameFields on FrameMetadata {
-  id
-  name
-  frame {
-    height
-    width
-    pixels
-  }
 }
 "}
    :frame-gql/create-frame
    {::dispatch  [:frame-gql/frame-created]
     ::mutation? true
     ::process   :result
+    ::frags    [frame-meta-fragment]
     ::text      "
 mutation ($i: NewFrameMetadata!) {
   result: createFrame(input: $i) {
@@ -77,20 +88,12 @@ mutation ($i: NewFrameMetadata!) {
     allFrames { ...FrameFields }
   }
 }
-fragment FrameFields on FrameMetadata {
-  id
-  name
-  frame {
-    height
-    width
-    pixels
-  }
-}
 "}
    :frame-gql/update-frame
    {::dispatch  [:frame-gql/frame-updated]
     ::mutation? true
     ::process   :result
+    ::frags    [frame-meta-fragment]
     ::text      "
 mutation ($i: UpdateFrameRequest!) {
   result: updateFrame(input: $i) {
@@ -98,34 +101,17 @@ mutation ($i: UpdateFrameRequest!) {
     allFrames { ...FrameFields }
   }
 }
-fragment FrameFields on FrameMetadata {
-  id
-  name
-  frame {
-    height
-    width
-    pixels
-  }
-}
 "}
    :frame-gql/delete-frame
    {::dispatch  [:frame-gql/frame-deleted]
     ::mutation? true
     ::process   :result
+    ::frags    [frame-meta-fragment]
     ::text      "
 mutation ($i: DeletedFrameRequest!) {
   result: deleteFrame(input: $i) {
     frameId
     allFrames { ...FrameFields }
-  }
-}
-fragment FrameFields on FrameMetadata {
-  id
-  name
-  frame {
-    height
-    width
-    pixels
   }
 }
 "}})
@@ -134,12 +120,13 @@ fragment FrameFields on FrameMetadata {
   :graphql/run
   (fn [{:keys [db]} [_ query-name vars]]
     (assert (contains? queries query-name))
-    (let [{::keys [text mutation?]} (get queries query-name)
+    (let [{::keys [text frags mutation?]} (get queries query-name)
+          q-text     (str text (string/join "\n" frags))
           send-vars  (if vars {:i vars} {})
           event-name (if mutation?
                        ::re-graph/mutate
                        ::re-graph/query)
-          event      [event-name :rg-instance text send-vars
+          event      [event-name :rg-instance q-text send-vars
                       [::query-return query-name]]]
       (log/debug "Event:" event)
       {:db       (assoc-in db [::in-flight? query-name] true)
