@@ -30,9 +30,9 @@
 (rf/reg-event-fx
   ::create-timeline
   (fn [{:keys [db]} [_ timeline-id]]
-    (let [frame (db/timeline-by-id db timeline-id)]
+    (let [timeline (db/timeline-by-id db timeline-id)]
       {:dispatch [:graphql/run :timeline-gql/create-timeline
-                  (dissoc frame :id :scratch?)]})))
+                  (dissoc timeline :id :scratch?)]})))
 
 (rf/reg-event-fx
   :timeline-gql/timeline-created
@@ -45,19 +45,18 @@
        :dispatch [:route/nav :timeline-page/edit
                   {:timeline-id timeline-id}]})))
 
-;; Save an update to an existing frame
 (rf/reg-event-fx
   ::update-timeline
   (fn [{:keys [db]} [_ timeline-id]]
-    (let [frame (db/timeline-by-id db timeline-id)]
-      {:dispatch [:graphql/run :timeline-gql/update-timeline frame]})))
+    (let [timeline (db/timeline-by-id db timeline-id)]
+      {:dispatch [:graphql/run :timeline-gql/update-timeline timeline]})))
 
 (rf/reg-event-db
   :timeline-gql/timeline-reverted
   (fn [db [_ payload]]
     (let [timeline-id (-> payload :id)]
       (assert (some? (db/timeline-by-id db timeline-id)))
-      (log/info "Reverted frame" timeline-id)
+      (log/info "Reverted timeline" timeline-id)
       (-> db
           (db/set-clean timeline-id)
           (db/replace-single-timeline payload)))))
@@ -67,7 +66,7 @@
   (fn [db [_ payload]]
     (let [timeline-id (-> payload :timeline :id)]
       (assert (some? (db/timeline-by-id db timeline-id)))
-      (log/info "Updated frame" timeline-id)
+      (log/info "Updated timeline" timeline-id)
       (-> db
           (db/set-clean timeline-id)
           (db/replace-all-timelines (:allTimelines payload))))))

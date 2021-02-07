@@ -13,6 +13,15 @@
 ;; ----------------------------------------------------------------------
 ;; Frame editor
 
+;; TODO: this is janky, maybe there's a better way to nestle those :li's
+(defn frame-extra-actions
+  [_frame-id]
+  [:span
+   [:li [:a "Duplicate"]]
+   [:li [:a "Fill"]]
+   [:li [:a "Randomize"]]])
+
+
 (defn frame-name-controls [frame-id]
   [name-edit/editable-name
    #:name-edit{:item-id     frame-id
@@ -25,14 +34,15 @@
 
 (defn frame-persist-controls [frame-id]
   [persist/persist-controls
-   #:persist{:item-id      frame-id
-             :name-type    ::frame
-             :scratch-sub  ::subs/scratch?
-             :clean-sub    ::subs/clean?
-             :update-event ::events/save-frame
-             :create-event ::events/create-frame
-             :delete-event ::events/delete-frame
-             :revert-event ::events/revert-frame}])
+   #:persist{:item-id       frame-id
+             :name-type     ::frame
+             :scratch-sub   ::subs/scratch?
+             :clean-sub     ::subs/clean?
+             :update-event  ::events/save-frame
+             :create-event  ::events/create-frame
+             :delete-event  ::events/delete-frame
+             :revert-event  ::events/revert-frame
+             :extra-actions frame-extra-actions}])
 
 (defn frame-editor [frame-id]
   [:div.uk-grid.uk-grid-divider {:data-uk-grid ""}

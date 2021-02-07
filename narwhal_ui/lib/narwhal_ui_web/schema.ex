@@ -34,7 +34,7 @@ defmodule NarwhalUiWeb.Schema do
     end
 
     @desc "List all saved timelines"
-    field :all_timelines, list_of(:named_timeline) do
+    field :all_timelines, list_of(:timeline_metadata) do
       resolve &NarwhalUiWeb.Resolvers.Timeline.all_saved_timelines/3
     end
 

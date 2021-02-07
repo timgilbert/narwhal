@@ -14,7 +14,7 @@ defmodule NarwhalUiWeb.Schema.Timeline do
   end
 
   @desc "A saved timeline with a name and ID"
-  object :named_timeline do
+  object :timeline_metadata do
     field :name, non_null(:string), description: "The name of this timeline"
     field :id, non_null(:string), description: "Unique ID for a saved timeline"
     field :timeline, non_null(:timeline), description: "The timeline data"
@@ -22,7 +22,7 @@ defmodule NarwhalUiWeb.Schema.Timeline do
 
   @desc "Response from a create timeline mutation"
   object :create_timeline_response do
-    field :named_timeline, non_null(:named_timeline) do
+    field :timeline, non_null(:timeline_metadata) do
       description "The frame that was just created"
     end
   end

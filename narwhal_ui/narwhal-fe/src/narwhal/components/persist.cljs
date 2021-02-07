@@ -3,6 +3,8 @@
             [narwhal.util.component :as component]
             [narwhal.util.util :as util :refer [<sub >evt]]))
 
+;; TODO: pass in extra options to this thing for randomize/etc
+
 (defn create-button
   [{:persist/keys [item-id clean-sub create-event]}]
   [:button.uk-button.uk-button-primary
@@ -17,7 +19,7 @@
    {:on-click #(>evt [update-event item-id])
     :disabled (<sub [clean-sub item-id])}
    [component/icon "cloud-upload"]
-   " Save"])
+   " Update"])
 
 ;; TODO: should delete scratch frames (from memory) too
 (defn delete-button
@@ -27,7 +29,7 @@
      (if scratch?
        {:disabled true}
        {:on-click #(>evt [delete-event item-id])})
-     " Delete frame"]))
+     " Delete"]))
 
 (defn revert-button
   [{:persist/keys [item-id scratch-sub clean-sub revert-event]}]
@@ -38,16 +40,15 @@
    [component/icon "refresh"]
    " Revert"])
 
-(defn actions-dropdown [options]
+(defn actions-dropdown [{:persist/keys [extra-actions item-id] :as options}]
   [:div
    [:button.uk-button.uk-button-default
     "Actions " [component/icon "triangle-down"]]
    [:div {:data-uk-dropdown ""}
     [:ul.uk-nav.uk-dropdown-nav
      [:li [delete-button options]]
-     [:li [:a "Duplicate"]]
-     [:li [:a "Fill"]]
-     [:li [:a "Randomize"]]]]])
+     (when extra-actions
+       [extra-actions item-id])]]])
 
 (defn persist-controls
   [{:persist/keys [item-id scratch-sub] :as options}]

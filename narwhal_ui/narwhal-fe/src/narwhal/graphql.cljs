@@ -16,18 +16,22 @@ fragment FrameFields on FrameMetadata {
 }
 ")
 
-(def timeline-meta-fragment "
-fragment TimelineFields on TimelineMetadata {
+(def timeline-fragment "
+fragment TimelineFields on Timeline {
+  effects {
+    durationMs
+  }
+}")
+
+(def timeline-meta-fragment (str "
+fragment TimelineMetadataFields on TimelineMetadata {
   id
   name
   timeline {
-    effects {
-      durationMs
-    }
-    total
+    ...TimelineFields
   }
 }
-")
+" timeline-fragment))
 
 (def queries
   {:frame-gql/new-random-frame
@@ -44,18 +48,41 @@ fragment TimelineFields on TimelineMetadata {
 "}
    :timeline-gql/new-empty-timeline
    {::dispatch [:timeline-gql/empty-timeline-loaded]
+    ::frags    [timeline-fragment]
     ::process  :timeline
     ::text     "
 query {
   emptyTimeline {
     timeline {
-      ... TimelineFragment
+      ... TimelineFields
     }
   }
 }
-fragment TimelineFragment on Timeline {
-  effects {durationMs}
-  total
+"}
+   :timeline-gql/create-timeline
+   {::dispatch  [:frame-gql/timeline-created]
+    ::mutation? true
+    ::process   :result
+    ::frags     [timeline-meta-fragment]
+    ::text      "
+mutation ($i: NewTimelineMetadata!) {
+  result: createTimeline(input: $i) {
+    timeline { id }
+    allTimelines { ...TimelineMetadataFields }
+  }
+}
+"}
+   :timeline-gql/update-timeline
+   {::dispatch  [:timeline-gql/timeline-updated]
+    ::mutation? true
+    ::process   :result
+    ::frags     [timeline-meta-fragment]
+    ::text      "
+mutation ($i: UpdateTimelineRequest!) {
+  result: updateTimeline(input: $i) {
+    frame { ...TimelineMetadataFields }
+    allFrames { ...TimelineMetadataFields }
+  }
 }
 "}
    :frame-gql/get-frame-by-id
@@ -69,18 +96,18 @@ query ($i: String!) {
 "}
    :nav-gql/nav
    {::dispatch [:nav-gql/nav-loaded]
-    ::frags    [frame-meta-fragment]
+    ::frags    [frame-meta-fragment timeline-meta-fragment]
     ::text     "
 {
   frames: allFrames { ...FrameFields }
-  timelines: allTimelines {id name}
+  timelines: allTimelines { ...TimelineMetadataFields }
 }
 "}
    :frame-gql/create-frame
    {::dispatch  [:frame-gql/frame-created]
     ::mutation? true
     ::process   :result
-    ::frags    [frame-meta-fragment]
+    ::frags     [frame-meta-fragment]
     ::text      "
 mutation ($i: NewFrameMetadata!) {
   result: createFrame(input: $i) {
@@ -93,7 +120,7 @@ mutation ($i: NewFrameMetadata!) {
    {::dispatch  [:frame-gql/frame-updated]
     ::mutation? true
     ::process   :result
-    ::frags    [frame-meta-fragment]
+    ::frags     [frame-meta-fragment]
     ::text      "
 mutation ($i: UpdateFrameRequest!) {
   result: updateFrame(input: $i) {
@@ -106,7 +133,7 @@ mutation ($i: UpdateFrameRequest!) {
    {::dispatch  [:frame-gql/frame-deleted]
     ::mutation? true
     ::process   :result
-    ::frags    [frame-meta-fragment]
+    ::frags     [frame-meta-fragment]
     ::text      "
 mutation ($i: DeletedFrameRequest!) {
   result: deleteFrame(input: $i) {

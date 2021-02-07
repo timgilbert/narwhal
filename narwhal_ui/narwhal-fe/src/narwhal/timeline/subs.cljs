@@ -30,6 +30,29 @@
     (some? timeline)))
 
 (rf/reg-sub
+  ::scratch?
+  (util/signal ::timeline-meta-by-id)
+  (fn [timeline]
+    (:scratch? timeline false)))
+
+(rf/reg-sub
+  ::dirty-root
+  (fn [db _]
+    (get-in db (db/timeline-path :t/dirty?))))
+
+(rf/reg-sub
+  ::dirty?
+  :<- [::dirty-root]
+  (fn [dirty-root [_ timeline-id]]
+    (get dirty-root timeline-id false)))
+
+(rf/reg-sub
+  ::clean?
+  (util/signal ::dirty?)
+  (fn [dirty?]
+    (not dirty?)))
+
+(rf/reg-sub
   ::timeline-steps
   (util/signal ::timeline-meta-by-id)
   (fn [timeline]
