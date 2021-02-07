@@ -38,6 +38,13 @@
     (assoc-in db (db/timeline-path :t/edit timeline-id step :t/selected-effect)
               effect-id)))
 
+(rf/reg-event-db
+  ::select-saved-frame-target
+  (fn [db [_ timeline-id step frame-id]]
+    (assoc-in db (db/timeline-path :t/edit timeline-id step
+                                   :t/frame-target :t/saved)
+              frame-id)))
+
 ;; Timeline persistence
 (rf/reg-event-fx
   ::create-timeline

@@ -65,3 +65,5 @@
 (defn init-db [db]
   (-> db
       (replace-all-timelines [])))
+
+(def default-selected-effect :narwhal.timeline.views.effects/saved)

@@ -79,4 +79,11 @@
   ::effect-chosen
   :<- [::edit-state-root]
   (fn [root [_ timeline-id step]]
-    (get-in root [timeline-id step :t/selected-effect])))
+    (get-in root [timeline-id step :t/selected-effect]
+            db/default-selected-effect)))
+
+(rf/reg-sub
+  ::selected-saved-frame-target
+  :<- [::edit-state-root]
+  (fn [root [_ timeline-id step]]
+    (get-in root [timeline-id step :t/frame-target :t/saved])))
