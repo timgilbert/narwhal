@@ -20,7 +20,7 @@ defmodule NarwhalUiWeb.Resolvers.Frame do
     {:ok, parent |> Frame.pixels() |> List.flatten}
   end
 
-  def all_saved_frames(_parent, args, _resolution) do
+  def all_frames(_parent, args, _resolution) do
     Repo.all_frames(args)
   end
 

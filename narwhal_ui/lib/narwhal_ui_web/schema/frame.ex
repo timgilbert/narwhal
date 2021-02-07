@@ -56,7 +56,7 @@ defmodule NarwhalUiWeb.Schema.Frame do
   end
 
   @desc "Input object for a frame deletion"
-  input_object :deleted_frame_request do
+  input_object :delete_frame_request do
     field :id, non_null(:string), description: "The ID of the frame to delete"
   end
 

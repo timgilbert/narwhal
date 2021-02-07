@@ -102,7 +102,7 @@
 ;; TODO: second delete crashes this with a re-graph error, why?
 (rf/reg-event-fx
   :frame-gql/frame-deleted
-  (fn [db [_ payload]]
+  (fn [{:keys [db]} [_ payload]]
     (log/info "Deleted frame" (:frameId payload))
     {:db       (db/replace-all-frames db (:allFrames payload))
      :dispatch [:route/nav :frame-page/list]}))

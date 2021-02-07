@@ -68,6 +68,6 @@
   (let [chosen    (<sub [::subs/effect-chosen timeline-id step])
         component (get effect-editors chosen effect-selector)]
     [:div
-     [:p "Chosen:" chosen ", tl: " timeline-id ", step: " step]
-     [component timeline-id step]]))
+     [component timeline-id step]
+     [:p "Chosen:" chosen ", tl: " timeline-id ", step: " step]]))
 

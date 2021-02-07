@@ -6,18 +6,18 @@
 
 ;; TODO: lots of copypasta from frames here, refactor to generic CRUD stuff
 
-(defn timeline-path
-  ([& rest]
-   (concat [:t/timelines] rest)))
+(defn timeline-path [& rest]
+  (concat [:t/timelines] rest))
 
 (defn replace-all-timelines
   [db timeline-list]
-  (assoc-in db (timeline-path :t/all)
-            (->> timeline-list
-                 ;; Why isn't (group-by) ever useful for anything?
-                 (map (fn [f]
-                        [(:id f) f]))
-                 (into {}))))
+  (let [new-all (->> timeline-list
+                     ;; Why isn't (group-by) ever useful for anything?
+                     (map (fn [f]
+                            [(:id f) f]))
+                     (into {}))]
+    (assoc-in db (timeline-path :t/all) new-all)))
+
 
 (defn replace-single-timeline
   [db new-timeline]
@@ -26,7 +26,13 @@
     (assoc-in db (timeline-path :t/all timeline-id) new-timeline)))
 
 (defn timeline-by-id [db timeline-id]
-  (get-in db (timeline-path :f/all timeline-id)))
+  (get-in db (timeline-path :t/all timeline-id)))
+
+(defn timeline-name [db timeline-id]
+  (get-in db (timeline-path :t/all timeline-id :name)))
+
+(defn set-timeline-name [db timeline-id new-name]
+  (assoc-in db (timeline-path :t/all timeline-id :name) new-name))
 
 (defn ^:private scratch-id [i]
   (str "timeline-" (gstring/padNumber i 2)))
@@ -38,7 +44,7 @@
         (recur (inc i))
         potential-id))))
 
-(defn with-scratch-metadata [db frame-data]
+(defn with-scratch-metadata [db timeline-data]
   (let [scratch-id   (next-scratch-id db)
         scratch-name (-> scratch-id
                          (gstring/replaceAll "-" " ")
@@ -46,15 +52,15 @@
     {:id       scratch-id
      :scratch? true
      :name     scratch-name
-     :timeline frame-data}))
+     :timeline timeline-data}))
 
 (defn set-dirty
-  [db frame-id]
-  (assoc-in db (timeline-path :t/dirty? frame-id) true))
+  [db timeline-id]
+  (assoc-in db (timeline-path :t/dirty? timeline-id) true))
 
 (defn set-clean
-  [db frame-id]
-  (update-in db (timeline-path :t/dirty?) dissoc frame-id))
+  [db timeline-id]
+  (update-in db (timeline-path :t/dirty?) dissoc timeline-id))
 
 (defn init-db [db]
   (-> db

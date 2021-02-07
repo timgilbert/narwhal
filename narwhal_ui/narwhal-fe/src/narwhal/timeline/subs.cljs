@@ -30,6 +30,12 @@
     (some? timeline)))
 
 (rf/reg-sub
+  ::timeline-name
+  (util/signal ::timeline-meta-by-id)
+  (fn [timeline]
+    (:name timeline)))
+
+(rf/reg-sub
   ::scratch?
   (util/signal ::timeline-meta-by-id)
   (fn [timeline]

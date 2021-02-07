@@ -15,14 +15,13 @@ fragment FrameFields on FrameMetadata {
   }
 }
 ")
-
 (def timeline-fragment "
 fragment TimelineFields on Timeline {
   effects {
     durationMs
   }
-}")
-
+}
+")
 (def timeline-meta-fragment (str "
 fragment TimelineMetadataFields on TimelineMetadata {
   id
@@ -49,18 +48,16 @@ fragment TimelineMetadataFields on TimelineMetadata {
    :timeline-gql/new-empty-timeline
    {::dispatch [:timeline-gql/empty-timeline-loaded]
     ::frags    [timeline-fragment]
-    ::process  :timeline
+    ::process  :result
     ::text     "
 query {
-  emptyTimeline {
-    timeline {
-      ... TimelineFields
-    }
+  result: emptyTimeline {
+    ... TimelineFields
   }
 }
 "}
    :timeline-gql/create-timeline
-   {::dispatch  [:frame-gql/timeline-created]
+   {::dispatch  [:timeline-gql/timeline-created]
     ::mutation? true
     ::process   :result
     ::frags     [timeline-meta-fragment]
@@ -80,8 +77,21 @@ mutation ($i: NewTimelineMetadata!) {
     ::text      "
 mutation ($i: UpdateTimelineRequest!) {
   result: updateTimeline(input: $i) {
-    frame { ...TimelineMetadataFields }
-    allFrames { ...TimelineMetadataFields }
+    timeline { ...TimelineMetadataFields }
+    allTimelines { ...TimelineMetadataFields }
+  }
+}
+"}
+   :timeline-gql/delete-timeline
+   {::dispatch  [:timeline-gql/timeline-deleted]
+    ::mutation? true
+    ::process   :result
+    ::frags     [timeline-meta-fragment]
+    ::text      "
+mutation ($i: DeletedTimelineRequest!) {
+  result: deleteTimeline(input: $i) {
+    timelineId
+    allTimelines { ...TimelineMetadataFields }
   }
 }
 "}
@@ -92,6 +102,15 @@ mutation ($i: UpdateTimelineRequest!) {
     ::text     "
 query ($i: String!) {
   result: frame(id: $i) { ...FrameFields }
+}
+"}
+   :timeline-gql/get-timeline-by-id
+   {::dispatch [:timeline-gql/timeline-reverted]
+    ::process  :result
+    ::frags    [timeline-meta-fragment]
+    ::text     "
+query ($i: String!) {
+  result: timeline(id: $i) { ...TimelineMetadataFields }
 }
 "}
    :nav-gql/nav

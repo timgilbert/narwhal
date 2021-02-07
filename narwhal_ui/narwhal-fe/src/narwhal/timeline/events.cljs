@@ -4,6 +4,18 @@
             [narwhal.util.util :as util :refer [<sub >evt]]
             [narwhal.timeline.db :as db]))
 
+(rf/reg-event-db
+  ::update-title
+  (fn [db [_ timeline-id {:keys [values] :as evt}]]
+    (let [new-name (:name values)
+          old-name (db/timeline-name db timeline-id)
+          changed? (and (not= "" new-name) (not= new-name old-name))]
+      (if changed?
+        (-> db
+            (db/set-dirty timeline-id)
+            (db/set-timeline-name timeline-id new-name))
+        db))))
+
 ;; New timeline
 (rf/reg-event-fx
   ::new-empty-timeline
@@ -52,6 +64,37 @@
       {:dispatch [:graphql/run :timeline-gql/update-timeline timeline]})))
 
 (rf/reg-event-db
+  :timeline-gql/timeline-updated
+  (fn [db [_ payload]]
+    (let [timeline-id (-> payload :timeline :id)]
+      (assert (some? (db/timeline-by-id db timeline-id)))
+      (log/info "Updated timeline" timeline-id)
+      (-> db
+          (db/set-clean timeline-id)
+          (db/replace-all-timelines (:allTimelines payload))))))
+
+;; Delete a timeline
+(rf/reg-event-fx
+  ::delete-timeline
+  (fn [_ [_ timeline-id]]
+    {:dispatch [:graphql/run :timeline-gql/delete-timeline {:id timeline-id}]}))
+
+;; TODO: second delete crashes this with a re-graph error, why?
+(rf/reg-event-fx
+  :timeline-gql/timeline-deleted
+  (fn [{:keys [db]} [_ payload]]
+    (log/info "Deleted timeline" (:timelineId payload))
+    {:db       (db/replace-all-timelines db (:allTimelines payload))
+     :dispatch [:route/nav :timeline-page/list]}))
+
+;; Revert an edited timeline back to its saved version
+(rf/reg-event-fx
+  ::revert-timeline
+  (fn [_ [_ timeline-id]]
+    (log/debug "Revert!" timeline-id)
+    {:dispatch [:graphql/run :timeline-gql/get-timeline-by-id timeline-id]}))
+
+(rf/reg-event-db
   :timeline-gql/timeline-reverted
   (fn [db [_ payload]]
     (let [timeline-id (-> payload :id)]
@@ -61,12 +104,3 @@
           (db/set-clean timeline-id)
           (db/replace-single-timeline payload)))))
 
-(rf/reg-event-db
-  :timeline-gql/timeline-updated
-  (fn [db [_ payload]]
-    (let [timeline-id (-> payload :timeline :id)]
-      (assert (some? (db/timeline-by-id db timeline-id)))
-      (log/info "Updated timeline" timeline-id)
-      (-> db
-          (db/set-clean timeline-id)
-          (db/replace-all-timelines (:allTimelines payload))))))

@@ -31,7 +31,6 @@
                :scratch-sub ::subs/scratch?
                :on-submit   [::events/update-title frame-id]}])
 
-
 (defn frame-persist-controls [frame-id]
   [persist/persist-controls
    #:persist{:item-id       frame-id
