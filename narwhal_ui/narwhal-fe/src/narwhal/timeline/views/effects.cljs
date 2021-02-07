@@ -27,14 +27,9 @@
    "random-effect-editor"])
 
 (defn no-saved-frames-message []
-  [:p "No saved frames available! Create one first"])
-
-(defn frame-chooser [timeline-id step frames]
-  [:div.uk-grid-small
-   (for [{:keys [id name]} frames]
-     ^{:key id}
-     [:div.uk-card.uk-card-default.uk-card-body.uk-card-small.uk-hover
-      (str name)])])
+  [:div.uk-flex.uk-flex-wrap.uk-flex-wrap-around
+   [:div.uk-card.uk-card-body.uk-card-small
+    [:p "No saved frames available! Create one first"]]])
 
 (defn saved-frame-effect-editor [timeline-id step]
   [:div
@@ -46,8 +41,6 @@
         #:frame-list{:active-id curr-target
                      :on-click [::events/select-saved-frame-target
                                 timeline-id step]}]))])
-       ;[frame-chooser timeline-id step frames]))
-   ;"saved-frame-effect-editor"])
 
 (def effect-editors
   {::color  {::editor   color-effect-editor
@@ -85,18 +78,5 @@
 (defn effect-chooser [timeline-id step]
   [:div
    [:h2 "Choose Effect"]
-   ;[:p "tl: " timeline-id ", step: " step]
    [effect-nav timeline-id step]
    [effect-editor timeline-id step]])
-;[saved-frame-chooser timeline-id step]
-;[random-frame-chooser timeline-id step]
-;[color-frame-chooser timeline-id step]]])
-
-;;; TODO: pass step in?
-;(defn effect-chooser [timeline-id step]
-;  (let [chosen    (<sub [::subs/effect-chosen timeline-id step])
-;        component (get effect-editors chosen effect-selector)]
-;    [:div
-;     [component timeline-id step]
-;     [:p "Chosen:" chosen ", tl: " timeline-id ", step: " step]]))
-
