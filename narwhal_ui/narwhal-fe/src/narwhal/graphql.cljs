@@ -17,9 +17,21 @@ fragment FrameFields on FrameMetadata {
 ")
 (def timeline-fragment "
 fragment TimelineFields on Timeline {
-  effects {
-    durationMs
+  isRepeat
+  steps {
+    ...StepFields
   }
+}
+fragment StepFields on Step {
+  pauseMs
+  repeat
+  effects {
+    ...EffectFields
+  }
+}
+fragment EffectFields on Effect {
+  __typename
+  durationMs
 }
 ")
 (def timeline-meta-fragment (str "

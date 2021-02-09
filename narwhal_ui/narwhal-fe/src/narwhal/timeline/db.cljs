@@ -18,7 +18,6 @@
                      (into {}))]
     (assoc-in db (timeline-path :t/all) new-all)))
 
-
 (defn replace-single-timeline
   [db new-timeline]
   (let [timeline-id (:id new-timeline)]
@@ -61,6 +60,17 @@
 (defn set-clean
   [db timeline-id]
   (update-in db (timeline-path :t/dirty?) dissoc timeline-id))
+
+(defn new-blank-step []
+  {:effects []
+   :repeat  1
+   :pause   1000})
+
+(defn update-step [db timeline-id step-index]
+  ;; The user has selected a thing and hit save
+  (let [timeline (timeline-by-id db timeline-id)
+        selected (timeline-path :t/edit timeline-id step-index)]
+    db))
 
 (defn init-db [db]
   (-> db

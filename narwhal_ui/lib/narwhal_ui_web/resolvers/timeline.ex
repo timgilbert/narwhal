@@ -5,13 +5,13 @@ defmodule NarwhalUiWeb.Resolvers.Timeline do
   alias NarwhalUi.Repo
 
   def empty_timeline(_parent, _args, _resolution) do
-    Logger.debug(inspect %{timeline: Timeline.new()})
+    Logger.debug(inspect Timeline.new())
     {:ok, Timeline.new()}
   end
 
-  def effects(parent, _args, _resolution) do
+  def is_repeat(parent, _args, _resolution) do
     Logger.debug(inspect parent)
-    {:ok, parent.items}
+    {:ok, parent.repeat?}
   end
 
   def all_timelines(_parent, args, _resolution) do
@@ -23,7 +23,7 @@ defmodule NarwhalUiWeb.Resolvers.Timeline do
   end
 
   def create_timeline(_parent, %{input: input}, _resolution) do
-    Logger.debug(inspect input)
+    Logger.warn("create_timeline", inspect input)
     {:ok, metadata} = Repo.insert_new_timeline(input)
     {:ok, all_timelines} = Repo.all_timelines(nil)
     {:ok, %{timeline: metadata, all_timelines: all_timelines}}

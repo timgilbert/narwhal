@@ -1,20 +1,7 @@
-defmodule UnicornTimelineTest do
+defmodule UnicornEffectTest do
   use ExUnit.Case
-  alias Unicorn.Step
-  alias Unicorn.Timeline
-  alias Unicorn.Fx.Random
-  doctest Unicorn.Timeline
-
-  setup _context do
-    {
-      :ok,
-      %{
-        s1: Step.new(Random.new(), 1000, 1),
-        s2: Step.new(Random.new(), 2000, 2),
-        s3: Step.new(Random.new(), 3000, 3)
-      }
-    }
-  end
+  alias Unicorn.Effect
+  doctest Unicorn.Effect
 
   test "append / total work", context do
     t =

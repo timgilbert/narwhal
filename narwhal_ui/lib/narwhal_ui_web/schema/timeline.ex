@@ -2,16 +2,23 @@ defmodule NarwhalUiWeb.Schema.Timeline do
   @moduledoc false
 
   use Absinthe.Schema.Notation
+  alias NarwhalUiWeb.Resolvers.Timeline
 
   @desc "A timeline"
   object :timeline do
-    field :effects, non_null(list_of(non_null(:effect))) do
-      description "The effects in this timeline"
-      resolve &NarwhalUiWeb.Resolvers.Timeline.effects/3
+    field :steps, non_null(list_of(non_null(:step))) do
+      description "The steps in this timeline"
     end
-    field :total, non_null(:integer),
-          description: "The total number of steps in this timeline"
-    field :is_repeat, non_null(:boolean)
+    field :total,
+          non_null(:integer),
+          description: """
+                       The total number of steps in this timeline, including
+                       repetitions
+                       """
+    field :is_repeat, non_null(:boolean) do
+          description "If true, start the timeline over when it gets to the end"
+          resolve &Timeline.is_repeat/3
+    end
   end
 
   @desc "A saved timeline with a name and ID"
@@ -39,15 +46,29 @@ defmodule NarwhalUiWeb.Schema.Timeline do
 
   @desc "Input object for a new timeline"
   input_object :new_timeline do
-    field :effects, non_null(list_of(:string)),
+    field :steps, non_null(list_of(non_null(:input_step))),
           description: "List of steps in the timeline"
+    field :is_repeat, non_null(:boolean),
+          description: "List of steps in the timeline"
+  end
+
+  @desc "Input object for a step within a timeline"
+  input_object :input_step do
+    field :effects, non_null(list_of(non_null(:input_effect))),
+          description: "List of effects in this step"
+  end
+
+  @desc "Input object for one of the effects in a step"
+  input_object :input_effect do
+    field :duration_ms, non_null(:integer),
+          description: "Amount of time to pause after this effect finishes"
   end
 
   @desc "Input object for a new timeline"
   input_object :create_timeline_request do
     field :name, non_null(:string), description: "Name of the new timeline"
     field :timeline, non_null(:new_timeline),
-      description: "The data for the timeline we're saving"
+          description: "The data for the timeline we're saving"
   end
 
   @desc "Input object for an updated timeline. Note that we currently require the entire object."

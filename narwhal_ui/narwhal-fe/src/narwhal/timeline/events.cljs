@@ -45,6 +45,24 @@
                                    :t/frame-target :t/saved)
               frame-id)))
 
+
+;; Steps
+
+(rf/reg-event-db
+  ::add-step
+  (fn [db [_ timeline-id]]
+    (let [timeline (db/timeline-by-id db timeline-id)
+          new-step (db/new-blank-step)
+          new-timeline (-> update timeline :steps conj new-step)]
+      (-> db
+          (db/replace-single-timeline new-timeline)
+          (db/set-dirty timeline-id)))))
+
+(rf/reg-event-db
+  ::save-step-update
+  (fn [db [_ timeline-id step-index]]
+    (db/update-step db timeline-id step-index)))
+
 ;; Timeline persistence
 (rf/reg-event-fx
   ::create-timeline

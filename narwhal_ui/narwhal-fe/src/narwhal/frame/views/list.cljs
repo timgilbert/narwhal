@@ -9,21 +9,21 @@
             [re-frame.core :as rf]))
 
 (defn frame-clicker
-  [frame-id on-click & children]
-  (let [click-fn (when (vector? on-click)
-                   #(>evt (conj on-click frame-id)))
+  [frame-id click-event & children]
+  (let [click-fn (when (vector? click-event)
+                   #(>evt (conj click-event frame-id)))
         root     (if click-fn
                    [:a {:on-click click-fn}]
                    [:div])]
     (into root children)))
 
 (defn frame-display
-  [frame-id frame-name active? on-click]
+  [frame-id frame-name active? click-event]
   (let [card-attr (if active? {:class "uk-card-primary"}
                               {:class "uk-card-default"})]
     [:div.uk-card.uk-card-body.uk-card-small.uk-card-hover
      card-attr
-     [frame-clicker frame-id on-click
+     [frame-clicker frame-id click-event
       [:div.uk-media-top.uk-align-center
        [grid/thumbnail-grid frame-id "100px"]]
       [:div.uk-card-footer
@@ -31,13 +31,13 @@
         frame-name]]]]))
 
 (defn frame-list
-  [{:frame-list/keys [active-id on-click]}]
+  [{:frame-list/keys [active-id click-event]}]
   (let [frame-meta (<sub [::subs/all-frame-metadata])]
     [:div.uk-flex.uk-flex-wrap.uk-flex-wrap-around
      (for [{:keys [id name] :as f} frame-meta
            :let [active? (= active-id id)]]
        ^{:key id}
-       [frame-display id name active? on-click])]))
+       [frame-display id name active? click-event])]))
 
 (defn create-frame-button []
   [:button.uk-button.uk-button-default
@@ -52,5 +52,5 @@
 (defn frame-list-page []
   [:div
    [:h1 "Saved Frames"]
-   [frame-list {:frame-list/on-click [::frame-page-click]}]
+   [frame-list {:frame-list/click-event [::frame-page-click]}]
    [create-frame-button]])

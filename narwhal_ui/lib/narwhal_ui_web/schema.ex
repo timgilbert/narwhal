@@ -6,6 +6,7 @@ defmodule NarwhalUiWeb.Schema do
   import_types NarwhalUiWeb.Schema.Color
   import_types NarwhalUiWeb.Schema.Frame
   import_types NarwhalUiWeb.Schema.General
+  import_types NarwhalUiWeb.Schema.Step
   import_types NarwhalUiWeb.Schema.Timeline
   import_types NarwhalUiWeb.Schema.Effect
 

@@ -6,6 +6,11 @@ defmodule NarwhalUi.TimelineMetadata do
   @type t :: %__MODULE__{name: String.t(), id: String.t(), timeline: %Timeline{}}
   defstruct [:name, :id, :timeline, :created_at, :updated_at]
 
+  def steps(%{steps: steps}) do
+    steps
+    |> Enum.map(fn %{pause_ms: pause_ms} -> Step.new() end)
+  end
+
   def new(id, %{name: name, timeline: timeline}) do
     now = DateTime.utc_now()
     Logger.debug(inspect timeline)

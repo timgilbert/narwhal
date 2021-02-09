@@ -38,9 +38,9 @@
      (if (empty? frames)
        [no-saved-frames-message]
        [frame-list/frame-list
-        #:frame-list{:active-id curr-target
-                     :on-click [::events/select-saved-frame-target
-                                timeline-id step]}]))])
+        #:frame-list{:active-id   curr-target
+                     :click-event [::events/select-saved-frame-target
+                                   timeline-id step]}]))])
 
 (def effect-editors
   {::color  {::editor   color-effect-editor
@@ -80,3 +80,9 @@
    [:h2 "Choose Effect"]
    [effect-nav timeline-id step]
    [effect-editor timeline-id step]])
+
+(defn effect-display [timeline-id step-index effect-index effect]
+  [:div
+   [:p.uk-text-lead
+    (str "Timeline " timeline-id ", step " step-index ", effect " effect-index)]
+   [:p (str effect)]])
