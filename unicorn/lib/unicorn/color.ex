@@ -47,12 +47,6 @@ defmodule Unicorn.Color do
     fn _x, _y -> random_color() end
   end
 
-  def approach_shader(target, scale) do
-    fn x, y ->
-      black()
-    end
-  end
-
   @spec to_hex(t()) :: String.t()
   def to_hex(color) do
     RGB.to_hex(color)

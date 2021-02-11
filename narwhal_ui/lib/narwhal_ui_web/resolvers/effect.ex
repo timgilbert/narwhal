@@ -1,22 +1,25 @@
 defmodule NarwhalUiWeb.Resolvers.Effect do
-  @moduledoc false
   alias Unicorn.Effect
   require Logger
-  alias NarwhalUi.Repo
 
-  def effect_type(effect, _args, _resolution) do
-    {:ok, :replace}
+  def effect_type_resolver(effect, _args, _resolution) do
+    case effect do
+      #      %Effect.Replace{} -> {:ok, :replace}
+      #      %Effect.Tween{} -> {:ok, :tween}
+      _ -> {:error, "What the?!"}
+    end
   end
 
-  def effect_duration_ms(effect, _args, _resolution) do
-    {:ok, 0}
+  def pause_ms_resolver(effect, _args, _resolution) do
+    {:ok, Effect.Effect.pause_ms(effect)}
   end
 
-  def effect_granularity(effect, _args, _resolution) do
-    {:ok, 1}
+  def duration_ms_resolver(effect, _args, _resolution) do
+    {:ok, Effect.Effect.duration_ms(effect)}
   end
 
-  def hydrate_effect(%{type: :replace} = args) do
-
+  def granularity_resolver(effect, _args, _resolution) do
+    {:ok, Effect.Effect.granularity(effect)}
   end
+
 end

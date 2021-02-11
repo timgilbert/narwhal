@@ -2,10 +2,10 @@ defmodule Unicorn.Runner do
   use GenServer
 
   alias Unicorn.Timeline
-  alias Unicorn.Step
+#  alias Unicorn.Step
   alias Unicorn.Frame
 
-  @buffer_size 10
+#  @buffer_size 10
 
   @type t :: %__MODULE__{timeline: Timeline.t(), counter: non_neg_integer, buffer: [Frame.t()]}
   defstruct timeline: nil, counter: 0, buffer: []

@@ -5,8 +5,8 @@ defmodule NarwhalUiWeb.Resolvers.Timeline do
   alias NarwhalUi.Repo
 
   def empty_timeline(_parent, _args, _resolution) do
-    Logger.debug(inspect Timeline.new())
-    {:ok, Timeline.new()}
+    Logger.debug(inspect Timeline.new(false))
+    {:ok, Timeline.new(false)}
   end
 
   def is_repeat(parent, _args, _resolution) do

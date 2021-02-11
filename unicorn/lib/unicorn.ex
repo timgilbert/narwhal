@@ -1,7 +1,6 @@
 defmodule Unicorn do
   alias Circuits.SPI
   alias Unicorn.Frame
-  import Enum
 
   # Port of https://github.com/pimoroni/unicorn-hat-hd/blob/master/library/unicornhathd/__init__.py
   # cf https://github.com/doceme/py-spidev

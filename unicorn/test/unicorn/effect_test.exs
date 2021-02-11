@@ -1,113 +1,44 @@
 defmodule UnicornEffectTest do
   use ExUnit.Case
   alias Unicorn.Effect
+  alias Unicorn.Target
+  alias Unicorn.Color
+
   doctest Unicorn.Effect
 
-  test "append / total work", context do
-    t =
-      Timeline.new(false)
-      |> Timeline.append(context[:s1])
-      |> Timeline.append(context[:s2])
-      |> Timeline.append(context[:s3])
+  # This is kind of dumb, is it useful?
+  test "frame target creation" do
+    e = Target.Random.new()
+    assert e == %Target.Random{}
 
-    assert t.total == 6
-    assert elem(Timeline.nth(t, 10), 0) == :err
+    black = Color.black()
+    e = Target.Solid.new(black)
+    assert e == %Target.Solid{color: black}
+
+    f = "frame-id"
+    e = Target.Saved.new(f)
+    assert e == %Target.Saved{frame_id: f}
   end
 
-  test "nth works correctly for 0, no repeat", context do
-    t =
-      Timeline.new(false)
-      |> Timeline.append(context[:s1])
-      |> Timeline.append(context[:s2])
-      |> Timeline.append(context[:s3])
+  test "effect creation, replace" do
+    target = Target.Random.new()
 
-    assert Timeline.nth(t, 0) == {:ok, context[:s1]}
+    e = Effect.Replace.new(target, 1000)
+    assert Effect.Effect.pause_ms(e) == 1000
+    assert Effect.Effect.granularity(e) == 1
+    assert Effect.Effect.duration_ms(e) == 0
+    assert Effect.Effect.immediate?(e) == true
+    assert Effect.Effect.target(e) == target
   end
 
-  test "nth works correctly, no repeat", context do
-    t =
-      Timeline.new(false)
-      |> Timeline.append(context[:s1])
-      |> Timeline.append(context[:s2])
-      |> Timeline.append(context[:s3])
+  test "effect creation, tween" do
+    target = Target.Solid.new(Color.black())
 
-    assert Timeline.nth(t, 0) == {:ok, context[:s1]}
-    assert Timeline.nth(t, 1) == {:ok, context[:s2]}
-    assert Timeline.nth(t, 2) == {:ok, context[:s2]}
-    assert Timeline.nth(t, 3) == {:ok, context[:s3]}
-    assert Timeline.nth(t, 4) == {:ok, context[:s3]}
-    assert Timeline.nth(t, 5) == {:ok, context[:s3]}
-    assert elem(Timeline.nth(t, 6), 0) == :err
-  end
-
-  test "repeat over single step", context do
-    t =
-      Timeline.new(true)
-      |> Timeline.append(context[:s1])
-
-    assert Timeline.nth(t, 0) == {:ok, context[:s1]}
-    assert Timeline.nth(t, 1) == {:ok, context[:s1]}
-    assert Timeline.nth(t, 200) == {:ok, context[:s1]}
-  end
-
-  test "repeat over multiple steps", context do
-    t =
-      Timeline.new(true)
-      |> Timeline.append(context[:s1])
-      |> Timeline.append(context[:s2])
-
-    assert Timeline.nth(t, 0) == {:ok, context[:s1]}
-    assert Timeline.nth(t, 1) == {:ok, context[:s2]}
-    assert Timeline.nth(t, 2) == {:ok, context[:s2]}
-    assert Timeline.nth(t, 3) == {:ok, context[:s1]}
-    assert Timeline.nth(t, 4) == {:ok, context[:s2]}
-    assert Timeline.nth(t, 5) == {:ok, context[:s2]}
-  end
-
-  test "serialization", _context do
-    t = Timeline.new(%{is_repeat: true, steps: []})
-    assert t == %Timeline{repeat?: true, steps: [], total: 0}
-  end
-
-  test "serialization with single step", _context do
-    steps = [%{pause_ms: 1000, repeat: 1, effects: []}]
-    t = Timeline.new(%{is_repeat: true, steps: steps})
-
-    assert t == %Timeline{
-             repeat?: true,
-             steps: [%Unicorn.Step{effects: [], pause_ms: 1000, repeat: 1}],
-             total: 1
-           }
-  end
-
-  test "serialization with several steps", _context do
-    steps = [
-      %{pause_ms: 1000, repeat: 1, effects: []},
-      %{pause_ms: 2000, repeat: 2, effects: []},
-      %{pause_ms: 3000, repeat: 3, effects: []}
-    ]
-    t = Timeline.new(%{is_repeat: true, steps: steps})
-
-    assert t == %Timeline{
-             repeat?: true,
-             steps: [
-               %Unicorn.Step{effects: [], pause_ms: 1000, repeat: 1},
-               %Unicorn.Step{effects: [], pause_ms: 2000, repeat: 2},
-               %Unicorn.Step{effects: [], pause_ms: 3000, repeat: 3},
-             ],
-             total: 6
-           }
-  end
-
-  test "serialization with one effect", _context do
-    effects = [%{type: :random_frame, pause_ms: 1000}]
-    steps = [%{pause_ms: 1000, repeat: 1, effects: effects}]
-    t = Timeline.new(%{is_repeat: true, steps: steps})
-
-    assert t == %Timeline{
-             repeat?: true,
-             steps: [%Unicorn.Step{effects: [], pause_ms: 1000, repeat: 1}],
-             total: 1
-           }
+    e = Effect.Tween.new(target, 2000, 3000, 10)
+    assert Effect.Effect.pause_ms(e) == 2000
+    assert Effect.Effect.duration_ms(e) == 3000
+    assert Effect.Effect.granularity(e) == 10
+    assert Effect.Effect.immediate?(e) == false
+    assert Effect.Effect.target(e) == target
   end
 end

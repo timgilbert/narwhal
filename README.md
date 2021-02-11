@@ -21,3 +21,4 @@ This is me trying to mess around with Elixir, [Nerves](http://nerves-project.org
 - Lib: implementation should just be a single list
 - UI: gql interface to detect connected hardware
   - Live-edit mode for grid if it's there
+- General: maybe should think about time in terms of FPS and have the runner pass the current time into the timeline (versus pausing x ms)

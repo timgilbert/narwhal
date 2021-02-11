@@ -2,19 +2,23 @@ defmodule Unicorn.Timeline do
   alias Unicorn.Step
   alias Unicorn.Fx.Tween
 
-  @type t :: %__MODULE__{steps: [Step.t()], repeat?: boolean(), total: non_neg_integer}
-  defstruct steps: [], repeat?: false, total: 0
+  @type t :: %__MODULE__{
+               steps: [Step.t()],
+               repeat?: boolean(),
+               total: non_neg_integer
+             }
+  defstruct [steps: [], repeat?: false, total: 0]
 
-  def new(%{steps: bare_steps, is_repeat: repeat?}) do
-    acc = %__MODULE__{steps: [], repeat?: repeat?, total: 0}
-    Enum.reduce(
-      bare_steps,
-      acc,
-      fn step, acc ->
-        append(acc, Step.new(step))
-      end
-    )
-  end
+  #  def new(%{steps: bare_steps, is_repeat: repeat?}) do
+  #    acc = %__MODULE__{steps: [], repeat?: repeat?, total: 0}
+  #    Enum.reduce(
+  #      bare_steps,
+  #      acc,
+  #      fn step, acc ->
+  #        append(acc, Step.new(step))
+  #      end
+  #    )
+  #  end
 
   @spec new(boolean()) :: t()
   def new(repeat?) do

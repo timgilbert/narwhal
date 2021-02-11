@@ -7,7 +7,8 @@ defmodule Unicorn.MixProject do
       version: "0.1.0",
       elixir: "~> 1.11",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      dialyzer: [plt_add_deps: :transitive]
     ]
   end
 
@@ -23,7 +24,8 @@ defmodule Unicorn.MixProject do
   defp deps do
     [
       {:circuits_spi, "~> 0.1"},
-      {:tint, "~> 1.1"}
+      {:tint, "~> 1.1"},
+      {:dialyxir, "~> 0.5.0", only: [:dev], runtime: false}
     ]
   end
 end

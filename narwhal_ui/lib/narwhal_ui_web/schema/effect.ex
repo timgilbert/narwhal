@@ -26,13 +26,14 @@ defmodule NarwhalUiWeb.Schema.Effect do
   object :effect do
     field :type, non_null(:effect_type) do
       description "The type of effect this object represents."
-      resolve &Effect.effect_type/3
+      resolve &Effect.effect_type_resolver/3
     end
     field :pause_ms, :integer do
       description """
       Number of milliseconds to pause after the event has
       finished.
       """
+      resolve &Effect.pause_ms_resolver/3
     end
     field :duration_ms, :integer do
       description """
@@ -42,6 +43,7 @@ defmodule NarwhalUiWeb.Schema.Effect do
       the `pauseMs` field can be used to pause on the final
       frame.
       """
+      resolve &Effect.duration_ms_resolver/3
     end
     field :granularity, :integer do
       description """
@@ -52,7 +54,9 @@ defmodule NarwhalUiWeb.Schema.Effect do
 
       For immediate effects, the granularity is always 1.
       """
+      resolve &Effect.granularity_resolver/3
     end
+
     # TODO: lighten/darken probably don't need this. Maybe there should
     # be a "percentage" field for those? tween 50% of the way to a new frame?
     field :target, non_null(:frame_target) do
