@@ -2,6 +2,7 @@ defmodule NarwhalUi.TimelineMetadata do
   @moduledoc false
   require Logger
   alias Unicorn.Timeline
+  alias NarwhalUiWeb.Resolvers.Hydrate
 
   @type t :: %__MODULE__{
                name: String.t(),
@@ -18,7 +19,7 @@ defmodule NarwhalUi.TimelineMetadata do
   def new(id, %{name: name, timeline: timeline}) do
     now = DateTime.utc_now()
     Logger.debug(inspect timeline)
-    new_timeline = Timeline.new(timeline)
+    new_timeline = Hydrate.hydrate_timeline(timeline)
     %__MODULE__{
       id: id,
       name: name,

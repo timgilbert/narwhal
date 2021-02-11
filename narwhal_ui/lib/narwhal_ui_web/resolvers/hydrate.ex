@@ -2,6 +2,7 @@ defmodule NarwhalUiWeb.Resolvers.Hydrate do
   alias Unicorn.Effect
   alias Unicorn.Target
   alias Unicorn.Step
+  alias Unicorn.Timeline
   require Logger
 
   def hydrate_effect(%{type: :replace, target: target} = args) do
@@ -104,4 +105,13 @@ defmodule NarwhalUiWeb.Resolvers.Hydrate do
     {:error, "Not enough info in " <> inspect args}
   end
 
+  def hydrate_timeline(%{is_repeat: repeat?, steps: steps}) do
+    timeline = Timeline.new(repeat?)
+    Enum.reduce_while(steps, timeline, fn step, t ->
+      case hydrate_step(step) do
+        {:ok, hydrated} -> {:cont, Timeline.append(t, hydrated)}
+        err -> {:halt, err}
+      end
+    end)
+  end
 end

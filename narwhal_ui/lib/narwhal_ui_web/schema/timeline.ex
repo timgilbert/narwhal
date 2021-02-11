@@ -17,7 +17,7 @@ defmodule NarwhalUiWeb.Schema.Timeline do
                        """
     field :is_repeat, non_null(:boolean) do
           description "If true, start the timeline over when it gets to the end"
-          resolve &Timeline.is_repeat/3
+          resolve &Timeline.is_repeat_resolver/3
     end
   end
 

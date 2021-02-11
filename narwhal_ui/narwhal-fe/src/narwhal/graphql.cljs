@@ -74,7 +74,7 @@ query {
     ::process   :result
     ::frags     [timeline-meta-fragment]
     ::text      "
-mutation ($i: NewTimelineMetadata!) {
+mutation ($i: CreateTimelineRequest!) {
   result: createTimeline(input: $i) {
     timeline { id }
     allTimelines { ...TimelineMetadataFields }

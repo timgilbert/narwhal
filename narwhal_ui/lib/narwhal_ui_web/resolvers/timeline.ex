@@ -9,9 +9,9 @@ defmodule NarwhalUiWeb.Resolvers.Timeline do
     {:ok, Timeline.new(false)}
   end
 
-  def is_repeat(parent, _args, _resolution) do
-    Logger.debug(inspect parent)
-    {:ok, parent.repeat?}
+  def is_repeat_resolver(timeline, _args, _resolution) do
+    Logger.debug(inspect timeline)
+    {:ok, timeline.repeat?}
   end
 
   def all_timelines(_parent, args, _resolution) do
@@ -23,7 +23,7 @@ defmodule NarwhalUiWeb.Resolvers.Timeline do
   end
 
   def create_timeline(_parent, %{input: input}, _resolution) do
-    Logger.warn("create_timeline", inspect input)
+    Logger.info(input)
     {:ok, metadata} = Repo.insert_new_timeline(input)
     {:ok, all_timelines} = Repo.all_timelines(nil)
     {:ok, %{timeline: metadata, all_timelines: all_timelines}}
