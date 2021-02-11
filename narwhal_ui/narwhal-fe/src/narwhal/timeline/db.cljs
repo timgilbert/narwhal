@@ -20,6 +20,7 @@
 
 (defn replace-single-timeline
   [db new-timeline]
+  (log/spy new-timeline)
   (let [timeline-id (:id new-timeline)]
     (assert (some? timeline-id))
     (assoc-in db (timeline-path :t/all timeline-id) new-timeline)))
@@ -62,9 +63,9 @@
   (update-in db (timeline-path :t/dirty?) dissoc timeline-id))
 
 (defn new-blank-step []
-  {:effects []
-   :repeat  1
-   :pause   1000})
+  {:effects     []
+   :repetitions 1
+   :pause_ms    1000})
 
 (defn update-step [db timeline-id step-index]
   ;; The user has selected a thing and hit save

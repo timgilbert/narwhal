@@ -53,7 +53,9 @@
   (fn [db [_ timeline-id]]
     (let [timeline (db/timeline-by-id db timeline-id)
           new-step (db/new-blank-step)
-          new-timeline (-> update timeline :steps conj new-step)]
+          new-timeline (update timeline :steps conj new-step)]
+      (log/spy timeline-id)
+      (log/spy new-timeline)
       (-> db
           (db/replace-single-timeline new-timeline)
           (db/set-dirty timeline-id)))))

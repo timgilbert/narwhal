@@ -18,68 +18,71 @@
    {:on-click #(>evt [::events/choose-effect timeline-id step nil])}
    [:span {:data-uk-icon "check"}]])
 
-(defn color-effect-editor [timeline-id step]
+(defn solid-frame-target-editor [timeline-id step-index]
   [:div
-   "color-effect-editor"])
+   "solid-frame-target-editor"])
 
-(defn random-effect-editor [timeline-id step]
+(defn random-frame-target-editor [timeline-id step-index]
   [:div
-   "random-effect-editor"])
+   "random-frame-target-editor"])
 
 (defn no-saved-frames-message []
   [:div.uk-flex.uk-flex-wrap.uk-flex-wrap-around
    [:div.uk-card.uk-card-body.uk-card-small
     [:p "No saved frames available! Create one first"]]])
 
-(defn saved-frame-effect-editor [timeline-id step]
+(defn saved-frame-target-editor [timeline-id step-index]
   [:div
-   (let [frames (<sub [::frame-subs/all-frame-metadata])
-         curr-target (<sub [::subs/selected-saved-frame-target timeline-id step])]
+   (let [frames      (<sub [::frame-subs/all-frame-metadata])
+         curr-target (<sub [::subs/selected-saved-frame-target
+                            timeline-id step-index])]
      (if (empty? frames)
        [no-saved-frames-message]
        [frame-list/frame-list
         #:frame-list{:active-id   curr-target
                      :click-event [::events/select-saved-frame-target
-                                   timeline-id step]}]))])
+                                   timeline-id step-index]}]))])
 
-(def effect-editors
-  {::color  {::editor   color-effect-editor
+(def frame-target-editors
+  {::color  {::editor   solid-frame-target-editor
              ::tab-name "Solid Color"}
-   ::random {::editor   random-effect-editor
+   ::random {::editor   random-frame-target-editor
              ::tab-name "Random Frame"}
-   ::saved  {::editor   saved-frame-effect-editor
+   ::saved  {::editor   saved-frame-target-editor
              ::tab-name "Saved Frame"}})
 
 (def all-effects [::saved ::random ::color])
 
-(defn effect-tab [timeline-id step effect-id {::keys [tab-name]}]
-  (let [current (<sub [::subs/effect-chosen timeline-id step])
+(defn frame-target-tab [timeline-id step-index effect-id {::keys [tab-name]}]
+  (let [current (<sub [::subs/effect-chosen timeline-id step-index])
         active? (= current effect-id)
         attrs   (if active?
                   {:class "uk-active"}
                   {:on-click #(>evt [::events/choose-effect
-                                     timeline-id step effect-id])})]
+                                     timeline-id step-index effect-id])})]
     [:li [:a attrs tab-name]]))
 
-(defn effect-editor [timeline-id step]
-  (let [selected-editor (<sub [::subs/effect-chosen timeline-id step])
-        {::keys [editor]} (get effect-editors selected-editor)]
+(defn frame-target-editor [timeline-id step-index]
+  (let [selected (<sub [::subs/effect-chosen timeline-id step-index])
+        {::keys [editor]} (get frame-target-editors selected)]
     (if editor
-      [editor timeline-id step]
-      [:p (str "Can't find editor '" selected-editor "'!")])))
+      [editor timeline-id step-index]
+      [:p (str "Can't find editor '" selected "'!")])))
 
-(defn effect-nav [timeline-id step]
+(defn frame-target-nav [timeline-id step-index]
   [:ul {:data-uk-tab ""}
    (for [effect-id all-effects
-         :let [props (get effect-editors effect-id (first effect-editors))]]
+         :let [props (get frame-target-editors effect-id
+                          (first frame-target-editors))]]
      ^{:key effect-id}
-     [effect-tab timeline-id step effect-id props])])
+     [frame-target-tab timeline-id step-index effect-id props])])
 
-(defn effect-chooser [timeline-id step]
+(defn effect-chooser [timeline-id step-index]
   [:div
-   [:h2 "Choose Effect"]
-   [effect-nav timeline-id step]
-   [effect-editor timeline-id step]])
+   ;; TODO: effect type, pause, etc
+   [:h2 "Choose Frame Target"]
+   [frame-target-nav timeline-id step-index]
+   [frame-target-editor timeline-id step-index]])
 
 (defn effect-display [timeline-id step-index effect-index effect]
   [:div

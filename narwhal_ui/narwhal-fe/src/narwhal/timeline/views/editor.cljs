@@ -28,22 +28,32 @@
                :scratch-sub ::subs/scratch?
                :on-submit   [::events/update-title timeline-id]}])
 
-(defn step-display [timeline-id step-index step]
-  [:div
-   (for [[eff-index effect] (map-indexed vector (:effects step))]
-     ^{key eff-index}
-     [effects/effect-display timeline-id eff-index effect])])
+(defn add-effect-control [timeline-id step-index]
+  [effects/effect-chooser timeline-id step-index])
 
-(defn no-steps-message [timeline-id]
+(defn no-effects-message [_timeline-id _step-index]
+  [:p "No effects yet!"])
+
+(defn step-display [timeline-id step-index step]
+  (let [{:keys [effects]} step]
+    [:div
+     (if (empty? effects)
+       [no-effects-message timeline-id step-index]
+       (for [[eff-index effect] (map-indexed vector effects)]
+         ^{:key eff-index}
+         [effects/effect-display timeline-id eff-index effect]))
+     [add-effect-control timeline-id step-index]]))
+
+(defn no-steps-message [_timeline-id]
   [:p "No steps yet!"])
 
 (defn step-list [timeline-id]
   (let [steps (<sub [::subs/timeline-steps timeline-id])]
     (if (empty? steps)
-      [no-steps-message]
+      [no-steps-message timeline-id]
       [:div
        (for [[step-index step] (map-indexed vector steps)]
-         ^{key step-index}
+         ^{:key step-index}
          [step-display timeline-id step-index step])])))
 
 (defn step-controls [timeline-id]
@@ -56,7 +66,6 @@
    [timeline-name-controls timeline-id]
    [step-list timeline-id]
    [step-controls timeline-id]
-   ;[effects/effect-chooser timeline-id 0]
    [timeline-persist-controls timeline-id]])
 
 (defn timeline-edit-page
