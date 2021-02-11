@@ -82,7 +82,6 @@ defmodule NarwhalUiWeb.Resolvers.Hydrate do
           repetitions: repetitions
         }
       ) do
-
     hydrated_effects =
       effects
       |> Enum.map(&hydrate_effect/1)
@@ -100,7 +99,6 @@ defmodule NarwhalUiWeb.Resolvers.Hydrate do
       es -> {:ok, Step.new(es, pause_ms, repetitions)}
     end
   end
-
   def hydrate_step(args) do
     {:error, "Not enough info in " <> inspect args}
   end
@@ -114,4 +112,8 @@ defmodule NarwhalUiWeb.Resolvers.Hydrate do
       end
     end)
   end
+  def hydrate_timeline(args) do
+    {:error, "Not enough info in " <> inspect args}
+  end
+
 end

@@ -19,7 +19,7 @@ defmodule NarwhalUi.TimelineMetadata do
   def new(id, %{name: name, timeline: timeline}) do
     now = DateTime.utc_now()
     Logger.debug(inspect timeline)
-    new_timeline = Hydrate.hydrate_timeline(timeline)
+    {:ok, new_timeline = Hydrate.hydrate_timeline(timeline)}
     %__MODULE__{
       id: id,
       name: name,
