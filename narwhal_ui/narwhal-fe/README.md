@@ -33,7 +33,3 @@ To create a production build run:
   - No gaps (for thumbnails)
   - rasterize and cache?
     - Maybe [this?](https://github.com/pmkroeker/rasterize-svg/blob/master/src/rasterize.ts])
-- Effect chooser:
-  - Add effect type (tween/replace)
-  - Pause/duration/repeat
-  - Dehydrate from local effect model to gql mutation payload
