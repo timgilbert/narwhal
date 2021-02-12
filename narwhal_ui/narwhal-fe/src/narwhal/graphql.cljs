@@ -31,6 +31,7 @@ fragment StepFields on Step {
 }
 fragment EffectFields on Effect {
   type
+  pauseMs
   durationMs
   granularity
   target {

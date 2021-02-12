@@ -134,7 +134,8 @@
   [db timeline-id step-index effect-index effect]
   (assert (every? some? [timeline-id effect]))
   (assert (every? number? [step-index effect-index]))
-  (let [step    (get-step db timeline-id step-index)
+  (let [step    (or (get-step db timeline-id step-index)
+                    (new-blank-step db))
         effects (-> (get step :effects [])
                     (assoc effect-index effect))]
     (assoc-step db timeline-id step-index
