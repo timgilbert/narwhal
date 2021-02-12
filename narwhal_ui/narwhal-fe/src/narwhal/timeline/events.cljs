@@ -76,7 +76,7 @@
   (fn [{:keys [db]} [_ timeline-id]]
     (let [timeline (db/timeline-by-id db timeline-id)]
       {:dispatch [:graphql/run :timeline-gql/create-timeline
-                  (dissoc timeline :id :scratch?)]})))
+                  (db/dehydrate timeline ::db/create)]})))
 
 (rf/reg-event-fx
   :timeline-gql/timeline-created
@@ -93,7 +93,8 @@
   ::update-timeline
   (fn [{:keys [db]} [_ timeline-id]]
     (let [timeline (db/timeline-by-id db timeline-id)]
-      {:dispatch [:graphql/run :timeline-gql/update-timeline timeline]})))
+      {:dispatch [:graphql/run :timeline-gql/update-timeline
+                  (db/dehydrate timeline)]})))
 
 (rf/reg-event-db
   :timeline-gql/timeline-updated

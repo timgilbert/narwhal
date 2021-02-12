@@ -2,7 +2,8 @@
   (:require [lambdaisland.glogi :as log]
             [re-frame.core :as rf]
             [narwhal.util.util :as util :refer [<sub >evt]]
-            [narwhal.frame.db :as db]))
+            [narwhal.frame.db :as db]
+            [narwhal.grid.db :as grid-db]))
 
 ;; ----------------------------------------------------------------------
 ;; Title stuff
@@ -27,6 +28,11 @@
   ::new-blank-frame
   (fn [_ _]
     {:dispatch [:graphql/run :frame-gql/new-blank-frame]}))
+
+(rf/reg-event-db
+  ::randomize-frame
+  (fn [db [_ frame-id]]
+    (grid-db/randomize-grid db frame-id)))
 
 ;; TODO: instead of this, randomize colors via grid controls
 (rf/reg-event-fx

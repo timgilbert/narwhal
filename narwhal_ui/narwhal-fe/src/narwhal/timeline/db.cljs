@@ -29,6 +29,14 @@
 (defn timeline-by-id [db timeline-id]
   (get-in db (timeline-path :t/all timeline-id)))
 
+(defn dehydrate
+  ([timeline-meta]
+   (dehydrate timeline-meta ::update))
+  ([timeline-meta type]
+   (case type
+     ::create (dissoc timeline-meta :id :scratch?)
+     ::update (dissoc timeline-meta :scratch?))))
+
 (defn timeline-name [db timeline-id]
   (get-in db (timeline-path :t/all timeline-id :name)))
 

@@ -23,6 +23,23 @@
 (defn set-active-palette-color [db color]
   (assoc-in db (grid-path :palette/active-color) color))
 
+;; Grid generation
+(defn random-grid
+  ([] (random-grid 16))
+  ([size]
+   {:height size
+    :width  size
+    :pixels (for [i (range (* size size))]
+              (color/random))}))
+
+(defn solid-grid-data
+  ([color] (solid-grid-data color 16))
+  ([color size]
+   {:height size
+    :width  size
+    :pixels (for [i (range (* size size))]
+              color)}))
+
 ;; ----------------------------------------------------------------------
 ;; Pixel manipulation
 
@@ -57,26 +74,17 @@
         (frame-db/set-dirty frame-id)
         (set-all-pixels-by-frame-id frame-id pixels))))
 
+(defn randomize-grid [db frame-id]
+  (let [frame  (frame-db/frame-by-id db frame-id)
+        total  (* (-> frame :frame :height) (-> frame :frame :width))
+        pixels (into [] (repeatedly total #(color/random)))]
+    (-> db
+        (frame-db/set-dirty frame-id)
+        (set-all-pixels-by-frame-id frame-id pixels))))
+
 (defn init-db [db]
   (-> db
       (set-active-palette-color "#ffffff")
       (set-active-tool :tools/pencil)))
-
-;; Grid generation
-(defn random-grid
-  ([] (random-grid 16))
-  ([size]
-   {:height size
-    :width  size
-    :pixels (for [i (range (* size size))]
-              (color/random))}))
-
-(defn solid-grid-data
-  ([color] (solid-grid-data color 16))
-  ([color size]
-   {:height size
-    :width  size
-    :pixels (for [i (range (* size size))]
-              color)}))
 
 (defonce random-grid-data (random-grid))

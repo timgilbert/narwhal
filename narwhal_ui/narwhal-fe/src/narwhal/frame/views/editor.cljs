@@ -15,11 +15,13 @@
 
 ;; TODO: this is janky, maybe there's a better way to nestle those :li's
 (defn frame-extra-actions
-  [_frame-id]
+  [frame-id]
   [:span
    [:li [:a "Duplicate"]]
    [:li [:a "Fill"]]
-   [:li [:a "Randomize"]]])
+   [:li [:a
+         {:on-click #(>evt [::events/randomize-frame frame-id])}
+         "Randomize"]]])
 
 
 (defn frame-name-controls [frame-id]

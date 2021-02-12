@@ -6,7 +6,8 @@
             [narwhal.timeline.subs :as subs]
             [narwhal.timeline.views.effects :as effects]
             [narwhal.components.persist :as persist]
-            [narwhal.components.name-edit :as name-edit]))
+            [narwhal.components.name-edit :as name-edit]
+            [narwhal.timeline.db :as db]))
 
 (defn timeline-persist-controls [timeline-id]
   [persist/persist-controls
@@ -61,12 +62,20 @@
    {:on-click #(>evt [::events/add-step timeline-id])}
    "Add Step"])
 
+(defn debug-view [timeline-id]
+  (let [timeline-meta (<sub [::subs/timeline-meta-by-id timeline-id])
+        hydrate-type (if (<sub [::subs/scratch? timeline-id])
+                       ::db/create
+                       ::db/update)]
+    [util/json-dump {:i (db/dehydrate timeline-meta hydrate-type)}]))
+
 (defn timeline-editor [timeline-id]
   [:div
    [timeline-name-controls timeline-id]
    [step-list timeline-id]
    [step-controls timeline-id]
-   [timeline-persist-controls timeline-id]])
+   [timeline-persist-controls timeline-id]
+   [debug-view timeline-id]])
 
 (defn timeline-edit-page
   [route]

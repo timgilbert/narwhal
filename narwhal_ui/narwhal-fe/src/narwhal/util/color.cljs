@@ -147,8 +147,4 @@
 (def black (::black named))
 
 (defn random []
-  (let [r (rand-int 256)
-        g (rand-int 256)
-        b (rand-int 256)]
-    (log/spy [r g b])
-    (gcolor/rgbToHex r g b)))
+  (gcolor/rgbToHex (rand-int 256) (rand-int 256) (rand-int 256)))

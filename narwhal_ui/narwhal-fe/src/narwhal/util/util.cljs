@@ -1,7 +1,9 @@
 (ns narwhal.util.util ; doubly useful
-  (:require [goog.string :as gstring]
+  (:require [lambdaisland.glogi :as log]
+            [goog.string :as gstring]
             [re-frame.core :as rf]
-            [narwhal.util.color :as color]))
+            [narwhal.util.color :as color])
+  (:import [goog.format JsonPrettyPrinter]))
 
 (defn <sub [sub]
   (let [sub-vec (if (keyword? sub) [sub] sub)]
@@ -12,18 +14,17 @@
 (def nbsp (gstring/unescapeEntities "&nbsp;"))
 (def tooltips? true)
 
-(defn rand-color []
-  (let [b ["0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "a" "b" "c" "d" "e" "f"]]
-    (apply str (concat "#" (repeatedly 6 #(rand-nth b))))))
-
-(defn random-pixels
-  ([] random-pixels 16 16)
-  ([height width]
-   (repeatedly (* height width) rand-color)))
-
 (defn signal
   "Produce a re-frame signal function which combines the given subscription
   name with whatever args were in the query vector."
   [sub]
   (fn [query-vector]
     (rf/subscribe (into [sub] (rest query-vector)))))
+
+(defn json-dump [clj-thing]
+  (let [js      (clj->js clj-thing)
+        json-pp (JsonPrettyPrinter.)
+        js-str  (.format json-pp js)]
+    [:div
+     ;[:p.uk-text-muted (str clj-str)]
+     [:pre js-str]]))
