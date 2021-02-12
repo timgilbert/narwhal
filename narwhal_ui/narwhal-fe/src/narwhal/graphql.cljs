@@ -24,14 +24,27 @@ fragment TimelineFields on Timeline {
 }
 fragment StepFields on Step {
   pauseMs
-  repeat
+  repetitions
   effects {
     ...EffectFields
   }
 }
 fragment EffectFields on Effect {
-  __typename
+  type
   durationMs
+  granularity
+  target {
+    ...TargetFields
+  }
+}
+fragment TargetFields on FrameTarget {
+  type
+  ...on SavedFrameTarget {
+    frameId
+  }
+  ...on SolidFrameTarget {
+    color
+  }
 }
 ")
 (def timeline-meta-fragment (str "

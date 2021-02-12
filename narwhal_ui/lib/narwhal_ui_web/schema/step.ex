@@ -8,7 +8,7 @@ defmodule NarwhalUiWeb.Schema.Step do
     field :effects, non_null(list_of(non_null(:effect))) do
       description "The steps in this timeline"
     end
-    field :repeat, non_null(:integer),
+    field :repetitions, non_null(:integer),
           description: "The total number of times to repeat this step when it's run"
     field :pause_ms, non_null(:integer),
           description: "Pause for this many milliseconds between each repetition"

@@ -3,13 +3,18 @@ defmodule NarwhalUiWeb.Schema.Effect do
 
   use Absinthe.Schema.Notation
   alias NarwhalUiWeb.Resolvers.Effect
+  alias NarwhalUiWeb.Resolvers.Effect
 
   @desc "The type of an effect"
   enum :effect_type do
-    value :replace, description: "Replace the frame with a target frame"
-    value :tween, description: "Gradually nudge the frame towards the given frame"
-    value :darken, description: "Gradually darken the frame"
-    value :lighten, description: "Gradually lighten the frame"
+    value :replace_effect,
+          description: "Replace the frame with a target frame"
+    value :tween_effect,
+          description: "Gradually nudge the frame towards the given frame"
+    value :darken_effect,
+          description: "Gradually darken the frame"
+    value :lighten_effect,
+          description: "Gradually lighten the frame"
   end
 
   @desc "For replace and tween effects, the type of target frame"
@@ -74,9 +79,10 @@ defmodule NarwhalUiWeb.Schema.Effect do
     field :type, non_null(:frame_target_type),
           description: "The type of this frame target."
     resolve_type fn
-      %Unicorn.Fx.Random.Struct{}, _ -> :random_effect
-      %Unicorn.Fx.Color.Struct{}, _ -> :color_effect
-      _, _ -> nil # TODO: log error
+      %Unicorn.Target.Random{}, _ -> :random_frame_target
+      %Unicorn.Target.Solid{}, _ -> :solid_frame_target
+      %Unicorn.Target.Saved{}, _ -> :saved_frame_target
+      _, _ -> nil # TODO: log error here
     end
   end
 
@@ -84,7 +90,7 @@ defmodule NarwhalUiWeb.Schema.Effect do
   object :random_frame_target do
     interfaces [:frame_target]
     field :type, non_null(:frame_target_type) do
-      resolve fn _, _ -> :random_frame end
+      resolve Effect.always(:random_frame)
     end
   end
 
@@ -92,9 +98,10 @@ defmodule NarwhalUiWeb.Schema.Effect do
   object :solid_frame_target do
     interface :frame_target
     field :type, non_null(:frame_target_type) do
-      resolve fn _, _ -> :solid_frame end
+      resolve Effect.always(:solid_frame)
     end
-    field :color, :string, description: "The color of the target frame"
+    field :color, non_null(:rgb_color),
+          description: "The color of the target frame"
   end
 
   # TODO: this sort of requires us to pull the frame repo into this library
@@ -104,9 +111,10 @@ defmodule NarwhalUiWeb.Schema.Effect do
   object :saved_frame_target do
     interface :frame_target
     field :type, non_null(:frame_target_type) do
-      resolve fn _, _ -> :saved_frame end
+      resolve Effect.always(:saved_frame)
     end
-    field :id, :string, description: "The unique ID of the saved frame"
+    field :frame_id, non_null(:string),
+          description: "The unique ID of the saved frame"
   end
 
   # Effect and frame target inputs
@@ -115,7 +123,7 @@ defmodule NarwhalUiWeb.Schema.Effect do
     field :type, non_null(:frame_target_type) do
       description "The type of this frame target"
     end
-    field :color, :string do
+    field :color, :rgb_color do
       description """
       For `solidFrameTarget` objects, the color to set the frame
       to. Ignored for other types of frame target.

@@ -4,9 +4,16 @@ defmodule NarwhalUiWeb.Resolvers.Effect do
 
   def effect_type_resolver(effect, _args, _resolution) do
     case effect do
-      #      %Effect.Replace{} -> {:ok, :replace}
-      #      %Effect.Tween{} -> {:ok, :tween}
-      _ -> {:error, "What the?!"}
+      %Effect.Replace{} ->
+        {:ok, :replace_effect}
+      %Effect.Tween{} ->
+        {:ok, :tween_effect}
+      _ ->
+        {
+          :error,
+          "Don't know how to determine type of " <>
+          inspect effect
+        }
     end
   end
 
@@ -22,4 +29,9 @@ defmodule NarwhalUiWeb.Resolvers.Effect do
     {:ok, Effect.Effect.granularity(effect)}
   end
 
+  def always (result) do
+    fn _parent, _args, _resolution ->
+      {:ok, result}
+    end
+  end
 end

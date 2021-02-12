@@ -73,25 +73,25 @@
 
 (defn new-default-frame-target
   ([db]
-   (new-default-frame-target db :random))
+   (new-default-frame-target db :RANDOM_FRAME))
   ([db target-type]
    (log/spy target-type)
    (merge
      {:type target-type}
      (case target-type
-       :solid {:color color/black}
-       :saved {:frameId (frame-db/first-frame-id db)}
+       :SOLID_FRAME {:color color/black}
+       :SAVED_FRAME {:frameId (frame-db/first-frame-id db)}
        nil))))
 
 (defn new-default-effect
   ([db]
-   (new-default-effect db :replace))
+   (new-default-effect db :REPLACE_EFFECT))
   ([db effect-type]
    (merge
      {:type    effect-type
       :pauseMs 0
       :target  (new-default-frame-target db)}
-     (when (= effect-type :tween)
+     (when (= effect-type :TWEEN_EFFECT)
        {:granularity 10
         :durationMs  1000}))))
 

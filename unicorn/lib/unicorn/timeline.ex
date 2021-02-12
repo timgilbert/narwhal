@@ -31,7 +31,7 @@ defmodule Unicorn.Timeline do
       timeline
     |
       steps: Enum.concat(timeline.steps, [step]),
-      total: timeline.total + step.repeat
+      total: timeline.total + step.repetitions
     }
   end
 

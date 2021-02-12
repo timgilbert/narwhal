@@ -18,6 +18,12 @@ defmodule NarwhalUiWeb.Resolvers.Timeline do
     Repo.all_timelines(args)
   end
 
+  def nuke_all_timelines(_parent, _args, _resolution) do
+    Repo.nuke_all_timelines()
+    {:ok, all_timelines} = Repo.all_timelines()
+    {:ok, %{timeline_id: "nope", all_timelines: all_timelines}}
+  end
+
   def timeline_by_id(_parent, %{id: timeline_id}, _resolution) do
     Repo.get_timeline_meta(timeline_id)
   end

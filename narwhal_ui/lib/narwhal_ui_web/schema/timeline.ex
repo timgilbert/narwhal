@@ -12,12 +12,12 @@ defmodule NarwhalUiWeb.Schema.Timeline do
     field :total,
           non_null(:integer),
           description: """
-                       The total number of steps in this timeline, including
-                       repetitions
-                       """
+          The total number of steps in this timeline, including
+          repetitions
+          """
     field :is_repeat, non_null(:boolean) do
-          description "If true, start the timeline over when it gets to the end"
-          resolve &Timeline.is_repeat_resolver/3
+      description "If true, start the timeline over when it gets to the end"
+      resolve &Timeline.is_repeat_resolver/3
     end
   end
 
@@ -45,29 +45,35 @@ defmodule NarwhalUiWeb.Schema.Timeline do
   end
 
   @desc "Input object for a new timeline"
-  input_object :new_timeline do
-    field :steps, non_null(list_of(non_null(:input_step))),
+  input_object :timeline_input do
+    field :steps, non_null(list_of(non_null(:step_input))),
           description: "List of steps in the timeline"
     field :is_repeat, non_null(:boolean),
           description: "List of steps in the timeline"
   end
 
   @desc "Input object for a step within a timeline"
-  input_object :input_step do
-    field :effects, non_null(list_of(non_null(:input_effect))),
+  input_object :step_input do
+    field :effects, non_null(list_of(non_null(:effect_input))),
           description: "List of effects in this step"
+    field :repetitions, non_null(:integer),
+          description: "How many times to repeat this step"
+    field :pause_ms, non_null(:integer),
+          description: "How long to pause after each repetition of this step"
   end
 
-  @desc "Input object for one of the effects in a step"
-  input_object :input_effect do
-    field :duration_ms, non_null(:integer),
-          description: "Amount of time to pause after this effect finishes"
-  end
+  #  @desc "Input object for one of the effects in a step"
+  #  input_object :input_effect do
+  #    field :type, non_null(:integer),
+  #          description: "Amount of time to pause after this effect finishes"
+  #    field :pause_ms, non_null(:integer),
+  #          description: "How long to pause after each repetition of this step"
+  #  end
 
   @desc "Input object for a new timeline"
   input_object :create_timeline_request do
     field :name, non_null(:string), description: "Name of the new timeline"
-    field :timeline, non_null(:new_timeline),
+    field :timeline, non_null(:timeline_input),
           description: "The data for the timeline we're saving"
   end
 
@@ -77,7 +83,7 @@ defmodule NarwhalUiWeb.Schema.Timeline do
           description: "The ID of the timeline we're updating"
     field :name, non_null(:string),
           description: "If non-null, update the timeline's name"
-    field :timeline, non_null(:new_timeline),
+    field :timeline, non_null(:timeline_input),
           description: "If non-null, update the timeline's data"
   end
 

@@ -61,10 +61,11 @@ defmodule NarwhalUi.Repo do
   # eg, Repo.select(Frame, %{}})
   # TODO: maybe this is too much of a leaky abstraction
   def select_all(type, _options) do
-    CubDB.select(@cubdb,
+    CubDB.select(
+      @cubdb,
       pipe: [
         filter: fn {{key_type, _id}, _r} ->
-          key_type == type
+                   key_type == type
         end,
         map: fn {_k, v} -> v end
       ]
@@ -103,6 +104,18 @@ defmodule NarwhalUi.Repo do
   def delete_timeline(timeline_id) do
     :ok = CubDB.delete(@cubdb, key(%{timeline_id: timeline_id}))
     {:ok, timeline_id}
+  end
+
+  def nuke_all_timelines() do
+    {:ok, timelines} = select_all(Timeline, nil)
+    timelines
+    |> Enum.map(fn t -> t.id end)
+    |> Enum.map(
+         fn id ->
+           {:ok, _} = delete_timeline(id)
+         end
+       )
+    {:ok, nil}
   end
 
   def update_frame(%{id: id, frame: _} = input) do

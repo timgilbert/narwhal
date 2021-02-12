@@ -40,13 +40,13 @@
                                    timeline-id step-index effect-index]}]))])
 
 (def frame-target-editors
-  {:solid  {::editor   solid-frame-target-editor
-            ::tab-name "Solid Color"}
-   :random {::editor   random-frame-target-editor
-            ::tab-name "Random Frame"}
-   :saved  {::editor   saved-frame-target-editor
-            ::tab-name "Saved Frame"}
-   ::all   [:saved :random :solid]})
+  {:SOLID_FRAME  {::editor   solid-frame-target-editor
+                  ::tab-name "Solid Color"}
+   :RANDOM_FRAME {::editor   random-frame-target-editor
+                  ::tab-name "Random Frame"}
+   :SAVED_FRAME  {::editor   saved-frame-target-editor
+                  ::tab-name "Saved Frame"}
+   ::all         [:RANDOM_FRAME :SAVED_FRAME :SOLID_FRAME]})
 
 ;; TODO: disable frame tab if no saved frames
 (defn frame-target-tab [timeline-id step-index effect-index target-type
@@ -91,12 +91,12 @@
    (:granularity effect) ", durationMs " (:durationMs effect)])
 
 (def effect-types
-  {:replace {::text   "Replace"
-             ::frame? true}
-   :tween   {::text     "Tween"
-             ::frame?   true
-             ::controls tween-controls}
-   ::all    [:replace :tween]})
+  {:REPLACE_EFFECT {::text   "Replace"
+                    ::frame? true}
+   :TWEEN_EFFECT   {::text     "Tween"
+                    ::frame?   true
+                    ::controls tween-controls}
+   ::all           [:REPLACE_EFFECT :TWEEN_EFFECT]})
 
 (defn effect-type-controls [timeline-id step-index effect-index]
   (assert (some? timeline-id))

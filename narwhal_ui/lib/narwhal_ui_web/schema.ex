@@ -84,6 +84,11 @@ defmodule NarwhalUiWeb.Schema do
       resolve &NarwhalUiWeb.Resolvers.Timeline.delete_timeline/3
     end
 
+    @desc "Nuke all timelines"
+    field :nuke_all_timelines, :delete_timeline_response do
+      resolve &NarwhalUiWeb.Resolvers.Timeline.nuke_all_timelines/3
+    end
+
     @desc "Update an existing timeline"
     field :update_timeline, :update_timeline_response do
       arg :input, non_null(:update_timeline_request)
