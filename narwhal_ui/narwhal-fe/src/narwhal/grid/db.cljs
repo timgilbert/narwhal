@@ -1,7 +1,8 @@
 (ns narwhal.grid.db
   (:require [lambdaisland.glogi :as log]
             [narwhal.util.util :as util :refer [<sub >evt]]
-            [narwhal.frame.db :as frame-db]))
+            [narwhal.frame.db :as frame-db]
+            [narwhal.util.color :as color]))
 
 ;; ----------------------------------------------------------------------
 ;; Tool stuff
@@ -60,3 +61,22 @@
   (-> db
       (set-active-palette-color "#ffffff")
       (set-active-tool :tools/pencil)))
+
+;; Grid generation
+(defn random-grid
+  ([] (random-grid 16))
+  ([size]
+   {:height size
+    :width  size
+    :pixels (for [i (range (* size size))]
+              (color/random))}))
+
+(defn solid-grid-data
+  ([color] (solid-grid-data color 16))
+  ([color size]
+   {:height size
+    :width  size
+    :pixels (for [i (range (* size size))]
+              color)}))
+
+(defonce random-grid-data (random-grid))

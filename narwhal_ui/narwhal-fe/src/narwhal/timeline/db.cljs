@@ -2,7 +2,9 @@
   (:require [lambdaisland.glogi :as log]
             [re-frame.core :as rf]
             [goog.string :as gstring]
-            [narwhal.util.util :as util :refer [<sub >evt]]))
+            [narwhal.util.util :as util :refer [<sub >evt]]
+            [narwhal.util.color :as color]
+            [narwhal.frame.db :as frame-db]))
 
 ;; TODO: lots of copypasta from frames here, refactor to generic CRUD stuff
 
@@ -20,7 +22,6 @@
 
 (defn replace-single-timeline
   [db new-timeline]
-  (log/spy new-timeline)
   (let [timeline-id (:id new-timeline)]
     (assert (some? timeline-id))
     (assoc-in db (timeline-path :t/all timeline-id) new-timeline)))
@@ -62,10 +63,97 @@
   [db timeline-id]
   (update-in db (timeline-path :t/dirty?) dissoc timeline-id))
 
-(defn new-blank-step []
-  {:effects     []
+(defn new-default-frame-target
+  ([db]
+   (new-default-frame-target db :random))
+  ([db target-type]
+   (log/spy target-type)
+   (merge
+     {:type target-type}
+     (case target-type
+       :solid {:color color/black}
+       :saved {:frameId (frame-db/first-frame-id db)}
+       nil))))
+
+(defn new-default-effect
+  ([db]
+   (new-default-effect db :replace))
+  ([db effect-type]
+   (merge
+     {:type    effect-type
+      :pauseMs 0
+      :target  (new-default-frame-target db)}
+     (when (= effect-type :tween)
+       {:granularity 10
+        :durationMs  1000}))))
+
+(defn new-blank-step [db]
+  {:effects     [(new-default-effect db)]
    :repetitions 1
-   :pause_ms    1000})
+   :pauseMs     1000})
+
+(defn get-step
+  [db timeline-id step-index]
+  (assert (some? timeline-id))
+  (assert (number? step-index))
+  (let [timeline (timeline-by-id db timeline-id)]
+    (get-in timeline [:steps step-index] nil)))
+
+(defn assoc-step
+  [db timeline-id step-index step]
+  (assert (every? some? [timeline-id step]))
+  (assert (number? step-index))
+  (let [timeline (timeline-by-id db timeline-id)
+        steps    (-> (get timeline :steps [])
+                     (assoc step-index step))
+        new-tl   (assoc-in timeline [:timeline :steps] steps)]
+    (replace-single-timeline db new-tl)))
+
+(defn get-effect
+  [db timeline-id step-index effect-index]
+  (assert (some? timeline-id))
+  (assert (every? number? [step-index effect-index]))
+  (let [timeline (timeline-by-id db timeline-id)]
+    (get-in timeline [:timeline :steps step-index :effects effect-index]
+            nil)))
+
+(defn get-target
+  [db timeline-id step-index effect-index]
+  (some-> (get-effect db timeline-id step-index effect-index)
+          :target))
+
+(defn assoc-effect
+  [db timeline-id step-index effect-index effect]
+  (assert (every? some? [timeline-id effect]))
+  (assert (every? number? [step-index effect-index]))
+  (let [step    (get-step db timeline-id step-index)
+        effects (-> (get step :effects [])
+                    (assoc effect-index effect))]
+    (assoc-step db timeline-id step-index
+                (assoc step :effects effects))))
+
+(defn replace-effect-type
+  [db timeline-id step-index effect-index effect-type]
+  (let [effect (new-default-effect db effect-type)]
+    (assoc-effect db timeline-id step-index effect-index
+                  effect)))
+
+(defn replace-frame-target
+  [db timeline-id step-index effect-index target]
+  (let [effect (get-effect db timeline-id step-index effect-index)]
+    (assoc-effect db timeline-id step-index effect-index
+                  (assoc effect :target target))))
+
+(defn replace-frame-target-type
+  [db timeline-id step-index effect-index target-type]
+  (replace-frame-target db timeline-id step-index effect-index
+                        (new-default-frame-target db target-type)))
+
+(defn replace-saved-frame-target-id
+  [db timeline-id step-index effect-index frame-id]
+  (let [target (get-target db timeline-id step-index effect-index)]
+    (replace-frame-target db timeline-id step-index effect-index
+                          (assoc target :frameId frame-id))))
 
 (defn update-step [db timeline-id step-index]
   ;; The user has selected a thing and hit save

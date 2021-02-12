@@ -6,86 +6,125 @@
             [narwhal.frame.subs :as frame-subs]
             [narwhal.timeline.events :as events]
             [narwhal.frame.views.list :as frame-list]
-            [re-frame.core :as rf]))
+            [re-frame.core :as rf]
+            [narwhal.util.color :as color]))
 
-(defn chooser-cancel-button [timeline-id step]
-  [:button
-   {:on-click #(>evt [::events/choose-effect timeline-id step nil])}
-   [:span {:data-uk-icon "close"}]])
+(defn solid-frame-target-editor
+  [timeline-id step-index effect-index]
+  (let [color (<sub [::subs/solid-frame-color
+                     timeline-id step-index effect-index])]
+    [:div.uk-flex.uk-flex-wrap.uk-flex-wrap-around
+     [frame-list/solid-frame-display true color]]))
 
-(defn chooser-confirm-button [timeline-id step]
-  [:button
-   {:on-click #(>evt [::events/choose-effect timeline-id step nil])}
-   [:span {:data-uk-icon "check"}]])
-
-(defn solid-frame-target-editor [timeline-id step-index]
-  [:div
-   "solid-frame-target-editor"])
-
-(defn random-frame-target-editor [timeline-id step-index]
-  [:div
-   "random-frame-target-editor"])
+(defn random-frame-target-editor
+  [_timeline-id _step-index _effect-index]
+  [:div.uk-flex.uk-flex-wrap.uk-flex-wrap-around
+   [frame-list/random-frame-display true]])
 
 (defn no-saved-frames-message []
   [:div.uk-flex.uk-flex-wrap.uk-flex-wrap-around
    [:div.uk-card.uk-card-body.uk-card-small
     [:p "No saved frames available! Create one first"]]])
 
-(defn saved-frame-target-editor [timeline-id step-index]
+(defn saved-frame-target-editor
+  [timeline-id step-index effect-index]
   [:div
    (let [frames      (<sub [::frame-subs/all-frame-metadata])
          curr-target (<sub [::subs/selected-saved-frame-target
-                            timeline-id step-index])]
+                            timeline-id step-index effect-index])]
      (if (empty? frames)
        [no-saved-frames-message]
        [frame-list/frame-list
         #:frame-list{:active-id   curr-target
                      :click-event [::events/select-saved-frame-target
-                                   timeline-id step-index]}]))])
+                                   timeline-id step-index effect-index]}]))])
 
 (def frame-target-editors
-  {::color  {::editor   solid-frame-target-editor
-             ::tab-name "Solid Color"}
-   ::random {::editor   random-frame-target-editor
-             ::tab-name "Random Frame"}
-   ::saved  {::editor   saved-frame-target-editor
-             ::tab-name "Saved Frame"}})
+  {:solid  {::editor   solid-frame-target-editor
+            ::tab-name "Solid Color"}
+   :random {::editor   random-frame-target-editor
+            ::tab-name "Random Frame"}
+   :saved  {::editor   saved-frame-target-editor
+            ::tab-name "Saved Frame"}
+   ::all   [:saved :random :solid]})
 
-(def all-effects [::saved ::random ::color])
+;; TODO: disable frame tab if no saved frames
+(defn frame-target-tab [timeline-id step-index effect-index target-type
+                        {::keys [tab-name]}]
+  (let [current (<sub [::subs/frame-target timeline-id
+                       step-index effect-index])
+        active? (= (:type current) target-type)]
+    [:li (when active? {:class "uk-active"})
+     (if active?
+       [:a tab-name]
+       [:a {:on-click #(>evt [::events/choose-target-type
+                              timeline-id step-index effect-index
+                              target-type])}
+        tab-name])]))
 
-(defn frame-target-tab [timeline-id step-index effect-id {::keys [tab-name]}]
-  (let [current (<sub [::subs/effect-chosen timeline-id step-index])
-        active? (= current effect-id)
-        attrs   (if active?
-                  {:class "uk-active"}
-                  {:on-click #(>evt [::events/choose-effect
-                                     timeline-id step-index effect-id])})]
-    [:li [:a attrs tab-name]]))
-
-(defn frame-target-editor [timeline-id step-index]
-  (let [selected (<sub [::subs/effect-chosen timeline-id step-index])
-        {::keys [editor]} (get frame-target-editors selected)]
+(defn frame-target-editor [timeline-id step-index effect-index]
+  (let [target (<sub [::subs/frame-target timeline-id step-index
+                      effect-index])
+        type   (:type target)
+        {::keys [editor]} (get frame-target-editors type)]
     (if editor
-      [editor timeline-id step-index]
-      [:p (str "Can't find editor '" selected "'!")])))
+      [editor timeline-id step-index effect-index]
+      [:p (str "Can't find editor '" type "'!")])))
 
-(defn frame-target-nav [timeline-id step-index]
-  [:ul {:data-uk-tab ""}
-   (for [effect-id all-effects
-         :let [props (get frame-target-editors effect-id
+(defn frame-target-nav [timeline-id step-index effect-index]
+  [:ul.uk-subnav.uk-subnav-pill
+   (for [target-type (::all frame-target-editors)
+         :let [props (get frame-target-editors target-type
                           (first frame-target-editors))]]
-     ^{:key effect-id}
-     [frame-target-tab timeline-id step-index effect-id props])])
+     ^{:key target-type}
+     [frame-target-tab timeline-id step-index effect-index
+      target-type props])])
+
+(defn frame-target-chooser [timeline-id step-index effect-index]
+  [:div
+   [:p "Choose Frame Target"]
+   [frame-target-nav timeline-id step-index effect-index]
+   [frame-target-editor timeline-id step-index effect-index]])
+
+(defn tween-controls [timeline-id step-index effect-index effect]
+  [:p "tween-controls, granularity "
+   (:granularity effect) ", durationMs " (:durationMs effect)])
+
+(def effect-types
+  {:replace {::text   "Replace"
+             ::frame? true}
+   :tween   {::text     "Tween"
+             ::frame?   true
+             ::controls tween-controls}
+   ::all    [:replace :tween]})
+
+(defn effect-type-controls [timeline-id step-index effect-index]
+  (assert (some? timeline-id))
+  (let [effect    (<sub [::subs/effect timeline-id step-index effect-index])
+        curr-type (:type effect)]
+    [:div
+     [:ul.uk-subnav.uk-subnav-pill
+      (for [eff-type (::all effect-types)
+            :let [{::keys [text]} (get effect-types eff-type)
+                  active? (= curr-type eff-type)]]
+        ^{:key eff-type}
+        [:li (when active? {:class "uk-active"})
+         [:a
+          {:on-click #(>evt [::events/choose-effect-type timeline-id
+                             step-index effect-index eff-type])}
+          text]])]
+     (when-let [controls (get-in effect-types [curr-type ::controls])]
+       [controls timeline-id step-index effect-index effect])
+     (when (get-in effect-types [curr-type ::frame?])
+       [frame-target-chooser timeline-id step-index effect-index])]))
 
 (defn effect-chooser [timeline-id step-index]
   [:div
-   ;; TODO: effect type, pause, etc
-   [:h2 "Choose Frame Target"]
-   [frame-target-nav timeline-id step-index]
-   [frame-target-editor timeline-id step-index]])
+   (assert (some? timeline-id))
+   [effect-type-controls timeline-id step-index 0]])
 
 (defn effect-display [timeline-id step-index effect-index effect]
   [:div
-   [:p.uk-text-lead
+   [:p.uk-text-muted
     (str "Timeline " timeline-id ", step " step-index ", effect " effect-index)]
    [:p (str effect)]])

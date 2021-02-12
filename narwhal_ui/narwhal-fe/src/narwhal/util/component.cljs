@@ -22,3 +22,11 @@
     (if msg (apply str msg) "An error occurred!")]
    [:p.uk-article
     [link :home-page/home "Home"]]])
+
+(defn slider [props]
+  [:input.uk-range
+   (merge {:type range
+           :value "0"
+           :min 0
+           :max 10000
+           :step 100})])

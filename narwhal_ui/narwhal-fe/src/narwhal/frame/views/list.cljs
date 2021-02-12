@@ -6,7 +6,8 @@
             [narwhal.nav.subs :as nav-subs]
             [fork.re-frame :as fork]
             [narwhal.grid.views :as grid]
-            [re-frame.core :as rf]))
+            [re-frame.core :as rf]
+            [narwhal.util.color :as color]))
 
 (defn frame-clicker
   [frame-id click-event & children]
@@ -17,7 +18,7 @@
                    [:div])]
     (into root children)))
 
-(defn frame-display
+(defn saved-frame-display
   [frame-id frame-name active? click-event]
   (let [card-attr (if active? {:class "uk-card-primary"}
                               {:class "uk-card-default"})]
@@ -37,7 +38,32 @@
      (for [{:keys [id name] :as f} frame-meta
            :let [active? (= active-id id)]]
        ^{:key id}
-       [frame-display id name active? click-event])]))
+       [saved-frame-display id name active? click-event])]))
+
+;; TODO: unify with above; componentize
+(defn random-frame-display
+  [active?]
+  [:div
+   [:div.uk-card.uk-card-body.uk-card-small.uk-card-hover
+    (if active? {:class "uk-card-primary"}
+                {:class "uk-card-default"})
+    [:div.uk-media-top.uk-align-center
+     [grid/random-grid "100px"]]
+    [:div.uk-card-footer
+     [:p.uk-align-center.uk-text-center
+      "Random"]]]])
+
+;; TODO: unify with above; componentize
+(defn solid-frame-display
+  [active? color]
+  [:div.uk-card.uk-card-body.uk-card-small.uk-card-hover
+   (if active? {:class "uk-card-primary"}
+               {:class "uk-card-default"})
+   [:div.uk-media-top.uk-align-center
+    [grid/solid-grid "100px" color]]
+   [:div.uk-card-footer
+    [:p.uk-align-center.uk-text-center.uk-text-small
+     color]]])
 
 (defn create-frame-button []
   [:button.uk-button.uk-button-default

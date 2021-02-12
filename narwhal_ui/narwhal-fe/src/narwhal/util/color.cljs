@@ -1,4 +1,6 @@
-(ns narwhal.util.color)
+(ns narwhal.util.color
+  (:require [lambdaisland.glogi :as log]
+            [goog.color :as gcolor]))
 
 (def named
   "HTML5 named colors, cribbed from https://github.com/thi-ng/color/blob/master/src/presets.org"
@@ -141,3 +143,12 @@
    ::white-smoke           "#f5f5f5"
    ::yellow                "#ffff00"
    ::yellow-green          "#9acd32"})
+
+(def black (::black named))
+
+(defn random []
+  (let [r (rand-int 256)
+        g (rand-int 256)
+        b (rand-int 256)]
+    (log/spy [r g b])
+    (gcolor/rgbToHex r g b)))

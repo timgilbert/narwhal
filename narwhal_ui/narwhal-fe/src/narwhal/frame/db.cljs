@@ -26,6 +26,12 @@
 (defn frame-by-id [db frame-id]
   (get-in db (frame-path :f/all frame-id)))
 
+(defn first-frame-id [db]
+  (some->> (get-in db (frame-path :f/all))
+           keys
+           sort
+           first))
+
 (defn ^:private scratch-id [i]
   (str "scratch-" (gstring/padNumber i 2)))
 
@@ -38,7 +44,7 @@
         potential-id))))
 
 (defn with-scratch-metadata [db frame-data]
-  (let [scratch-id (next-scratch-id db)
+  (let [scratch-id   (next-scratch-id db)
         scratch-name (-> scratch-id
                          (gstring/replaceAll "-" " ")
                          (gstring/toTitleCase))]

@@ -33,29 +33,33 @@
                      (db/set-dirty new-timeline-id))})))
 
 (rf/reg-event-db
-  ::choose-effect
-  (fn [db [_ timeline-id step effect-id]]
-    (assoc-in db (db/timeline-path :t/edit timeline-id step :t/selected-effect)
-              effect-id)))
+  ::select-saved-frame-target
+  (fn [db [_ timeline-id step-index effect-index frame-id]]
+    (db/replace-saved-frame-target-id db timeline-id step-index effect-index
+                                      frame-id)))
+
+;; Effect frame targets
 
 (rf/reg-event-db
-  ::select-saved-frame-target
-  (fn [db [_ timeline-id step frame-id]]
-    (assoc-in db (db/timeline-path :t/edit timeline-id step
-                                   :t/frame-target :t/saved)
-              frame-id)))
+  ::choose-effect-type
+  (fn [db [_ timeline-id step-index effect-index eff-type]]
+    (db/replace-effect-type db timeline-id step-index effect-index eff-type)))
 
+(rf/reg-event-db
+  ::choose-target-type
+  (fn [db [_ timeline-id step-index effect-index target-type]]
+    (log/spy [timeline-id step-index effect-index target-type])
+    (db/replace-frame-target-type db timeline-id step-index effect-index
+                                  target-type)))
 
 ;; Steps
 
 (rf/reg-event-db
   ::add-step
   (fn [db [_ timeline-id]]
-    (let [timeline (db/timeline-by-id db timeline-id)
-          new-step (db/new-blank-step)
-          new-timeline (update timeline :steps conj new-step)]
-      (log/spy timeline-id)
-      (log/spy new-timeline)
+    (let [timeline     (db/timeline-by-id db timeline-id)
+          new-step     (db/new-blank-step db)
+          new-timeline (update-in timeline [:timeline :steps] conj new-step)]
       (-> db
           (db/replace-single-timeline new-timeline)
           (db/set-dirty timeline-id)))))
@@ -66,6 +70,7 @@
     (db/update-step db timeline-id step-index)))
 
 ;; Timeline persistence
+
 (rf/reg-event-fx
   ::create-timeline
   (fn [{:keys [db]} [_ timeline-id]]

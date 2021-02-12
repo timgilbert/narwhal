@@ -5,7 +5,8 @@
             [narwhal.grid.subs :as subs]
             [narwhal.frame.subs :as frame-subs]
             [narwhal.util.color :as color]
-            [narwhal.util.component :as component]))
+            [narwhal.util.component :as component]
+            [narwhal.grid.db :as db]))
 
 (defn tool-icon [tool icon-name]
   (let [selected? (= (<sub [::subs/active-tool]) tool)
@@ -118,8 +119,10 @@
   [base-svg-cell (assoc attrs ::gutter-color color)])
 
 (defn ^:private base-grid
-  [{::keys [frame-id grid-length cell-component gutter-size gutter-color]}]
-  (let [{:keys [height width pixels]} (<sub [::subs/frame-data frame-id])
+  [{::keys [frame-id grid-length cell-component gutter-size gutter-color
+            grid-data]}]
+  (let [data      (or grid-data (<sub [::subs/frame-data frame-id]))
+        {:keys [height width pixels]} data
         cell-size 100
         vb-width  (* width cell-size)
         vb-height (* height cell-size)
@@ -170,3 +173,13 @@
   [base-grid {::frame-id       frame-id
               ::grid-length    (or size "600px")
               ::cell-component svg-thumb-cell}])
+
+(defn random-grid [size]
+  [base-grid {::grid-length    (or size "600px")
+              ::cell-component svg-thumb-cell
+              ::grid-data      db/random-grid-data}])
+
+(defn solid-grid [size color]
+  [base-grid {::grid-length    (or size "600px")
+              ::cell-component svg-thumb-cell
+              ::grid-data      (db/solid-grid-data color)}])

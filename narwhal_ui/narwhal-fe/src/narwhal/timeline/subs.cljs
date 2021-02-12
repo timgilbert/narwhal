@@ -61,29 +61,50 @@
 (rf/reg-sub
   ::timeline-steps
   (util/signal ::timeline-meta-by-id)
-  (fn [timeline]
-    (:steps timeline [])))
+  (fn [timeline-meta _]
+    (get-in timeline-meta [:timeline :steps])))
 
 (rf/reg-sub
   ::timeline-step
-  (fn [_ timeline-id _step]
-    (rf/subscribe [::timeline-steps timeline-id]))
-  (fn [timeline-steps [_ _ step]]
-    (nth timeline-steps step nil)))
+  (util/signal ::timeline-steps)
+  (fn [timeline-steps [_ _timeline-id step-index]]
+    (log/spy step-index)
+    (log/spy timeline-steps)
+    (log/spy (number? step-index))
+    (assert (number? step-index))
+    (nth timeline-steps step-index nil)))
+
+(rf/reg-sub
+  ::effects-for-step
+  (util/signal ::timeline-step)
+  (fn [step _]
+    (:effects step)))
+
+(rf/reg-sub
+  ::effect
+  (util/signal ::effects-for-step)
+  (fn [effects [_ _timeline-id _step-index effect-index]]
+    (assert (number? effect-index))
+    (nth effects effect-index nil)))
 
 (rf/reg-sub
   ::edit-state-root
   (fn [db _] (get-in db (db/timeline-path :t/edit))))
 
 (rf/reg-sub
-  ::effect-chosen
-  :<- [::edit-state-root]
-  (fn [root [_ timeline-id step]]
-    (get-in root [timeline-id step :t/selected-effect]
-            db/default-selected-effect)))
+  ::frame-target
+  (util/signal ::effect)
+  (fn [effect _]
+    (:target effect)))
 
 (rf/reg-sub
   ::selected-saved-frame-target
-  :<- [::edit-state-root]
-  (fn [root [_ timeline-id step]]
-    (get-in root [timeline-id step :t/frame-target :t/saved])))
+  (util/signal ::frame-target)
+  (fn [target _]
+    (get target :frameId)))
+
+(rf/reg-sub
+  ::solid-frame-color
+  (util/signal ::frame-target)
+  (fn [target _]
+    (get target :color)))
