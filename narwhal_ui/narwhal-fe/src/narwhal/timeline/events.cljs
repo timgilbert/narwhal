@@ -4,6 +4,15 @@
             [narwhal.util.util :as util :refer [<sub >evt]]
             [narwhal.timeline.db :as db]))
 
+;; Edit state
+(rf/reg-event-db
+  ::edit-effect
+  (fn [db [_ timeline-id step-index effect-index state]]
+    (db/update-edit-state
+      db
+      [timeline-id step-index effect-index]
+      state)))
+
 (rf/reg-event-db
   ::update-title
   (fn [db [_ timeline-id {:keys [values] :as evt}]]
@@ -48,9 +57,21 @@
 (rf/reg-event-db
   ::choose-target-type
   (fn [db [_ timeline-id step-index effect-index target-type]]
-    (log/spy [timeline-id step-index effect-index target-type])
     (db/replace-frame-target-type db timeline-id step-index effect-index
                                   target-type)))
+
+;; Effects
+
+(rf/reg-event-db
+  ::insert-effect
+  (fn [db [_ timeline-id step-index effect-index]]
+    (let [step     (db/get-step db timeline-id step-index)
+          [before after] (split-at effect-index (:effects step))
+          effects  (concat before [(db/new-default-effect db)] after)
+          new-step (assoc step :effects effects)]
+      (-> db
+          (db/assoc-step timeline-id step-index new-step)
+          (db/set-dirty timeline-id)))))
 
 ;; Steps
 
@@ -59,7 +80,7 @@
   (fn [db [_ timeline-id]]
     (let [timeline     (db/timeline-by-id db timeline-id)
           new-step     (db/new-blank-step db)
-          new-timeline (update-in timeline [:timeline :steps] conj new-step)]
+          new-timeline (update timeline :steps conj new-step)]
       (-> db
           (db/replace-single-timeline new-timeline)
           (db/set-dirty timeline-id)))))
@@ -74,9 +95,9 @@
 (rf/reg-event-fx
   ::create-timeline
   (fn [{:keys [db]} [_ timeline-id]]
-    (let [timeline (db/timeline-by-id db timeline-id)]
+    (let [timeline-meta (db/timeline-meta-by-id db timeline-id)]
       {:dispatch [:graphql/run :timeline-gql/create-timeline
-                  (db/dehydrate timeline ::db/create)]})))
+                  (db/dehydrate timeline-meta ::db/create)]})))
 
 (rf/reg-event-fx
   :timeline-gql/timeline-created
@@ -92,15 +113,15 @@
 (rf/reg-event-fx
   ::update-timeline
   (fn [{:keys [db]} [_ timeline-id]]
-    (let [timeline (db/timeline-by-id db timeline-id)]
+    (let [timeline-meta (db/timeline-meta-by-id db timeline-id)]
       {:dispatch [:graphql/run :timeline-gql/update-timeline
-                  (db/dehydrate timeline)]})))
+                  (db/dehydrate timeline-meta)]})))
 
 (rf/reg-event-db
   :timeline-gql/timeline-updated
   (fn [db [_ payload]]
     (let [timeline-id (-> payload :timeline :id)]
-      (assert (some? (db/timeline-by-id db timeline-id)))
+      (assert (some? (db/timeline-meta-by-id db timeline-id)))
       (log/info "Updated timeline" timeline-id)
       (-> db
           (db/set-clean timeline-id)
@@ -131,7 +152,7 @@
   :timeline-gql/timeline-reverted
   (fn [db [_ payload]]
     (let [timeline-id (-> payload :id)]
-      (assert (some? (db/timeline-by-id db timeline-id)))
+      (assert (some? (db/timeline-meta-by-id db timeline-id)))
       (log/info "Reverted timeline" timeline-id)
       (-> db
           (db/set-clean timeline-id)

@@ -5,6 +5,30 @@
             [narwhal.timeline.db :as db]
             [clojure.string :as string]))
 
+;; Edit (transitory state for editor)
+(rf/reg-sub
+  ::edit-root
+  (fn [db _] (get-in db (db/edit-path))))
+
+(rf/reg-sub
+  ::editing-step?
+  :<- ::edit-root
+  (fn [root [_ timeline-id step-index]]
+    (assert (some? timeline-id))
+    (assert (number? step-index))
+    (get root [timeline-id step-index] false)))
+
+(rf/reg-sub
+  ::editing-effect?
+  :<- ::edit-root
+  (fn [root [_ timeline-id step-index effect-index]]
+    (assert (some? timeline-id))
+    (assert (number? step-index))
+    (assert (number? effect-index))
+    (get root [timeline-id step-index effect-index] false)))
+
+;; Timeline
+
 (rf/reg-sub
   ::timeline-root
   (fn [db _] (get-in db (db/timeline-path :t/all))))

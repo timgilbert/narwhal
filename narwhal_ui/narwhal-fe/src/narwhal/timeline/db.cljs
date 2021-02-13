@@ -11,6 +11,23 @@
 (defn timeline-path [& rest]
   (concat [:t/timelines] rest))
 
+(defn edit-path [& rest]
+  (concat [:t/edit] rest))
+
+(defn get-edit-state [db edit-tuple]
+  (assert (seq? edit-tuple))
+  (assert (every? some? edit-tuple))
+  (get-in db (edit-path edit-tuple) false))
+
+(defn update-edit-state [db edit-tuple state]
+  (assert (seq? edit-tuple))
+  (assert (boolean? state))
+  (assert (every? some? edit-tuple))
+  (let [path (edit-path edit-tuple)]
+    (if state
+      (assoc-in db path true)
+      (update-in db dissoc path))))
+
 (defn replace-all-timelines
   [db timeline-list]
   (let [new-all (->> timeline-list
@@ -26,8 +43,13 @@
     (assert (some? timeline-id))
     (assoc-in db (timeline-path :t/all timeline-id) new-timeline)))
 
-(defn timeline-by-id [db timeline-id]
+(defn timeline-meta-by-id [db timeline-id]
   (get-in db (timeline-path :t/all timeline-id)))
+
+(defn timeline-by-id [db timeline-id]
+  (-> db
+      (timeline-meta-by-id timeline-id)
+      :timeline))
 
 (defn dehydrate
   ([timeline-meta]
@@ -49,7 +71,7 @@
 (defn next-scratch-id [db]
   (loop [i 1]
     (let [potential-id (scratch-id i)]
-      (if (some? (timeline-by-id db potential-id))
+      (if (some? (timeline-meta-by-id db potential-id))
         (recur (inc i))
         potential-id))))
 
@@ -73,14 +95,14 @@
 
 (defn new-default-frame-target
   ([db]
-   (new-default-frame-target db :RANDOM_FRAME))
+   (new-default-frame-target db "RANDOM_FRAME"))
   ([db target-type]
    (log/spy target-type)
    (merge
      {:type target-type}
      (case target-type
-       :SOLID_FRAME {:color color/black}
-       :SAVED_FRAME {:frameId (frame-db/first-frame-id db)}
+       "SOLID_FRAME" {:color color/black}
+       "SAVED_FRAME" {:frameId (frame-db/first-frame-id db)}
        nil))))
 
 (defn new-default-effect
@@ -111,10 +133,13 @@
   [db timeline-id step-index step]
   (assert (every? some? [timeline-id step]))
   (assert (number? step-index))
-  (let [timeline (timeline-by-id db timeline-id)
-        steps    (-> (get timeline :steps [])
+  (let [meta     (timeline-meta-by-id db timeline-id)
+        steps    (-> (get-in meta [:timeline :steps] [])
                      (assoc step-index step))
-        new-tl   (assoc-in timeline [:timeline :steps] steps)]
+        new-tl   (assoc-in meta [:timeline :steps] steps)]
+    ;(log/spy (:steps timeline))
+    ;(log/spy steps)
+    ;(log/spy (assoc (:steps timeline) step-index step))
     (replace-single-timeline db new-tl)))
 
 (defn get-effect
@@ -122,7 +147,7 @@
   (assert (some? timeline-id))
   (assert (every? number? [step-index effect-index]))
   (let [timeline (timeline-by-id db timeline-id)]
-    (get-in timeline [:timeline :steps step-index :effects effect-index]
+    (get-in timeline [:steps step-index :effects effect-index]
             nil)))
 
 (defn get-target
@@ -172,6 +197,7 @@
 
 (defn init-db [db]
   (-> db
-      (replace-all-timelines [])))
+      (replace-all-timelines [])
+      (assoc-in (edit-path) {})))
 
 (def default-selected-effect :narwhal.timeline.views.effects/saved)

@@ -12,8 +12,11 @@
 
 (defn icon
   ([icon-name] (icon icon-name nil))
-  ([icon-name props]
-   [:span (merge {:data-uk-icon icon-name} props)]))
+  ([icon-name props] (icon icon-name props 1))
+  ([icon-name props ratio]
+   [:span (merge {:data-uk-icon
+                  (str "icon:" icon-name "; ratio:" ratio)}
+                 props)]))
 
 (defn error-page [& msg]
   [:article.uk-article
@@ -25,7 +28,7 @@
 
 (defn slider [props]
   [:input.uk-range
-   (merge {:type range
+   (merge {:type :range
            :value "0"
            :min 0
            :max 10000

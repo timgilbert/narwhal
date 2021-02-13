@@ -40,13 +40,13 @@
                                    timeline-id step-index effect-index]}]))])
 
 (def frame-target-editors
-  {:SOLID_FRAME  {::editor   solid-frame-target-editor
-                  ::tab-name "Solid Color"}
-   :RANDOM_FRAME {::editor   random-frame-target-editor
-                  ::tab-name "Random Frame"}
-   :SAVED_FRAME  {::editor   saved-frame-target-editor
-                  ::tab-name "Saved Frame"}
-   ::all         [:RANDOM_FRAME :SAVED_FRAME :SOLID_FRAME]})
+  {"SOLID_FRAME"  {::editor   solid-frame-target-editor
+                   ::tab-name "Solid Color"}
+   "RANDOM_FRAME" {::editor   random-frame-target-editor
+                   ::tab-name "Random Frame"}
+   "SAVED_FRAME"  {::editor   saved-frame-target-editor
+                   ::tab-name "Saved Frame"}
+   ::all         ["RANDOM_FRAME" "SAVED_FRAME" "SOLID_FRAME"]})
 
 ;; TODO: disable frame tab if no saved frames
 (defn frame-target-tab [timeline-id step-index effect-index target-type
