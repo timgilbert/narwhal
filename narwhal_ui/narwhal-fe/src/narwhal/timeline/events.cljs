@@ -2,7 +2,8 @@
   (:require [lambdaisland.glogi :as log]
             [re-frame.core :as rf]
             [narwhal.util.util :as util :refer [<sub >evt]]
-            [narwhal.timeline.db :as db]))
+            [narwhal.timeline.db :as db]
+            [narwhal.util.edit-state :as edit]))
 
 ;; Edit state
 
@@ -42,16 +43,20 @@
 
 ;; Effect frame targets
 
-(rf/reg-event-db
+;; TODO: just alter type here
+(rf/reg-event-fx
   ::choose-effect-type
-  (fn [db [_ timeline-id step-index effect-index eff-type]]
-    (db/replace-effect-type db timeline-id step-index effect-index eff-type)))
+  (fn [{:keys [db]} [_ timeline-id step-index effect-index eff-type]]
+    {:db       (db/replace-effect-type
+                 db timeline-id step-index effect-index eff-type)
+     :dispatch [::edit/clear-editing ::edit/timeline]}))
 
-(rf/reg-event-db
+(rf/reg-event-fx
   ::choose-target-type
-  (fn [db [_ timeline-id step-index effect-index target-type]]
-    (db/replace-frame-target-type db timeline-id step-index effect-index
-                                  target-type)))
+  (fn [{:keys [db]} [_ timeline-id step-index effect-index target-type]]
+    {:db       (db/replace-frame-target-type
+                 db timeline-id step-index effect-index target-type)
+     :dispatch [::edit/clear-editing ::edit/timeline]}))
 
 ;; Effects
 

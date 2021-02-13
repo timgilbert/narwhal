@@ -35,3 +35,5 @@ To create a production build run:
     - Maybe [this?](https://github.com/pmkroeker/rasterize-svg/blob/master/src/rasterize.ts])
 - Better dirty handling
   - Copy server response on receipt
+- Use maps instead of big tuples fro effect addresses
+- DRY up effect/target type editors

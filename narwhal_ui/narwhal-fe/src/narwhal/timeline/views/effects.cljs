@@ -96,10 +96,12 @@
    (:granularity effect) ", durationMs " (:durationMs effect)])
 
 (def effect-types
-  {"REPLACE_EFFECT" {::text   "Replace"
-                     ::frame? true
-                     ::icon   "grid"}
+  {"REPLACE_EFFECT" {::text     "Replace"
+                     ::tab-name "Replace"
+                     ::frame?   true
+                     ::icon     "grid"}
    "TWEEN_EFFECT"   {::text     "Tween"
+                     ::tab-name "Tween"
                      ::frame?   true
                      ::icon     "move"
                      ::controls tween-controls}
@@ -176,7 +178,7 @@
       [:div]
       [:div
        [:div.uk-card.uk-card-default
-        (for [t-type  (::all frame-target-editors)
+        (for [t-type (::all frame-target-editors)
               :let [{::keys [icon tab-name]} (get frame-target-editors t-type)
                     active? (= t-type current)
                     event   (if active?
@@ -185,6 +187,32 @@
                                timeline-id step-index effect-index
                                t-type])]]
           ^{:key t-type}
+          [:div
+           (when active? {:class "uk-background-primary"})
+           [component/icon icon
+            {:data-uk-tooltip (str "title: " tab-name " >" active? "; pos: top")
+             :on-click        #(>evt event)}
+            "1.5"]])]])))
+
+(defn effect-thumb-effect-type-editor
+  [timeline-id step-index effect-index effect]
+  (let [edit-tuple [::edit/effect-type timeline-id
+                    step-index effect-index]
+        editing?   (<sub [::edit/editing? ::edit/timeline edit-tuple])
+        current    (some-> effect :type)]
+    (if-not editing?
+      [:div]
+      [:div
+       [:div.uk-card.uk-card-default
+        (for [e-type (::all effect-types)
+              :let [{::keys [icon tab-name]} (get effect-types e-type)
+                    active? (= e-type current)
+                    event   (if active?
+                              [::edit/clear-editing ::edit/timeline]
+                              [::events/choose-effect-type
+                               timeline-id step-index effect-index
+                               e-type])]]
+          ^{:key e-type}
           [:div
            (when active? {:class "uk-background-primary"})
            [component/icon icon
@@ -244,6 +272,8 @@
     [:div.uk-flex.uk-flex-around.uk-flex-middle
      [effect-thumb-effect-icons timeline-id step-index effect-index effect]
      [effect-thumb-effect-target-type-editor
+      timeline-id step-index effect-index effect]
+     [effect-thumb-effect-type-editor
       timeline-id step-index effect-index effect]
      [effect-thumb-frame-target timeline-id step-index effect-index effect]]]
    [:div.uk-width-expand
