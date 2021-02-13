@@ -9,14 +9,38 @@
             [re-frame.core :as rf]
             [narwhal.util.color :as color]
             [narwhal.util.edit-state :as edit]
-            [narwhal.grid.views :as grid]))
+            [narwhal.grid.views :as grid]
+            [fork.re-frame :as fork]))
+
+(defn color-picker
+  [{:keys [props values handle-change handle-blur]}]
+  [:div
+   [:label.uk-form-label {:for :color} "Choose Color"]
+   [:input.uk-input
+    {:type      "color"
+     :name      :color
+     :on-change (fn [js-evt]
+                  (handle-change js-evt)
+                  (>evt [::events/set-solid-frame-color (::addr props)
+                         (fork/retrieve-event-value js-evt)]))
+     :on-blur  (fn [js-evt]
+                 (handle-blur js-evt)
+                 (>evt [::edit/clear-editing ::edit/timeline]))
+     :value    (get values :color)}]])
 
 (defn solid-frame-target-editor
   [timeline-id step-index effect-index]
   (let [color (<sub [::subs/solid-frame-color
                      timeline-id step-index effect-index])]
-    [:div.uk-flex.uk-flex-wrap.uk-flex-wrap-around
-     [frame-list/solid-frame-display true color]]))
+    [:form.uk-form-stacked
+     [fork/form
+      {:props             {::addr [timeline-id step-index effect-index]}
+       :initial-values    {:color color}
+       :prevent-default?  true
+       :clean-on-unmount? true
+       :keywordize-keys   true
+       :path              [::edit-color timeline-id step-index effect-index]}
+      color-picker]]))
 
 (defn random-frame-target-editor
   [_timeline-id _step-index _effect-index]
@@ -96,15 +120,17 @@
    (:granularity effect) ", durationMs " (:durationMs effect)])
 
 (def effect-types
-  {"REPLACE_EFFECT" {::text     "Replace"
-                     ::tab-name "Replace"
-                     ::frame?   true
-                     ::icon     "grid"}
-   "TWEEN_EFFECT"   {::text     "Tween"
-                     ::tab-name "Tween"
-                     ::frame?   true
-                     ::icon     "move"
-                     ::controls tween-controls}
+  {"REPLACE_EFFECT" {::text       "Replace"
+                     ::tab-name   "Replace"
+                     ::frame?     true
+                     ::immediate? true
+                     ::icon       "grid"}
+   "TWEEN_EFFECT"   {::text       "Tween"
+                     ::tab-name   "Tween"
+                     ::frame?     true
+                     ::icon       "move"
+                     ::immediate? false
+                     ::controls   tween-controls}
    ::all            ["REPLACE_EFFECT" "TWEEN_EFFECT"]})
 
 (defn effect-type-controls [timeline-id step-index effect-index]
@@ -145,7 +171,8 @@
                                              edit-tuple])}
         edit-props {:class           "uk-background-primary"
                     :data-uk-tooltip "title: Click to cancel; pos: top"
-                    :on-click        #(>evt [::edit/clear-editing ::edit/timeline])}]
+                    :on-click        #(>evt [::edit/clear-editing
+                                             ::edit/timeline])}]
     [:div
      (if editing? edit-props show-props)
      [component/icon icon-name nil "1.5"]]))
@@ -229,13 +256,19 @@
 
 (defn effect-thumb-frame-target
   [timeline-id step-index effect-index {:keys [target]}]
-  (let [editing? (<sub [::edit/editing? ::edit/timeline
-                        [::edit/target timeline-id step-index effect-index]])]
+  (let [editing?  (<sub [::edit/editing? ::edit/timeline
+                         [::edit/target timeline-id step-index effect-index]])
+        editable? (or (not= (:type target) "RANDOM_FRAME") editing?)]
     [:div.uk-padding-small
-     (if editing?
-       {:data-uk-tooltip "title: Click to edit; pos: right"}
-       {:on-click #(>evt [::edit/set-editing ::edit/timeline
-                          [::edit/target timeline-id step-index effect-index]])})
+     (cond
+       editing?
+       {:data-uk-tooltip "title: Click to close; pos: top"
+        :on-click        #(>evt [::edit/clear-editing ::edit/timeline])}
+       editable?
+       {:data-uk-tooltip "title: Click to edit target details; pos: top"
+        :on-click        #(>evt [::edit/set-editing ::edit/timeline
+                                 [::edit/target timeline-id step-index
+                                  effect-index]])})
      (case (:type target)
        "RANDOM_FRAME"
        [grid/random-grid "60px"]
@@ -245,10 +278,72 @@
        [grid/thumbnail-grid (:frameId target) "60px"]
        [:p "Unknown type " (:type target)])]))
 
-(defn effect-thumb-frame-controls [effect]
+(defn effect-thumb-pause-control
+  [{:keys [props] :as fork-props}]
+  ;; TODO: this should be click-to-edit
   [:div
-   [:p.uk-text-muted
-    (str effect)]])
+   [component/number-control fork-props
+    #:component{:field-name :pauseMs
+                :blur-event ::events/set-effect-pause-ms
+                :event-args (::addr props)
+                :label      "Pause (ms)"
+                :tooltip    (str "title: Pause for this many milliseconds "
+                                 "after this event finishes; pos: top")}]])
+
+(defn effect-thumb-duration-control
+  [{:keys [props] :as fork-props}]
+  [:div
+   (when-not (-> props ::config ::immediate?)
+     [component/number-control fork-props
+      #:component{:field-name :durationMs
+                  :blur-event ::events/set-effect-duration-ms
+                  :event-args (::addr props)
+                  :label      "Duration (ms)"
+                  :tooltip    (str "title: This event will occur over this "
+                                   "many milliseconds; pos: top")}])])
+
+(defn effect-thumb-granularity-control
+  [{:keys [props] :as fork-props}]
+  [:div
+   (when-not (-> props ::config ::immediate?)
+     [component/number-control fork-props
+      #:component{:field-name :granularity
+                  :blur-event ::events/set-effect-granularity
+                  :event-args (::addr props)
+                  :label      "Granularity"
+                  :minimum    1
+                  :step       1
+                  :tooltip    (str "title: The number of intermediate frames "
+                                   "generated during the effect's duration; "
+                                   "pos: top")}])])
+
+(defn effect-thumb-effect-controls
+  [{:keys [props] :as fork-props}]
+  [:div {:data-uk-grid ""}
+   [:div.uk-width-auto
+    [effect-thumb-pause-control fork-props]]
+   [:div.uk-width-auto
+    [effect-thumb-duration-control fork-props]]
+   [:div.uk-width-auto
+    [effect-thumb-granularity-control fork-props]]
+   [:div.uk-width-expand.uk-text-center]])
+;[:p.uk-text-muted (str (::effect props))]]])
+
+(defn effect-thumb-effect-form
+  [timeline-id step-index effect-index effect]
+  [:form.uk-form-stacked
+   [fork/form
+    {:props             {::addr   [timeline-id step-index effect-index]
+                         ::effect effect
+                         ::config (get effect-types (:type effect))}
+     :initial-values    {:pauseMs     (:pauseMs effect)
+                         :durationMs  (:durationMs effect)
+                         :granularity (:granularity effect)}
+     :prevent-default?  true
+     :clean-on-unmount? true
+     :keywordize-keys   true
+     :path              [::edit-effect-form timeline-id step-index effect-index]}
+    effect-thumb-effect-controls]])
 
 (defn effect-insert-delete-controls
   [timeline-id step-index effect-index effect]
@@ -266,6 +361,17 @@
      :on-click        #(>evt [::events/insert-effect timeline-id
                               step-index (inc effect-index)])}]])
 
+(defn effect-detail-controls
+  [timeline-id step-index effect-index effect]
+  (let [frame-type (-> effect :target :type)
+        config     (get frame-target-editors frame-type)
+        control    (get config ::editor)]
+    (if (and (<sub [::edit/editing? ::edit/timeline
+                    [::edit/target timeline-id step-index effect-index]])
+             (some? control))
+      [control timeline-id step-index effect-index effect]
+      [effect-thumb-effect-form timeline-id step-index effect-index effect])))
+
 (defn effect-thumbnail [timeline-id step-index effect-index effect]
   [:div {:data-uk-grid ""}
    [:div.uk-width-auto.uk-text-center
@@ -277,7 +383,7 @@
       timeline-id step-index effect-index effect]
      [effect-thumb-frame-target timeline-id step-index effect-index effect]]]
    [:div.uk-width-expand
-    [effect-thumb-frame-controls effect]]
+    [effect-detail-controls timeline-id step-index effect-index effect]]
    [:div.uk-width-1-6.uk-text-center
     [effect-insert-delete-controls timeline-id step-index effect-index]]])
 

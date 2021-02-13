@@ -47,15 +47,19 @@
 (rf/reg-event-fx
   ::choose-effect-type
   (fn [{:keys [db]} [_ timeline-id step-index effect-index eff-type]]
-    {:db       (db/replace-effect-type
-                 db timeline-id step-index effect-index eff-type)
+    {:db       (-> db
+                   (db/replace-effect-type
+                     timeline-id step-index effect-index eff-type)
+                   (db/set-dirty timeline-id))
      :dispatch [::edit/clear-editing ::edit/timeline]}))
 
 (rf/reg-event-fx
   ::choose-target-type
   (fn [{:keys [db]} [_ timeline-id step-index effect-index target-type]]
-    {:db       (db/replace-frame-target-type
-                 db timeline-id step-index effect-index target-type)
+    {:db       (-> db
+                   (db/replace-frame-target-type
+                     timeline-id step-index effect-index target-type)
+                   (db/set-dirty timeline-id))
      :dispatch [::edit/clear-editing ::edit/timeline]}))
 
 ;; Effects
@@ -72,14 +76,44 @@
           (db/set-dirty timeline-id)))))
 
 (rf/reg-event-db
-  ::set-effect-edit-state
-  (fn [db [_ timeline-id step-index effect-index]]
-    (db/set-edit-state db [timeline-id step-index effect-index])))
+  ::set-effect-pause-ms
+  (fn [db [_ [timeline-id step-index effect-index] value]]
+    (let [effect (-> db
+                     (db/get-effect timeline-id step-index effect-index)
+                     (assoc :pauseMs value))]
+      (-> db
+          (db/assoc-effect timeline-id step-index effect-index effect)
+          (db/set-dirty timeline-id)))))
 
 (rf/reg-event-db
-  ::clear-effect-edit-state
-  (fn [db [_ timeline-id step-index effect-index]]
-    (db/clear-edit-state db)))
+  ::set-effect-duration-ms
+  (fn [db [_ [timeline-id step-index effect-index] value]]
+    (let [effect (-> db
+                     (db/get-effect timeline-id step-index effect-index)
+                     (assoc :durationMs value))]
+      (-> db
+          (db/assoc-effect timeline-id step-index effect-index effect)
+          (db/set-dirty timeline-id)))))
+
+(rf/reg-event-db
+  ::set-effect-granularity
+  (fn [db [_ [timeline-id step-index effect-index] value]]
+    (let [effect (-> db
+                     (db/get-effect timeline-id step-index effect-index)
+                     (assoc :granularity value))]
+      (-> db
+          (db/assoc-effect timeline-id step-index effect-index effect)
+          (db/set-dirty timeline-id)))))
+
+(rf/reg-event-db
+  ::set-solid-frame-color
+  (fn [db [_ [timeline-id step-index effect-index] color]]
+    (let [effect (-> db
+                     (db/get-effect timeline-id step-index effect-index)
+                     (assoc-in [:target :color] color))]
+      (-> db
+          (db/assoc-effect timeline-id step-index effect-index effect)
+          (db/set-dirty timeline-id)))))
 
 ;; Steps
 

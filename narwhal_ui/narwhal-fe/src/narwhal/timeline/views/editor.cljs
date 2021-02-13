@@ -66,8 +66,10 @@
      ;[add-effect-control timeline-id step-index
      ; (count effects) nil]]))
 
-(defn no-steps-message [_timeline-id]
-  [:p "No steps yet!"])
+(defn no-steps-message [timeline-id]
+  [:div
+   [:p "No steps yet!"]
+   [step-controls timeline-id 0]])
 
 (defn step-repeat-display
   [timeline-id step-index {:keys [repetitions]}]
@@ -119,7 +121,13 @@
 
 (defn timeline-edit-page
   [route]
-  (let [timeline-id (-> route :path-params :timeline-id)]
-    (if (<sub [::subs/timeline-exists? timeline-id])
+  (let [timeline-id (-> route :path-params :timeline-id)
+        exists?     (<sub [::subs/timeline-exists? timeline-id])
+        loaded?     (<sub [:nav/loaded? timeline-id])]
+    (cond
+      exists?
       [timeline-editor timeline-id]
-      [component/error-page "Can't find timeline-id " timeline-id])))
+      loaded?
+      [component/error-page "Can't find timeline-id " timeline-id]
+      :else
+      [component/spinner-page])))

@@ -27,7 +27,6 @@
         json-pp (JsonPrettyPrinter.)
         js-str  (.format json-pp js)]
     [:div
-     ;[:p.uk-text-muted (str clj-str)]
      [:pre js-str]]))
 
 (defn for-children

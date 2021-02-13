@@ -20,6 +20,12 @@
     (:nav/page root)))
 
 (rf/reg-sub
+  :nav/loaded?
+  :<- [::pages-root]
+  (fn [root _]
+    (:nav/loaded? root false)))
+
+(rf/reg-sub
   ::active-frame-id
   :<- [::router-subs/current-route]
   (fn [route]

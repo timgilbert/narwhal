@@ -37,3 +37,4 @@ To create a production build run:
   - Copy server response on receipt
 - Use maps instead of big tuples fro effect addresses
 - DRY up effect/target type editors
+- Spinner on initial load

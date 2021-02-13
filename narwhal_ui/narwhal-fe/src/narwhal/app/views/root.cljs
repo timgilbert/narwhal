@@ -22,6 +22,7 @@
 (defn app
   []
   (let [route   (<sub ::router-subs/current-route)
+        loaded? (<sub :nav/loaded?)
         page    (or (-> route :data :name) :home-page/home)
         handler (get handlers page component/error-page)]
     (assert (some? route))
@@ -32,4 +33,6 @@
       [:div {:class "uk-width-1-6@s"}
        [nav/side-nav]]
       [:div {:class "uk-width-expand"}
-       [handler route]]]]))
+       (if  loaded?
+         [handler route]
+         [component/spinner-page])]]]))
