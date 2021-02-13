@@ -31,54 +31,77 @@
 
 (defn add-effect-control
   [timeline-id step-index effect-index _effect]
-  [component/icon
-   "plus-circle"
-   {:data-uk-tooltip (str "title: Click here to insert an effect "
-                          "at element " effect-index ";"
-                          "pos: right")
-    :on-click        #(>evt [::events/insert-effect timeline-id
-                             step-index effect-index])}])
+  [:span])
+  ;[component/icon
+  ; "plus-circle"
+  ; {:data-uk-tooltip (str "title: Click here to insert an effect "
+  ;                        "at element " effect-index ";"
+  ;                        "pos: right")
+  ;  :on-click        #(>evt [::events/insert-effect timeline-id
+  ;                           step-index effect-index])}])
 
 (defn no-effects-message [timeline-id step-index]
   [:div
    [:p "No effects yet!"]])
+
+(defn step-controls [timeline-id step-index step]
+  [:div
+   [:hr]
+   [:p "reps: " (:repetitions step) ", pause: " (:pauseMs step)]
+   [:button.uk-button.uk-button-default
+    {:on-click #(>evt [::events/add-step timeline-id])}
+    "Add Step"]])
 
 (defn step-display [timeline-id step-index step]
   (let [{:keys [effects]} step]
     [:div.uk-width-5-6
      (if (empty? effects)
        [no-effects-message timeline-id step-index]
-       [util/for-children effects
-        [:div]
-        [add-effect-control timeline-id step-index]
-        [effects/effect-display timeline-id step-index]])
-     [add-effect-control timeline-id step-index
-      (count effects) nil]]))
+       [:div
+        [util/for-children effects
+         [:div]
+         ;[add-effect-control timeline-id step-index]
+         [effects/effect-display timeline-id step-index]]
+        [step-controls timeline-id step-index step]])]))
+     ;[add-effect-control timeline-id step-index
+     ; (count effects) nil]]))
 
 (defn no-steps-message [_timeline-id]
   [:p "No steps yet!"])
 
+(defn step-repeat-display
+  [timeline-id step-index {:keys [repetitions]}]
+  [:div.uk-flex.uk-flex-column
+   (if (= repetitions 1)
+     [:div
+       [component/icon "arrow-down"
+        {:data-uk-tooltip "title: Repeats one time; pos: right"}]]
+     [:div
+      [component/icon "arrow-down"
+       {:data-uk-tooltip "title: Insert effect above; pos: right"}]
+      [:div repetitions]])])
+
 (defn step-number [timeline-id step-index step]
   [:div.uk-width-1-6.uk-text-center
-   [:div.uk-card.uk-card-default
-    [:h3.uk-card-header.uk-text-center
+   [:div.uk-card.uk-card-default.uk-height-1-1
+    [:h3.uk-text-center
      (inc step-index)]
-    [:p "reps: " (:repetitions step)]
-    [:p "pause: " (:pauseMs step)]]])
+    [step-repeat-display timeline-id step-index step]]])
+
+(defn step-divider [total step-index step]
+  (when (> total (inc step-index))
+     [:hr.uk-width-1-1]))
 
 (defn step-list [timeline-id]
   (let [steps (<sub [::subs/timeline-steps timeline-id])]
     (if (empty? steps)
       [no-steps-message timeline-id]
       [util/for-children steps
-       [:div.uk-grid.uk-child-width-expand {:data-uk-grid ""}]
+       [:div.uk-grid.uk-child-width-expand.uk-padding-small {:data-uk-grid ""}]
        [step-number timeline-id]
-       [step-display timeline-id]])))
-
-(defn step-controls [timeline-id]
-  [:button.uk-button.uk-button-default
-   {:on-click #(>evt [::events/add-step timeline-id])}
-   "Add Step"])
+       [step-display timeline-id]
+       ;[step-controls timeline-id]
+       [step-divider (count steps)]])))
 
 (defn debug-view [timeline-id]
   (let [timeline-meta (<sub [::subs/timeline-meta-by-id timeline-id])
@@ -91,7 +114,6 @@
   [:div
    [timeline-name-controls timeline-id]
    [step-list timeline-id]
-   [step-controls timeline-id]
    [timeline-persist-controls timeline-id]
    [debug-view timeline-id]])
 

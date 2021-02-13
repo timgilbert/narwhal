@@ -19,6 +19,7 @@
   name with whatever args were in the query vector."
   [sub]
   (fn [query-vector]
+    (assert (seqable? query-vector))
     (rf/subscribe (into [sub] (rest query-vector)))))
 
 (defn json-dump [clj-thing]

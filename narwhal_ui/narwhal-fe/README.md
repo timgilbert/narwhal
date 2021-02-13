@@ -33,3 +33,5 @@ To create a production build run:
   - No gaps (for thumbnails)
   - rasterize and cache?
     - Maybe [this?](https://github.com/pmkroeker/rasterize-svg/blob/master/src/rasterize.ts])
+- Better dirty handling
+  - Copy server response on receipt
