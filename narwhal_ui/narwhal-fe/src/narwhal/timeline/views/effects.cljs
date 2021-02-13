@@ -91,12 +91,12 @@
    (:granularity effect) ", durationMs " (:durationMs effect)])
 
 (def effect-types
-  {:REPLACE_EFFECT {::text   "Replace"
-                    ::frame? true}
-   :TWEEN_EFFECT   {::text     "Tween"
-                    ::frame?   true
-                    ::controls tween-controls}
-   ::all           [:REPLACE_EFFECT :TWEEN_EFFECT]})
+  {"REPLACE_EFFECT" {::text   "Replace"
+                     ::frame? true}
+   "TWEEN_EFFECT"   {::text     "Tween"
+                     ::frame?   true
+                     ::controls tween-controls}
+   ::all           ["REPLACE_EFFECT" "TWEEN_EFFECT"]})
 
 (defn effect-type-controls [timeline-id step-index effect-index]
   (assert (some? timeline-id))
@@ -118,13 +118,26 @@
      (when (get-in effect-types [curr-type ::frame?])
        [frame-target-chooser timeline-id step-index effect-index])]))
 
-(defn effect-chooser [timeline-id step-index]
+(defn effect-editor [timeline-id step-index effect-index effect]
   [:div
    (assert (some? timeline-id))
-   [effect-type-controls timeline-id step-index 0]])
+   [effect-type-controls timeline-id step-index effect-index]])
 
-(defn effect-display [timeline-id step-index effect-index effect]
+(defn effect-thumbnail [timeline-id step-index effect-index effect]
   [:div
    [:p.uk-text-muted
     (str "Timeline " timeline-id ", step " step-index ", effect " effect-index)]
-   [:p (str effect)]])
+   [:p (str effect)]
+   [:button.uk-button.uk-button-small
+    {:on-click #(>evt [::events/set-effect-edit-state timeline-id
+                       step-index effect-index])}
+    "Edit effect"]])
+
+
+(defn effect-display
+  [timeline-id step-index effect-index effect]
+  (let [editing? (<sub [::subs/editing-effect? timeline-id
+                        step-index effect-index])]
+    (if editing?
+      [effect-editor timeline-id step-index effect-index effect]
+      [effect-thumbnail timeline-id step-index effect-index effect])))

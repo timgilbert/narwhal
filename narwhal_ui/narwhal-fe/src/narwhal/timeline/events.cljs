@@ -5,13 +5,6 @@
             [narwhal.timeline.db :as db]))
 
 ;; Edit state
-(rf/reg-event-db
-  ::edit-effect
-  (fn [db [_ timeline-id step-index effect-index state]]
-    (db/update-edit-state
-      db
-      [timeline-id step-index effect-index]
-      state)))
 
 (rf/reg-event-db
   ::update-title
@@ -72,6 +65,16 @@
       (-> db
           (db/assoc-step timeline-id step-index new-step)
           (db/set-dirty timeline-id)))))
+
+(rf/reg-event-db
+  ::set-effect-edit-state
+  (fn [db [_ timeline-id step-index effect-index]]
+    (db/set-edit-state db [timeline-id step-index effect-index])))
+
+(rf/reg-event-db
+  ::clear-effect-edit-state
+  (fn [db [_ timeline-id step-index effect-index]]
+    (db/clear-edit-state db)))
 
 ;; Steps
 

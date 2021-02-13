@@ -14,19 +14,13 @@
 (defn edit-path [& rest]
   (concat [:t/edit] rest))
 
-(defn get-edit-state [db edit-tuple]
-  (assert (seq? edit-tuple))
-  (assert (every? some? edit-tuple))
-  (get-in db (edit-path edit-tuple) false))
+(defn set-edit-state
+  [db edit-tuple]
+  (assoc-in db (edit-path :t/effect) edit-tuple))
 
-(defn update-edit-state [db edit-tuple state]
-  (assert (seq? edit-tuple))
-  (assert (boolean? state))
-  (assert (every? some? edit-tuple))
-  (let [path (edit-path edit-tuple)]
-    (if state
-      (assoc-in db path true)
-      (update-in db dissoc path))))
+(defn clear-edit-state
+  [db]
+  (assoc-in db (edit-path :t/effect) nil))
 
 (defn replace-all-timelines
   [db timeline-list]
@@ -97,7 +91,6 @@
   ([db]
    (new-default-frame-target db "RANDOM_FRAME"))
   ([db target-type]
-   (log/spy target-type)
    (merge
      {:type target-type}
      (case target-type
@@ -107,13 +100,13 @@
 
 (defn new-default-effect
   ([db]
-   (new-default-effect db :REPLACE_EFFECT))
+   (new-default-effect db "REPLACE_EFFECT"))
   ([db effect-type]
    (merge
      {:type    effect-type
       :pauseMs 0
       :target  (new-default-frame-target db)}
-     (when (= effect-type :TWEEN_EFFECT)
+     (when (= effect-type "TWEEN_EFFECT")
        {:granularity 10
         :durationMs  1000}))))
 
@@ -133,13 +126,10 @@
   [db timeline-id step-index step]
   (assert (every? some? [timeline-id step]))
   (assert (number? step-index))
-  (let [meta     (timeline-meta-by-id db timeline-id)
-        steps    (-> (get-in meta [:timeline :steps] [])
-                     (assoc step-index step))
-        new-tl   (assoc-in meta [:timeline :steps] steps)]
-    ;(log/spy (:steps timeline))
-    ;(log/spy steps)
-    ;(log/spy (assoc (:steps timeline) step-index step))
+  (let [meta   (timeline-meta-by-id db timeline-id)
+        steps  (-> (get-in meta [:timeline :steps] [])
+                   (assoc step-index step))
+        new-tl (assoc-in meta [:timeline :steps] steps)]
     (replace-single-timeline db new-tl)))
 
 (defn get-effect
@@ -198,6 +188,6 @@
 (defn init-db [db]
   (-> db
       (replace-all-timelines [])
-      (assoc-in (edit-path) {})))
+      (clear-edit-state)))
 
 (def default-selected-effect :narwhal.timeline.views.effects/saved)

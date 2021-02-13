@@ -8,24 +8,13 @@
 ;; Edit (transitory state for editor)
 (rf/reg-sub
   ::edit-root
-  (fn [db _] (get-in db (db/edit-path))))
-
-(rf/reg-sub
-  ::editing-step?
-  :<- ::edit-root
-  (fn [root [_ timeline-id step-index]]
-    (assert (some? timeline-id))
-    (assert (number? step-index))
-    (get root [timeline-id step-index] false)))
+  (fn [db _] (get-in db (db/edit-path :t/effect))))
 
 (rf/reg-sub
   ::editing-effect?
-  :<- ::edit-root
+  :<- [::edit-root]
   (fn [root [_ timeline-id step-index effect-index]]
-    (assert (some? timeline-id))
-    (assert (number? step-index))
-    (assert (number? effect-index))
-    (get root [timeline-id step-index effect-index] false)))
+    (= [timeline-id step-index effect-index] root)))
 
 ;; Timeline
 
@@ -92,9 +81,6 @@
   ::timeline-step
   (util/signal ::timeline-steps)
   (fn [timeline-steps [_ _timeline-id step-index]]
-    (log/spy step-index)
-    (log/spy timeline-steps)
-    (log/spy (number? step-index))
     (assert (number? step-index))
     (nth timeline-steps step-index nil)))
 
@@ -110,10 +96,6 @@
   (fn [effects [_ _timeline-id _step-index effect-index]]
     (assert (number? effect-index))
     (nth effects effect-index nil)))
-
-(rf/reg-sub
-  ::edit-state-root
-  (fn [db _] (get-in db (db/timeline-path :t/edit))))
 
 (rf/reg-sub
   ::frame-target
