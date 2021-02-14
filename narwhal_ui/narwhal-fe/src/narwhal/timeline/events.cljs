@@ -67,12 +67,35 @@
 (rf/reg-event-db
   ::insert-effect
   (fn [db [_ timeline-id step-index effect-index]]
-    (let [step     (db/get-step db timeline-id step-index)
-          [before after] (split-at effect-index (:effects step))
-          effects  (concat before [(db/new-default-effect db)] after)
-          new-step (assoc step :effects effects)]
+    (-> db
+        (db/insert-effect timeline-id step-index effect-index)
+        (db/set-dirty timeline-id))))
+
+(rf/reg-event-db
+  ::insert-step
+  (fn [db [_ timeline-id step-index]]
+    (-> db
+        (db/insert-step timeline-id step-index)
+        (db/set-dirty timeline-id))))
+
+(rf/reg-event-db
+  ::set-step-pause-ms
+  (fn [db [_ [timeline-id step-index] value]]
+    (let [step (-> db
+                   (db/get-step timeline-id step-index)
+                   (assoc :pauseMs value))]
       (-> db
-          (db/assoc-step timeline-id step-index new-step)
+          (db/assoc-step timeline-id step-index step)
+          (db/set-dirty timeline-id)))))
+
+(rf/reg-event-db
+  ::set-step-repetitions
+  (fn [db [_ [timeline-id step-index] value]]
+    (let [step (-> db
+                   (db/get-step timeline-id step-index)
+                   (assoc :repetitions value))]
+      (-> db
+          (db/assoc-step timeline-id step-index step)
           (db/set-dirty timeline-id)))))
 
 (rf/reg-event-db

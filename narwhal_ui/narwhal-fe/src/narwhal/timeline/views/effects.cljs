@@ -217,7 +217,7 @@
           [:div
            (when active? {:class "uk-background-primary"})
            [component/icon icon
-            {:data-uk-tooltip (str "title: " tab-name " >" active? "; pos: top")
+            {:data-uk-tooltip (str "title: " tab-name "; pos: top")
              :on-click        #(>evt event)}
             "1.5"]])]])))
 
@@ -243,7 +243,7 @@
           [:div
            (when active? {:class "uk-background-primary"})
            [component/icon icon
-            {:data-uk-tooltip (str "title: " tab-name " >" active? "; pos: top")
+            {:data-uk-tooltip (str "title: " tab-name "; pos: top")
              :on-click        #(>evt event)}
             "1.5"]])]])))
 

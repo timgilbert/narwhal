@@ -7,7 +7,8 @@
             [narwhal.timeline.views.effects :as effects]
             [narwhal.components.persist :as persist]
             [narwhal.components.name-edit :as name-edit]
-            [narwhal.timeline.db :as db]))
+            [narwhal.timeline.db :as db]
+            [fork.re-frame :as fork]))
 
 (defn timeline-persist-controls [timeline-id]
   [persist/persist-controls
@@ -29,27 +30,63 @@
                :scratch-sub ::subs/scratch?
                :on-submit   [::events/update-title timeline-id]}])
 
-(defn add-effect-control
-  [timeline-id step-index effect-index _effect]
-  [:span])
-  ;[component/icon
-  ; "plus-circle"
-  ; {:data-uk-tooltip (str "title: Click here to insert an effect "
-  ;                        "at element " effect-index ";"
-  ;                        "pos: right")
-  ;  :on-click        #(>evt [::events/insert-effect timeline-id
-  ;                           step-index effect-index])}])
-
 (defn no-effects-message [timeline-id step-index]
   [:div
    [:p "No effects yet!"]])
 
+(defn step-pause-control
+  [{:keys [props] :as fork-props}]
+  [:div
+   [component/number-control fork-props
+    #:component{:field-name :pauseMs
+                :blur-event ::events/set-step-pause-ms
+                :event-args (::addr props)
+                :label      "Step Pause (ms)"
+                :tooltip    (str "title: Pause for this many milliseconds "
+                                 "in between each repetition of this step"
+                                 "; pos: top")}]])
+
+(defn step-repetitions-control
+  [{:keys [props] :as fork-props}]
+  [:div
+   [component/number-control fork-props
+    #:component{:field-name :repetitions
+                :blur-event ::events/set-step-repetitions
+                :event-args (::addr props)
+                :label      "Repetitions"
+                :minimum    1
+                :step       1
+                :tooltip    (str "title: Number of times to repeat this "
+                                 "step; pos: top")}]])
+
+(defn all-step-controls [{:keys [] :as fork-props}]
+  [:div.uk-grid.uk-child-width-1-5 {:data-uk-grid ""}
+   [step-pause-control fork-props]
+   [step-repetitions-control fork-props]])
+
+(defn step-control-form
+  [timeline-id step-index step]
+  (log/spy step)
+  [:form.uk-form-stacked
+   [fork/form
+    {:props             {::addr [timeline-id step-index]}
+     :initial-values    {:pauseMs     (:pauseMs step)
+                         :repetitions (:repetitions step)}
+     :prevent-default?  true
+     :clean-on-unmount? true
+     :keywordize-keys   true
+     :path              [::edit-step-form timeline-id step-index]}
+    all-step-controls]])
+
 (defn step-controls [timeline-id step-index step]
   [:div
    [:hr]
-   [:p "reps: " (:repetitions step) ", pause: " (:pauseMs step)]
+   [:form]
+   [:div
+    [:p.uk-text-muted "Step controls"]
+    [step-control-form timeline-id step-index step]]
    [:button.uk-button.uk-button-default
-    {:on-click #(>evt [::events/add-step timeline-id])}
+    {:on-click #(>evt [::events/insert-step timeline-id (inc step-index)])}
     "Add Step"]])
 
 (defn step-display [timeline-id step-index step]
@@ -60,11 +97,8 @@
        [:div
         [util/for-children effects
          [:div]
-         ;[add-effect-control timeline-id step-index]
          [effects/effect-display timeline-id step-index]]
         [step-controls timeline-id step-index step]])]))
-     ;[add-effect-control timeline-id step-index
-     ; (count effects) nil]]))
 
 (defn no-steps-message [timeline-id]
   [:div
@@ -76,8 +110,8 @@
   [:div.uk-flex.uk-flex-column
    (if (= repetitions 1)
      [:div
-       [component/icon "arrow-down"
-        {:data-uk-tooltip "title: Repeats one time; pos: right"}]]
+      [component/icon "arrow-down"
+       {:data-uk-tooltip "title: Repeats one time; pos: right"}]]
      [:div
       [component/icon "arrow-down"
        {:data-uk-tooltip "title: Insert effect above; pos: right"}]
@@ -92,17 +126,17 @@
 
 (defn step-divider [total step-index step]
   (when (> total (inc step-index))
-     [:hr.uk-width-1-1]))
+    [:hr.uk-width-1-1]))
 
 (defn step-list [timeline-id]
   (let [steps (<sub [::subs/timeline-steps timeline-id])]
     (if (empty? steps)
       [no-steps-message timeline-id]
       [util/for-children steps
-       [:div.uk-grid.uk-child-width-expand.uk-padding-small {:data-uk-grid ""}]
+       [:div.uk-grid.uk-child-width-expand.uk-padding-small
+        {:data-uk-grid ""}]
        [step-number timeline-id]
        [step-display timeline-id]
-       ;[step-controls timeline-id]
        [step-divider (count steps)]])))
 
 (defn debug-view [timeline-id]

@@ -89,7 +89,7 @@
 
 (defn new-default-frame-target
   ([db]
-   (new-default-frame-target db "RANDOM_FRAME"))
+   (new-default-frame-target db "SOLID_FRAME"))
   ([db target-type]
    (merge
      {:type target-type}
@@ -103,9 +103,11 @@
    (new-default-effect db "REPLACE_EFFECT"))
   ([db effect-type]
    (merge
-     {:type    effect-type
-      :pauseMs 0
-      :target  (new-default-frame-target db)}
+     {:type        effect-type
+      :pauseMs     0
+      :target      (new-default-frame-target db)
+      :granularity 1
+      :durationMs  0}
      (when (= effect-type "TWEEN_EFFECT")
        {:granularity 10
         :durationMs  1000}))))
@@ -128,9 +130,21 @@
   (assert (number? step-index))
   (let [meta   (timeline-meta-by-id db timeline-id)
         steps  (-> (get-in meta [:timeline :steps] [])
-                   (assoc step-index step))
+                   (assoc step-index step)
+                   vec)
         new-tl (assoc-in meta [:timeline :steps] steps)]
     (replace-single-timeline db new-tl)))
+
+(defn insert-step
+  ([db timeline-id step-index]
+   (insert-step db timeline-id step-index (new-blank-step db)))
+  ([db timeline-id step-index step]
+   (let [meta   (timeline-meta-by-id db timeline-id)
+         steps  (get-in meta [:timeline :steps] [])
+         [before after] (split-at step-index steps)
+         steps  (vec (concat before [step] after))
+         new-tl (assoc-in meta [:timeline :steps] steps)]
+     (replace-single-timeline db new-tl))))
 
 (defn get-effect
   [db timeline-id step-index effect-index]
@@ -144,6 +158,17 @@
   [db timeline-id step-index effect-index]
   (some-> (get-effect db timeline-id step-index effect-index)
           :target))
+
+(defn insert-effect
+  ([db timeline-id step-index effect-index]
+   (insert-effect db timeline-id step-index effect-index
+                  (new-default-effect db)))
+  ([db timeline-id step-index effect-index effect]
+   (let [step     (get-step db timeline-id step-index)
+         [before after] (split-at effect-index (:effects step))
+         effects  (vec (concat before [effect] after))
+         new-step (assoc step :effects effects)]
+     (assoc-step db timeline-id step-index new-step))))
 
 (defn assoc-effect
   [db timeline-id step-index effect-index effect]
