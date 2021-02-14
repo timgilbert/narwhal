@@ -66,7 +66,6 @@
 
 (defn step-control-form
   [timeline-id step-index step]
-  (log/spy step)
   [:form.uk-form-stacked
    [fork/form
     {:props             {::addr [timeline-id step-index]}
@@ -113,8 +112,9 @@
       [component/icon "arrow-down"
        {:data-uk-tooltip "title: Repeats one time; pos: right"}]]
      [:div
-      [component/icon "arrow-down"
-       {:data-uk-tooltip "title: Insert effect above; pos: right"}]
+      [component/icon "refresh"
+       {:data-uk-tooltip (str "title: Repeats " repetitions
+                              " times; pos: right")}]
       [:div repetitions]])])
 
 (defn step-number [timeline-id step-index step]
@@ -146,9 +146,31 @@
                         ::db/update)]
     [util/json-dump {:i (db/dehydrate timeline-meta hydrate-type)}]))
 
+(defn toggle-button [timeline-id {:components/keys [active? icon]}]
+  [component/icon icon])
+
+(defn playback-toggle [timeline-id]
+  (let [repeat? (<sub [::subs/timeline-repeat? timeline-id])
+        icon    (if repeat? "refresh" "arrow-right")
+        tooltip (if repeat?
+                  "Repeats forever. Click to toggle to run once."
+                  "Runs once. Click to toggle to repeat.")]
+    [:div
+     [component/icon icon
+      {:on-click        #(>evt [::events/toggle-repeat timeline-id])
+       :data-uk-tooltip (str "title:" tooltip ";pos: top")}]]))
+
+(defn top-controls
+  [timeline-id]
+  [:div
+   [:div.uk-flex.uk-flex-left.uk-flex-middle
+    [playback-toggle timeline-id]
+    [:div.uk-padding-small
+     [timeline-name-controls timeline-id]]]])
+
 (defn timeline-editor [timeline-id]
   [:div
-   [timeline-name-controls timeline-id]
+   [top-controls timeline-id]
    [step-list timeline-id]
    [timeline-persist-controls timeline-id]
    [debug-view timeline-id]])

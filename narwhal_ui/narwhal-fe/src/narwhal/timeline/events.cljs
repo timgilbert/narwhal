@@ -19,6 +19,15 @@
             (db/set-timeline-name timeline-id new-name))
         db))))
 
+(rf/reg-event-db
+  ::toggle-repeat
+  (fn [db [_ timeline-id]]
+    (-> db
+        (db/set-dirty timeline-id)
+        (db/replace-single-timeline
+          (-> (db/timeline-meta-by-id db timeline-id)
+              (update-in [:timeline :isRepeat] not))))))
+
 ;; New timeline
 (rf/reg-event-fx
   ::new-empty-timeline

@@ -28,9 +28,9 @@
 (defn display-frame-name
   [{:name-edit/keys [item-id name-type dirty-sub name-sub]}]
   (let [ital (if (<sub [dirty-sub item-id]) :i :span)]
-    [:div {:data-uk-tooltip "title:Click to Edit; pos: bottom-left"
+    [:div {:data-uk-tooltip "title:Click to Edit; pos: top-left"
            :on-click        #(>evt [::title-clicked name-type item-id])}
-     [:p.uk-text-lead
+     [:div.uk-text-lead
       [ital (<sub [name-sub item-id])]]]))
 
 (defn edit-name-form

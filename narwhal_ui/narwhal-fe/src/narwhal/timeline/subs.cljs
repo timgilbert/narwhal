@@ -43,6 +43,12 @@
     (some? timeline)))
 
 (rf/reg-sub
+  ::timeline-repeat?
+  (util/signal ::timeline-meta-by-id)
+  (fn [timeline]
+    (some-> timeline :timeline :isRepeat)))
+
+(rf/reg-sub
   ::timeline-name
   (util/signal ::timeline-meta-by-id)
   (fn [timeline]
