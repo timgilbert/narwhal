@@ -23,6 +23,23 @@
 (defn set-active-palette-color [db color]
   (assoc-in db (grid-path :palette/active-color) color))
 
+(defn get-swatch [db swatch-index]
+  (-> db
+      (get-in (grid-path :palette/swatches))
+      (nth swatch-index)))
+
+(defn set-edit-swatch [db swatch-index]
+  (assoc-in db (grid-path :palette/swatch-edit) swatch-index))
+
+(defn clear-edit-swatch [db]
+  (update-in db (grid-path) dissoc :palette/swatch-edit))
+
+(defn set-swatch-color [db swatch-index color]
+  (assoc-in db (grid-path :palette/swatches swatch-index) color))
+
+(defn set-swatch-defaults [db]
+  (assoc-in db (grid-path :palette/swatches) color/default-swatches))
+
 ;; Grid generation
 (defn random-grid
   ([] (random-grid 16))
@@ -85,6 +102,7 @@
 (defn init-db [db]
   (-> db
       (set-active-palette-color "#ffffff")
+      (set-swatch-defaults)
       (set-active-tool :tools/pencil)))
 
 (defonce random-grid-data (random-grid))

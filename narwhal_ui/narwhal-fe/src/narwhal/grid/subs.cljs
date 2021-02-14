@@ -14,6 +14,29 @@
   ::active-color
   (fn [db _] (db/active-color db)))
 
+(rf/reg-sub
+  ::swatches
+  (fn [db _] (get-in db (db/grid-path :palette/swatches))))
+
+(rf/reg-sub
+  ::swatch-count
+  :<- [::swatches]
+  (fn [swatches _]
+    (count swatches)))
+
+(rf/reg-sub
+  ::swatch
+  :<- [::swatches]
+  (fn [swatches [_ swatch-index]]
+    (assert (number? swatch-index))
+    (assert (<= swatch-index (count swatches)))
+    (nth swatches swatch-index)))
+
+(rf/reg-sub
+  ::swatch-under-edit
+  (fn [db _]
+    (get-in db (db/grid-path :palette/swatch-edit))))
+
 ;; NB, this is the frame, not the metadata
 (rf/reg-sub
   ::frame-data

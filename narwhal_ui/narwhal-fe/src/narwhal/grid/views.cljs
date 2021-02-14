@@ -3,7 +3,6 @@
             [narwhal.util.util :as util :refer [<sub >evt]]
             [narwhal.grid.events :as events]
             [narwhal.grid.subs :as subs]
-            [narwhal.frame.subs :as frame-subs]
             [narwhal.util.color :as color]
             [narwhal.util.component :as component]
             [narwhal.grid.db :as db]))
@@ -29,25 +28,38 @@
    (::color/hot-pink color/named)
    (::color/green color/named)])
 
-(defn color-preset [color]
-  [:div.palette-swatch
-   {:style    {:background-color color
-               :cursor           :crosshair}
-    :on-click #(>evt [::events/set-active-color color])}
-   util/nbsp])
+(defn color-swatch [swatch-index]
+  (let [color (<sub [::subs/swatch swatch-index])]
+    [:div.palette-swatch
+     {:style           {:background-color color
+                        :cursor           :crosshair}
+      :on-click        #(>evt [::events/set-active-color color])
+      :on-double-click #(>evt [::events/edit-swatch swatch-index])}
+     util/nbsp]))
+
+(defn color-picker []
+  (let [swatch-index (<sub [::subs/swatch-under-edit])
+        curr-color   (when swatch-index (<sub [::subs/swatch swatch-index]))]
+    [:div
+     (when curr-color
+       [component/color-picker
+        #:component{:start-color  curr-color
+                    :change-event [::events/set-swatch-color swatch-index]
+                    :blur-event   [::events/clear-edit-swatch]}])]))
 
 (defn color-palette []
-  [:div
-   [:p "Palette"]
+  [:div.uk-padding-small
    [:div.palette-grid
     [:div.palette-selected.palette-swatch
-     {:style {:background-color (<sub [::subs/active-color])}}
+     {:style {:background-color (<sub [::subs/active-color])}
+      :data-uk-tooltip "title: Double-click a swatch to update its color"}
      util/nbsp]
-    (for [[i c] (map-indexed vector palette-colors)]
-      ^{:key i} [color-preset c])]])
+    (for [i (range (<sub [::subs/swatch-count]))]
+      ^{:key i} [color-swatch i])]
+   [color-picker]])
 
 (defn controls []
-  [:div
+  [:div.uk-align-center
    [color-palette]
    [:p "Controls"]
    [:ul.uk-iconnav.uk-iconnav-vertical
@@ -55,28 +67,6 @@
     [tool-icon :tools/bucket "paint-bucket"]
     [:li {:on-click #(>evt [:frame-edit/random])} [component/icon "bolt"]]
     [:li {:on-click #(>evt [:frame-edit/blank])} [component/icon "trash"]]]])
-
-(defn html-cell [frame-id color index]
-  [:div.pixel-cell
-   (merge {:style    {:background-color color}
-           :on-click #(>evt [::events/click frame-id index])}
-          (when util/tooltips?
-            {:data-uk-tooltip (str "title: " index "; pos: bottom-left")}))
-   util/nbsp])
-
-(defn grid-footer []
-  [:div.uk-flex.uk-flex-middle
-   [:fieldset.uk-fieldset
-    [:div.uk-margin
-     [:input.uk-input.uk-form-width-medium
-      {:type "text" :placeholder "Frame name"}]]]])
-
-(defn html-grid [frame-id]
-  (let [pixels (<sub [::subs/pixels frame-id])]
-    (when pixels
-      [:div.pixel-grid
-       (for [[i color] (map-indexed vector pixels)]
-         ^{:key i} [html-cell frame-id color i])])))
 
 ;; ----------------------------------------------------------------------
 ;; SVG stuff

@@ -148,3 +148,10 @@
 
 (defn random []
   (gcolor/rgbToHex (rand-int 256) (rand-int 256) (rand-int 256)))
+
+(defonce default-swatches
+  (into
+    [(::black named) (::red named) (::green named) (::blue named)
+     (::gray named) (::cyan named) (::magenta named) (::yellow named)
+     (::white named) (::purple named) (::brown named) (::pink named)]
+    (repeatedly 4 random)))

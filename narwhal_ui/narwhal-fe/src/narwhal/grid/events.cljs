@@ -20,6 +20,23 @@
   (fn [db [_ color]]
     (db/set-active-palette-color db color)))
 
+(rf/reg-event-db
+  ::edit-swatch
+  (fn [db [_ swatch-index]]
+    (db/set-edit-swatch db swatch-index)))
+
+(rf/reg-event-db
+  ::clear-edit-swatch
+  (fn [db _]
+    (db/clear-edit-swatch db)))
+
+(rf/reg-event-db
+  ::set-swatch-color
+  (fn [db [_ swatch-index color]]
+    (-> db
+        (db/set-active-palette-color color)
+        (db/set-swatch-color swatch-index color))))
+
 ;; ----------------------------------------------------------------------
 ;; Grid interaction
 (rf/reg-event-fx

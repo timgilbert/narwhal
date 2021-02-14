@@ -139,7 +139,8 @@
 
 (rf/reg-event-db
   ::set-solid-frame-color
-  (fn [db [_ [timeline-id step-index effect-index] color]]
+  (fn [db [_ timeline-id step-index effect-index color]]
+    ;(log/spy [_ timeline-id step-index effect-index color])
     (let [effect (-> db
                      (db/get-effect timeline-id step-index effect-index)
                      (assoc-in [:target :color] color))]

@@ -1,9 +1,9 @@
 (ns narwhal.util.component
-  (:require [narwhal.util.util :as util :refer [<sub >evt]]
+  (:require [lambdaisland.glogi :as log]
+            [narwhal.util.util :as util :refer [<sub >evt]]
             [narwhal.router.core :as router]
             [goog.string :as gstring]
             [re-frame.core :as rf]
-            [re-graph.logging :as log]
             [fork.re-frame :as fork]))
 
 (defn link
@@ -67,6 +67,41 @@
                         (log/debug "Blur" value)
                         (>evt rf-evt)))
          :value     (get values field-name)})]]))
+
+(defn color-picker-control
+  [{:keys [props values handle-change handle-blur]}]
+  (let [{:component/keys [field-name label change-event blur-event]} props]
+    [:div
+     (when label
+       [:label.uk-form-label {:for field-name} label])
+     [:input.uk-input
+      {:type      "color"
+       :name      field-name
+       :on-change (fn [js-evt]
+                    (handle-change js-evt)
+                    (>evt (-> change-event
+                              (concat [(fork/retrieve-event-value js-evt)])
+                              vec)))
+
+       :on-blur  (fn [js-evt]
+                   (handle-blur js-evt)
+                   (>evt blur-event))
+       :value    (get values field-name)}]]))
+
+(defn color-picker
+  [{:component/keys [change-event start-color] :as component-props}]
+  (let [props (merge #:component{:field-name :color
+                                 :label      "Choose Color"}
+                     component-props)]
+    [:form.uk-form-stacked
+     [fork/form
+      {:props             props
+       :initial-values    {(:component/field-name props) start-color}
+       :prevent-default?  true
+       :clean-on-unmount? true
+       :keywordize-keys   true
+       :path              [::edit-color change-event]}
+      color-picker-control]]))
 
 (defn slider [props]
   [:input.uk-range

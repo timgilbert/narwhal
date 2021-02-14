@@ -47,11 +47,11 @@
 
 (defn frame-editor [frame-id]
   [:div.uk-grid.uk-grid-divider {:data-uk-grid ""}
-   [:div {:class "uk-width-expand"}
+   [:div.uk-width-expand
     [grid/edit-grid frame-id]
     [frame-name-controls frame-id]
     [frame-persist-controls frame-id]]
-   [:div {:class "uk-width-1-6@s"}
+   [:div.uk-width-1-4
     [grid/controls]]])
 
 (defn frame-editor-page

@@ -12,35 +12,15 @@
             [narwhal.grid.views :as grid]
             [fork.re-frame :as fork]))
 
-(defn color-picker
-  [{:keys [props values handle-change handle-blur]}]
-  [:div
-   [:label.uk-form-label {:for :color} "Choose Color"]
-   [:input.uk-input
-    {:type      "color"
-     :name      :color
-     :on-change (fn [js-evt]
-                  (handle-change js-evt)
-                  (>evt [::events/set-solid-frame-color (::addr props)
-                         (fork/retrieve-event-value js-evt)]))
-     :on-blur  (fn [js-evt]
-                 (handle-blur js-evt)
-                 (>evt [::edit/clear-editing ::edit/timeline]))
-     :value    (get values :color)}]])
-
 (defn solid-frame-target-editor
   [timeline-id step-index effect-index]
   (let [color (<sub [::subs/solid-frame-color
                      timeline-id step-index effect-index])]
-    [:form.uk-form-stacked
-     [fork/form
-      {:props             {::addr [timeline-id step-index effect-index]}
-       :initial-values    {:color color}
-       :prevent-default?  true
-       :clean-on-unmount? true
-       :keywordize-keys   true
-       :path              [::edit-color timeline-id step-index effect-index]}
-      color-picker]]))
+    [component/color-picker
+     #:component{:start-color  color
+                 :change-event [::events/set-solid-frame-color
+                                timeline-id step-index effect-index]
+                 :blur-event   [::edit/clear-editing ::edit/timeline]}]))
 
 (defn random-frame-target-editor
   [_timeline-id _step-index _effect-index]
